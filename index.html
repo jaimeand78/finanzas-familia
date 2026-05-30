@@ -234,6 +234,13 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
 .hint{font-size:11px;color:#9b9b97;margin-bottom:1rem;line-height:1.5;}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a18;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:200;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* OFFLINE */
+#offlineBanner{display:none;background:#FAECE7;border-bottom:1.5px solid #F0997B;padding:8px 16px;text-align:center;font-size:12px;font-weight:600;color:#993C1D;position:sticky;top:53px;z-index:19;}
+#offlineBanner.on{display:block;}
+.pending-badge{background:#BA7517;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:4px;}
+.sdot.offline{background:#D85A30;}
+.sdot.pending{background:#BA7517;animation:p 1s infinite;}
 #pwab{background:#E1F5EE;border:1.5px solid #9FE1CB;border-radius:14px;padding:12px 16px;margin:1rem 16px 0;max-width:500px;margin-left:auto;margin-right:auto;display:none;}
 #pwab p{font-size:13px;color:#085041;line-height:1.5;}
 .inactive-row{opacity:.4;}
@@ -266,6 +273,60 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
 .hor-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
 .hor-name{font-size:13px;flex:1;margin-left:8px;}
 .hor-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:#D85A30;}
+
+/* VIAJE */
+.vcard{background:linear-gradient(135deg,#1a1a18 0%,#2a2a28 100%);border-radius:16px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.vcl{font-size:11px;color:#9b9b97;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.vca{font-size:26px;font-weight:600;font-family:'DM Mono',monospace;color:#fff;}
+.vcc{font-size:12px;color:#9b9b97;margin-top:2px;}
+.vci{font-size:2rem;opacity:.6;}
+.vform{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;}
+.vft{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9b9b97;margin-bottom:14px;}
+.vaw{background:#F5F3EE;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.vcursel{font-size:15px;font-weight:600;padding:6px 10px;border:1.5px solid #d8d6d0;border-radius:10px;background:#fff;color:#1a1a18;outline:none;font-family:'DM Mono',monospace;cursor:pointer;}
+.vai{flex:1;font-size:26px;font-weight:600;font-family:'DM Mono',monospace;border:none;background:transparent;color:#1a1a18;outline:none;width:100%;-moz-appearance:textfield;}
+.vai::-webkit-outer-spin-button,.vai::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.vai::placeholder{color:#ccc;}
+.vfields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.vsel{width:100%;font-size:13px;padding:9px 10px;border:1.5px solid #e8e6e0;border-radius:10px;background:#fafaf8;color:#1a1a18;outline:none;font-family:'DM Sans',sans-serif;}
+.vnote{width:100%;font-size:13px;padding:9px 12px;border:1.5px solid #e8e6e0;border-radius:10px;background:#fafaf8;color:#1a1a18;outline:none;font-family:'DM Sans',sans-serif;}
+.vwho{display:flex;align-items:center;gap:6px;margin-bottom:12px;padding:9px 12px;background:#F5F3EE;border-radius:10px;}
+.vwho-lbl{font-size:12px;color:#9b9b97;}
+.vsub{width:100%;padding:13px;background:#1D9E75;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.vlh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.vlt{font-size:12px;font-weight:600;color:#9b9b97;text-transform:uppercase;letter-spacing:.05em;}
+.vi{background:#fff;border-radius:14px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.vii{width:36px;height:36px;border-radius:10px;background:#F5F3EE;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.vil{flex:1;min-width:0;}
+.vin{font-size:13px;font-weight:500;margin-bottom:2px;}
+.vic{font-size:11px;color:#9b9b97;}
+.vim{font-size:11px;color:#ccc;margin-top:1px;}
+.vir{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.via{font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:#D85A30;}
+.via-cop{font-size:10px;color:#9b9b97;font-family:'DM Mono',monospace;}
+.vid{width:24px;height:24px;border-radius:50%;border:none;background:none;cursor:pointer;color:#ddd;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.vid:hover{color:#D85A30;background:#FAECE7;}
+.vempty{text-align:center;color:#ccc;font-size:13px;padding:2.5rem 0;}
+.vtasa{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;}
+.vtasa-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9b9b97;margin-bottom:10px;}
+.vtasa-row{display:flex;align-items:center;gap:8px;}
+.vtasa-lbl{font-size:13px;flex:1;}
+.vtasa-inp{width:110px;text-align:right;font-size:13px;font-family:'DM Mono',monospace;padding:6px 8px;border:1.5px solid #e8e6e0;border-radius:10px;background:#fafaf8;outline:none;-moz-appearance:textfield;}
+.vtasa-inp::-webkit-outer-spin-button,.vtasa-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.vtasa-inp:focus{border-color:#1D9E75;}
+.vresumen{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;}
+.vres-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9b9b97;margin-bottom:10px;}
+.vres-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;}
+.vres-lbl{color:#6b6b68;}
+.vres-val{font-family:'DM Mono',monospace;font-weight:600;}
+.vres-div{border:none;border-top:1px solid #f0ede8;margin:8px 0;}
+.vday-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.vday-lbl{font-size:15px;font-weight:600;}
+.vcbar-sec{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;}
+.vcbar-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9b9b97;margin-bottom:10px;}
+
+
+
 </style>
 </head>
 <body>
@@ -293,6 +354,7 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
     </div>
   </div>
 </div>
+<div id="offlineBanner">📵 Sin conexión — los gastos se guardan localmente <span class="pending-badge" id="pendingCount" style="display:none;"></span></div>
 
 <div class="tabs">
   <button class="tab on"  onclick="go('m')">Mensual</button>
@@ -300,6 +362,7 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
   <button class="tab"     onclick="go('n')">Nómina</button>
   <button class="tab"     onclick="go('e')">Empleadas</button>
   <button class="tab"     onclick="go('d')">Hoy 💸</button>
+  <button class="tab"     onclick="go('v')">✈️ Viaje</button>
   <button class="tab"     onclick="go('x')">Análisis 📊</button>
 </div>
 
@@ -576,6 +639,90 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
   </div>
 </div>
 
+<!-- ═══════════════ VIAJE ═══════════════ -->
+<div id="pv" class="pg">
+  <div class="vday-nav">
+    <button class="mb" onclick="chVDay(-1)">&#8592;</button>
+    <span class="vday-lbl" id="vDayLbl">Hoy</span>
+    <button class="mb" onclick="chVDay(1)">&#8594;</button>
+  </div>
+
+  <!-- Tarjeta resumen del día -->
+  <div class="vcard">
+    <div>
+      <div class="vcl">Total del día</div>
+      <div class="vca" id="vDayTotal">€0</div>
+      <div class="vcc" id="vDayCount">0 gastos</div>
+    </div>
+    <div class="vci">✈️</div>
+  </div>
+
+  <!-- Tasas de conversión -->
+  <div class="vtasa">
+    <div class="vtasa-t">Tasas de conversión a COP</div>
+    <div class="vtasa-row" style="margin-bottom:8px;">
+      <span class="vtasa-lbl">1 EUR =</span>
+      <input class="vtasa-inp" type="number" inputmode="numeric" id="vTasaEUR" value="4500" placeholder="4500" oninput="recalcVTotal()"/>
+      <span style="font-size:12px;color:#9b9b97;margin-left:4px;">COP</span>
+    </div>
+    <div class="vtasa-row">
+      <span class="vtasa-lbl">1 USD =</span>
+      <input class="vtasa-inp" type="number" inputmode="numeric" id="vTasaUSD" value="4200" placeholder="4200" oninput="recalcVTotal()"/>
+      <span style="font-size:12px;color:#9b9b97;margin-left:4px;">COP</span>
+    </div>
+  </div>
+
+  <!-- Formulario registro -->
+  <div class="vform">
+    <div class="vft">Registrar gasto</div>
+    <div class="vaw">
+      <select class="vcursel" id="vCur">
+        <option value="EUR">€</option>
+        <option value="USD">$</option>
+        <option value="COP">₡</option>
+      </select>
+      <input class="vai" type="text" inputmode="decimal" id="vAmt" placeholder="0"/>
+    </div>
+    <div class="vfields">
+      <select class="vsel" id="vCat">
+        <option>Alojamiento</option>
+        <option>Transporte</option>
+        <option>Comida</option>
+        <option>Entradas / museos</option>
+        <option>Compras</option>
+        <option>Salud / farmacia</option>
+        <option>Otros</option>
+      </select>
+      <input class="vnote" type="text" id="vNote" placeholder="Nota (opcional)"/>
+    </div>
+    <div class="vwho">
+      <span class="vwho-lbl">Registrando como</span>
+      <span class="chip" id="vWhoChip"></span>
+    </div>
+    <button class="vsub" onclick="submitViaje()">+ Registrar gasto</button>
+  </div>
+
+  <!-- Lista del día -->
+  <div class="vlh">
+    <span class="vlt">Gastos del día</span>
+    <button onclick="refreshViaje()" style="font-size:12px;color:#6b8ccc;background:none;border:none;cursor:pointer;">↻ Recargar</button>
+  </div>
+  <div id="vList"></div>
+
+  <!-- Resumen acumulado del viaje -->
+  <div class="vresumen" id="vResumen" style="display:none;">
+    <div class="vres-t">Resumen del viaje</div>
+    <div class="vres-row"><span class="vres-lbl">Total EUR</span><span class="vres-val" id="vTotEUR">€0</span></div>
+    <div class="vres-row"><span class="vres-lbl">Total USD</span><span class="vres-val" id="vTotUSD">$0</span></div>
+    <div class="vres-row"><span class="vres-lbl">Total COP otros</span><span class="vres-val" id="vTotCOP">₡0</span></div>
+    <div class="vres-div"></div>
+    <div class="vres-row"><span class="vres-lbl" style="font-weight:600;">Total en COP</span><span class="vres-val" id="vTotTOT" style="color:#0F6E56;">$0</span></div>
+    <div id="vBarras"></div>
+  </div>
+</div>
+
+
+
 <div id="toast"></div>
 <script>
 
@@ -612,7 +759,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(!user) document.getElementById('userScreen').classList.add('visible');
   else updateChip();
   if(navigator.userAgent.match(/iPhone|iPad/)&&!navigator.standalone) document.getElementById('pwab').style.display='block';
-  setSS('ok');
+  updateOfflineUI();
+  if(navigator.onLine){setSS('ok');syncOfflineQueue();}
   subMonth();
   subHist();
   renderMLabel();
@@ -624,12 +772,101 @@ function updateChip(){const c=document.getElementById('uChip');if(!c)return;c.te
 
 // ── SYNC STATUS ──
 function setSS(s){
+  if(!navigator.onLine){updateOfflineUI();return;}
   const d=document.getElementById('sdot'),l=document.getElementById('slbl');
   if(!d||!l)return;
+  const pending=oqSize();
+  if(pending>0&&s==='ok'){d.className='sdot pending';l.textContent='Pendientes: '+pending;return;}
   d.className='sdot'+(s==='ok'?' ok':s==='wait'?' wait':'');
   l.textContent=s==='ok'?'Sincronizado':s==='wait'?'Guardando...':'Sin conexión';
 }
-function save(){setSS('wait');clearTimeout(wTimer);wTimer=setTimeout(()=>{db.ref(dKey(curY,curM)).set(stripAutoItems(JSON.parse(JSON.stringify(D)))).then(()=>setSS('ok')).catch(()=>setSS(''));},800);}
+function save(){
+  setSS('wait');
+  clearTimeout(wTimer);
+  wTimer=setTimeout(()=>{
+    const data=stripAutoItems(JSON.parse(JSON.stringify(D)));
+    if(!navigator.onLine){
+      oqAdd({type:'set',path:dKey(curY,curM),data});
+      updateOfflineUI();
+      return;
+    }
+    db.ref(dKey(curY,curM)).set(data)
+      .then(()=>setSS('ok'))
+      .catch(()=>{
+        oqAdd({type:'set',path:dKey(curY,curM),data});
+        updateOfflineUI();
+      });
+  },800);
+}
+
+// ── OFFLINE QUEUE ──
+const OQ_KEY='organiza2_offline_queue';
+
+function oqLoad(){try{return JSON.parse(localStorage.getItem(OQ_KEY)||'[]');}catch(e){return[];}}
+function oqSave(q){try{localStorage.setItem(OQ_KEY,JSON.stringify(q));}catch(e){console.error('oqSave',e);}}
+function oqAdd(item){const q=oqLoad();q.push({...item,_ts:Date.now()});oqSave(q);updateOfflineUI();}
+function oqSize(){return oqLoad().length;}
+
+function updateOfflineUI(){
+  const online=navigator.onLine;
+  const pending=oqSize();
+  const banner=document.getElementById('offlineBanner');
+  const badge=document.getElementById('pendingCount');
+  const d=document.getElementById('sdot'),l=document.getElementById('slbl');
+  if(banner){
+    if(!online){
+      banner.classList.add('on');
+      banner.innerHTML='📵 Sin conexión — los gastos se guardan localmente'+(pending>0?` <span class="pending-badge">${pending} pendiente${pending>1?'s':''}</span>`:'');
+    }else if(pending>0){
+      banner.classList.add('on');
+      banner.innerHTML=`☁️ Sincronizando ${pending} gasto${pending>1?'s':''}...`;
+    }else{
+      banner.classList.remove('on');
+    }
+  }
+  if(d&&l){
+    if(!online){d.className='sdot offline';l.textContent='Sin conexión';}
+    else if(pending>0){d.className='sdot pending';l.textContent='Pendientes: '+pending;}
+    // si online y sin pendientes, setSS('ok') lo maneja
+  }
+}
+
+async function syncOfflineQueue(){
+  if(!navigator.onLine) return;
+  const q=oqLoad();
+  if(!q.length) return;
+  updateOfflineUI();
+  const failed=[];
+  for(const item of q){
+    try{
+      if(item.type==='push'){
+        await db.ref(item.path).push(item.data);
+      }else if(item.type==='set'){
+        await db.ref(item.path).set(item.data);
+      }
+    }catch(e){
+      console.error('syncOfflineQueue item failed:',e);
+      failed.push(item);
+    }
+  }
+  oqSave(failed);
+  updateOfflineUI();
+  if(failed.length===0 && q.length>0){
+    toast('✅ '+q.length+' gasto'+(q.length>1?'s':'')+' sincronizado'+(q.length>1?'s':''));
+    setSS('ok');
+    // Recargar vistas si corresponde
+    if(curTab==='d') refreshDaily();
+    if(curTab==='v') refreshViaje();
+    syncDailyMonth();
+  }else if(failed.length>0){
+    toast('⚠️ '+failed.length+' gasto'+(failed.length>1?'s':'')+' pendiente'+(failed.length>1?'s':''));
+  }
+}
+
+// Detectar cambios de conectividad
+window.addEventListener('online',()=>{updateOfflineUI();syncOfflineQueue();});
+window.addEventListener('offline',()=>{updateOfflineUI();});
+
 
 // ── KEYS ──
 function dKey(y,m){return`pl/${FBK}/${y}/${m}`;}
@@ -945,7 +1182,7 @@ function renderMLabel(){
 }
 
 // ── TABS ──
-const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',x:'px'};
+const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',v:'pv',a:'pa',h:'ph'};
 const KEYS=Object.keys(PAGES);
 window.go=function(tab){
   curTab=tab;
@@ -958,6 +1195,7 @@ window.go=function(tab){
   if(tab==='n'){document.getElementById('nomMes').textContent=MONTHS[curM]+' '+curY;loadNomFields();}
   if(tab==='e'){document.getElementById('empMes').textContent=MONTHS[curM]+' '+curY;loadEmpFields();}
   if(tab==='d'){dailyDate=new Date();subDaily();updateDWho();}
+  if(tab==='v'){viajeDate=new Date();subViaje();updateVWho();}
   if(tab==='b') renderBudget();
 };
 
@@ -1496,16 +1734,44 @@ window.submitDaily=async function(){
   const note=document.getElementById('dNote').value.trim();
   if(!amt){toast('Ingresa un monto');return;}
   if(!user){document.getElementById('userScreen').classList.add('visible');return;}
+  const entry={amount:amt,category:cat,note:note||'',who:user,ts:new Date().toISOString()};
+  document.getElementById('dAmt').value='';document.getElementById('dNote').value='';
+  // Mostrar en pantalla inmediatamente (optimistic UI)
+  const localId='local_'+Date.now();
+  const existing=document.getElementById('dList');
+  if(existing){
+    const icon=ICONS[cat]||'💸';
+    const ch=user.toLowerCase();
+    const time=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    const div=document.createElement('div');
+    div.className='di';div.id='local_'+localId;
+    div.style.opacity='0.6';
+    div.innerHTML=`<div class="dii">${icon}</div><div class="dil"><div class="din">${note||cat}</div><div class="dic">${cat} · <span class="chip ${ch}" style="font-size:9px;">${user}</span> <span style="font-size:10px;color:#BA7517;">⏳ pendiente</span></div><div class="dim">${time}</div></div><div class="dir"><div class="dia">${fmt(amt)}</div></div>`;
+    existing.insertBefore(div,existing.firstChild);
+    // Actualizar total del día visualmente
+    const tot=document.getElementById('dTotal');
+    if(tot){const cur=parseFloat(tot.textContent.replace(/[^0-9]/g,''))||0;tot.textContent=fmt(cur+amt);}
+    const cnt=document.getElementById('dCount');
+    if(cnt){const n=parseInt(cnt.textContent)||0;cnt.textContent=(n+1)+' gasto'+((n+1)!==1?'s':'');}
+  }
+  if(!navigator.onLine){
+    oqAdd({type:'push',path:dayKey(dailyDate),data:entry});
+    updateOfflineUI();
+    toast('💾 Guardado offline — se sincroniza al reconectar');
+    return;
+  }
   setSS('wait');
   try{
-    await db.ref(dayKey(dailyDate)).push({amount:amt,category:cat,note:note||'',who:user,ts:new Date().toISOString()});
-    document.getElementById('dAmt').value='';document.getElementById('dNote').value='';
+    await db.ref(dayKey(dailyDate)).push(entry);
     setSS('ok');
-    toast('✅ Gasto registrado');logH('expense',(note||cat),amt,cat);
+    toast('✅ Gasto registrado');
+    logH('expense',(note||cat),amt,cat);
+    refreshDaily();
   }catch(e){
     console.error('submitDaily:',e);
-    setSS('');
-    toast('No se pudo guardar el gasto');
+    oqAdd({type:'push',path:dayKey(dailyDate),data:entry});
+    updateOfflineUI();
+    toast('💾 Guardado offline — se sincroniza al reconectar');
   }
 };
 
@@ -1919,6 +2185,186 @@ window.fixAllData = async function () {
   alert("Datos limpiados y unificados correctamente");
 };
   
+// ── VIAJE ──
+let viajeDate=new Date();
+let viajeRefPath='';
+let viajeUnsub=null;
+
+function vKey(d){return`viaje/${FBK}/${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;}
+
+function updateVWho(){const c=document.getElementById('vWhoChip');if(!c)return;c.textContent=user||'?';c.className='chip '+(user||'').toLowerCase();}
+
+function updateVDayLabel(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=new Date(viajeDate);d.setHours(0,0,0,0);
+  const diff=Math.round((d-today)/86400000);
+  const lbl=diff===0?'Hoy':diff===-1?'Ayer':viajeDate.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+  const el=document.getElementById('vDayLbl');if(el)el.textContent=lbl;
+}
+
+function subViaje(){
+  if(viajeUnsub&&viajeRefPath){db.ref(viajeRefPath).off('value',viajeUnsub);viajeUnsub=null;}
+  updateVDayLabel();updateVWho();
+  const path=vKey(viajeDate);
+  viajeRefPath=path;
+  loadViajePath(path);
+  viajeUnsub=db.ref(path).on('value',snap=>{
+    if(path!==viajeRefPath)return;
+    renderViajeData(path,snap.val());
+  });
+}
+
+async function loadViajePath(path){
+  try{
+    const res=await fetch(`${FBU}/${path}.json?v=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    renderViajeData(path,await res.json());
+  }catch(e){renderVList([]);}
+}
+
+window.refreshViaje=function(){if(viajeRefPath)loadViajePath(viajeRefPath);};
+window.chVDay=function(d){viajeDate=new Date(viajeDate);viajeDate.setDate(viajeDate.getDate()+d);subViaje();recalcVTotal();};
+
+function renderViajeData(path,data){
+  if(path!==viajeRefPath)return;
+  const items=Object.keys(data||{}).map(id=>({id,...data[id]}));
+  items.sort((a,b)=>new Date(b.ts||0)-new Date(a.ts||0));
+  renderVList(items);
+}
+
+const VICONS={Alojamiento:'🏨',Transporte:'🚌',Comida:'🍽️','Entradas / museos':'🎭',Compras:'🛍️','Salud / farmacia':'💊',Otros:'💸'};
+const VCUR_SYMBOL={EUR:'€',USD:'$',COP:'₡'};
+
+function fmtV(amt,cur){return(VCUR_SYMBOL[cur]||cur)+Math.round(amt||0).toLocaleString('es-CO');}
+
+function renderVList(items){
+  const tasaEUR=parseFloat(document.getElementById('vTasaEUR')?.value)||4500;
+  const tasaUSD=parseFloat(document.getElementById('vTasaUSD')?.value)||4200;
+  // Totales del día
+  let dayTotal=0;
+  items.forEach(i=>{
+    if(i.currency==='EUR') dayTotal+=((i.amount||0)*tasaEUR);
+    else if(i.currency==='USD') dayTotal+=((i.amount||0)*tasaUSD);
+    else dayTotal+=(i.amount||0);
+  });
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('vDayTotal','$'+Math.round(dayTotal).toLocaleString('es-CO')+' COP');
+  set('vDayCount',items.length+' gasto'+(items.length!==1?'s':''));
+  const list=document.getElementById('vList');if(!list)return;
+  if(!items.length){list.innerHTML='<div class="vempty">✈️<br/>Sin gastos registrados</div>';return;}
+  list.innerHTML=items.map(item=>{
+    const d=new Date(item.ts);
+    const time=d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    const icon=VICONS[item.category]||'💸';
+    const ch=(item.who||'').toLowerCase();
+    const sym=VCUR_SYMBOL[item.currency]||'';
+    const cop=item.currency==='EUR'?Math.round((item.amount||0)*tasaEUR):item.currency==='USD'?Math.round((item.amount||0)*tasaUSD):null;
+    return`<div class="vi">
+      <div class="vii">${icon}</div>
+      <div class="vil">
+        <div class="vin">${item.note||item.category}</div>
+        <div class="vic">${item.category} · <span class="chip ${ch}" style="font-size:9px;">${item.who||'?'}</span></div>
+        <div class="vim">${time}</div>
+      </div>
+      <div class="vir">
+        <div class="via">${sym}${(item.amount||0).toLocaleString('es-CO')} ${item.currency}</div>
+        ${cop?`<div class="via-cop">≈ $${cop.toLocaleString('es-CO')} COP</div>`:''}
+        <button class="vid" onclick="delViaje('${item.id}')">&#215;</button>
+      </div>
+    </div>`;
+  }).join('');
+  recalcVTotal();
+}
+
+window.submitViaje=async function(){
+  const amt=parseFloat(document.getElementById('vAmt').value)||0;
+  const cur=document.getElementById('vCur').value;
+  const cat=document.getElementById('vCat').value;
+  const note=document.getElementById('vNote').value.trim();
+  if(!amt){toast('Ingresa un monto');return;}
+  if(!user){document.getElementById('userScreen').classList.add('visible');return;}
+  const entry={amount:amt,currency:cur,category:cat,note:note||'',who:user,ts:new Date().toISOString()};
+  document.getElementById('vAmt').value='';document.getElementById('vNote').value='';
+  // Mostrar inmediatamente (optimistic UI)
+  const tasaEUR=parseFloat(document.getElementById('vTasaEUR')?.value)||4500;
+  const tasaUSD=parseFloat(document.getElementById('vTasaUSD')?.value)||4200;
+  const vlist=document.getElementById('vList');
+  if(vlist){
+    const icon=VICONS[cat]||'💸';
+    const ch=user.toLowerCase();
+    const sym=VCUR_SYMBOL[cur]||'';
+    const cop=cur==='EUR'?Math.round(amt*tasaEUR):cur==='USD'?Math.round(amt*tasaUSD):null;
+    const time=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    const div=document.createElement('div');
+    div.className='vi';div.style.opacity='0.6';
+    div.innerHTML=`<div class="vii">${icon}</div><div class="vil"><div class="vin">${note||cat}</div><div class="vic">${cat} · <span class="chip ${ch}" style="font-size:9px;">${user}</span> <span style="font-size:10px;color:#BA7517;">⏳</span></div><div class="vim">${time}</div></div><div class="vir"><div class="via">${sym}${amt.toLocaleString('es-CO')} ${cur}</div>${cop?`<div class="via-cop">≈ $${cop.toLocaleString('es-CO')} COP</div>`:''}</div>`;
+    vlist.insertBefore(div,vlist.firstChild);
+    const dayTot=document.getElementById('vDayTotal');
+    if(dayTot){
+      const copAmt=cur==='EUR'?amt*tasaEUR:cur==='USD'?amt*tasaUSD:amt;
+      const cur2=parseFloat((dayTot.textContent||'0').replace(/[^0-9]/g,''))||0;
+      dayTot.textContent='$'+Math.round(cur2+copAmt).toLocaleString('es-CO')+' COP';
+    }
+  }
+  if(!navigator.onLine){
+    oqAdd({type:'push',path:vKey(viajeDate),data:entry});
+    updateOfflineUI();
+    toast('💾 Guardado offline — se sincroniza al reconectar');
+    return;
+  }
+  setSS('wait');
+  try{
+    await db.ref(vKey(viajeDate)).push(entry);
+    setSS('ok');toast('✅ Gasto registrado');
+    refreshViaje();
+  }catch(e){
+    oqAdd({type:'push',path:vKey(viajeDate),data:entry});
+    updateOfflineUI();
+    toast('💾 Guardado offline — se sincroniza al reconectar');
+  }
+};
+
+window.delViaje=function(id){db.ref(vKey(viajeDate)+'/'+id).remove();};
+
+async function recalcVTotal(){
+  const tasaEUR=parseFloat(document.getElementById('vTasaEUR')?.value)||4500;
+  const tasaUSD=parseFloat(document.getElementById('vTasaUSD')?.value)||4200;
+  // Leer todos los días del mes actual del viaje
+  try{
+    const snap=await db.ref(`viaje/${FBK}`).once('value');
+    if(!snap.val()){document.getElementById('vResumen').style.display='none';return;}
+    let totEUR=0,totUSD=0,totCOP=0;
+    const byCat={};
+    snap.forEach(ySnap=>ySnap.forEach(mSnap=>mSnap.forEach(dSnap=>dSnap.forEach(item=>{
+      const v=item.val();
+      if(v.currency==='EUR') totEUR+=v.amount||0;
+      else if(v.currency==='USD') totUSD+=v.amount||0;
+      else totCOP+=v.amount||0;
+      if(!byCat[v.category]) byCat[v.category]=0;
+      if(v.currency==='EUR') byCat[v.category]+=((v.amount||0)*tasaEUR);
+      else if(v.currency==='USD') byCat[v.category]+=((v.amount||0)*tasaUSD);
+      else byCat[v.category]+=(v.amount||0);
+    }))));
+    const totTotal=Math.round(totEUR*tasaEUR+totUSD*tasaUSD+totCOP);
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    set('vTotEUR','€'+totEUR.toLocaleString('es-CO'));
+    set('vTotUSD','$'+totUSD.toLocaleString('es-CO'));
+    set('vTotCOP','₡'+Math.round(totCOP).toLocaleString('es-CO'));
+    set('vTotTOT','$'+totTotal.toLocaleString('es-CO')+' COP');
+    // Barras por categoría
+    const cats=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+    const mx=cats[0]?cats[0][1]:1;
+    const barHTML=cats.map(([name,val],i)=>`
+      <div class="br" style="margin-top:10px;">
+        <div class="bc">${name}</div>
+        <div class="bt"><div class="bf" style="width:${Math.round((val/mx)*100)}%;background:${COLORS[i%COLORS.length]};"></div></div>
+        <div class="bv">$${Math.round(val).toLocaleString('es-CO')}</div>
+      </div>`).join('');
+    const barEl=document.getElementById('vBarras');if(barEl)barEl.innerHTML=barHTML;
+    document.getElementById('vResumen').style.display='block';
+  }catch(e){console.error('recalcVTotal',e);}
+}
+
 </script>
 </body>
 </html>
