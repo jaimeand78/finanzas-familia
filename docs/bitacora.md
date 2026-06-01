@@ -166,11 +166,38 @@ agregar gasto → Firebase daily → syncDailyMonth() → save() → listener �
 ---
 
 ### 🐛 Bug #9 — Pestaña Hoy no carga las categorías al abrir por primera vez
-**Fecha:** Junio 2026  
-**Causa:** La cola offline introdujo una condición de carrera: al abrir la pestaña Hoy, `subDaily()` llamaba `populateCatSel()` inmediatamente, pero `D.categories` todavía estaba vacío porque Firebase no había respondido. El select quedaba sin opciones. Al navegar a otro día o volver al tab, `D` ya estaba listo y las categorías aparecían.  
-**Solución:** Dos cambios coordinados:
-1. En `subDaily()`: solo llamar `populateCatSel()` si `D.categories` ya tiene datos — evita poblar un select vacío.
-2. En `renderAll()`: llamar `populateCatSel()` al final si `curTab === 'd'` — cuando Firebase entrega los datos y renderiza, el select se repuebla automáticamente.
+**Fecha:** 1 junio 2026
+
+**Síntoma:** Al abrir la pestaña "Hoy 💸" aparecía "No options" en el selector de categorías. Si se cambiaba de pestaña y se volvía, las categorías aparecían correctamente.
+
+**Hipótesis inicial (incorrecta):** Condición de carrera introducida por la funcionalidad offline — `populateCatSel()` ejecutándose antes de que Firebase cargara `D.categories`.
+
+**Diagnóstico real:** La función `go()` tenía referencias a módulos eliminados. El objeto `PAGES` incluía entradas para Anual (`pa`) e Historial (`ph`) que ya no existían en el HTML:
+```javascript
+const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',v:'pv',a:'pa',h:'ph'};
+```
+`document.getElementById('pa')` y `document.getElementById('ph')` devolvían `null`. Al ejecutar `.classList.toggle()` sobre `null` se lanzaba una excepción que interrumpía la ejecución de `go('d')` antes de completar la inicialización de la pestaña Hoy.
+
+**Error en consola:**
+```
+Uncaught TypeError: can't access property "classList", document.getElementById(...) is null
+```
+
+**Solución:** Dos cambios:
+1. Eliminar referencias obsoletas `a:'pa'` y `h:'ph'` del objeto `PAGES`.
+2. Robustecer la navegación con guards en `KEYS.forEach`:
+```javascript
+KEYS.forEach((t,i)=>{
+  const page=document.getElementById(PAGES[t]);
+  if(page){ page.classList.toggle('on',t===tab); }
+  const btn=document.querySelectorAll('.tab')[i];
+  if(btn){ btn.classList.toggle('on',t===tab); }
+});
+```
+
+**Commit:** `cambio en linea 1189 KEYS.forEach por una version robusta para evitar el bug 9`
+
+**Lección:** Antes de investigar Firebase, offline o sincronización, revisar siempre la consola del navegador. Un error JavaScript previo puede producir síntomas aparentemente no relacionados. Este bug también indica que pueden existir otras referencias huérfanas en el código — pendiente revisión.
 
 **Estado:** ✅ Resuelto
 
@@ -190,7 +217,7 @@ agregar gasto → Firebase daily → syncDailyMonth() → save() → listener �
 | May 2026 | Firebase rules no cubren `viaje/` | Regla explícita en Console | ✅ |
 | May 2026 | iOS decimales en `type="number"` | Pendiente: `type="text"` | 🔲 |
 | May 2026 | `manifest.json` tiene apellidos | Pendiente: actualizar name/description | 🔲 |
-| Jun 2026 | Pestaña Hoy sin categorías al abrir | Guard en `subDaily()` + `populateCatSel()` en `renderAll()` | ✅ |
+| Jun 2026 | Pestaña Hoy sin categorías al abrir | Referencias huérfanas `pa`/`ph` en `PAGES` rompían `go()` con TypeError | ✅ |
 
 ---
 
@@ -293,7 +320,7 @@ hist/[uid]/[pushId]/
 | [pendiente] | 10 mayo 2026 | feat: agregar pestaña Análisis con Semáforo, Tendencia y Hormiga |
 | [pendiente] | Mayo 2026 | feat: agregar módulo Viaje con cola offline |
 | [pendiente] | Mayo 2026 | feat: implementar offline queue para gastos diarios y viaje |
-| [pendiente] | Jun 2026 | fix: pestaña Hoy sin categorías por condición de carrera con offline queue |
+| [pendiente] | Jun 2026 | fix: KEYS.forEach robusto para evitar TypeError con módulos eliminados (bug #9) |
 
 ---
 
@@ -336,6 +363,9 @@ hist/[uid]/[pushId]/
 
 > **Separar identidad personal de producto desde el día 1.**  
 > Mezclar el repositorio personal con el producto crea deuda de marca. Una organización GitHub dedicada facilita el escalado y la presentación profesional.
+
+> **La consola del navegador primero, siempre.**  
+> El bug #9 parecía un problema de Firebase o de sincronización offline. Era un `TypeError` silencioso por referencias huérfanas a módulos eliminados. Un error JavaScript previo puede producir síntomas completamente no relacionados. Antes de investigar Firebase, revisar la consola.
 
 ---
 
