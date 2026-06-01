@@ -1187,11 +1187,17 @@ const KEYS=Object.keys(PAGES);
 window.go=function(tab){
   curTab=tab;
   KEYS.forEach((t,i)=>{
-    document.getElementById(PAGES[t]).classList.toggle('on',t===tab);
-    document.querySelectorAll('.tab')[i].classList.toggle('on',t===tab);
-  });
-  if(tab==='x') renderAnalisis();
+  const page=document.getElementById(PAGES[t]);
+  if(page){
+    page.classList.toggle('on',t===tab);
+  }
 
+  const btn=document.querySelectorAll('.tab')[i];
+  if(btn){
+    btn.classList.toggle('on',t===tab);
+  }
+});
+  if(tab==='x') renderAnalisis();
   if(tab==='n'){document.getElementById('nomMes').textContent=MONTHS[curM]+' '+curY;loadNomFields();}
   if(tab==='e'){document.getElementById('empMes').textContent=MONTHS[curM]+' '+curY;loadEmpFields();}
   if(tab==='d'){dailyDate=new Date();subDaily();updateDWho();}
