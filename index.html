@@ -1436,6 +1436,7 @@ function renderAll(){
       <div class="aa"><input type="text" id="ni${ci}" placeholder="Nuevo ítem..."/><button class="ab" onclick="addItem(${ci})">+ Ítem</button></div>
     </div>`;
   }).join('');
+  if(curTab==='d') populateCatSel();
   recalc();
 }
 
@@ -1678,7 +1679,8 @@ function updateDWho(){const c=document.getElementById('dWhoChip');if(!c)return;c
 
 function subDaily(){
   if(dailyUnsub&&dailyRefPath){db.ref(dailyRefPath).off('value',dailyUnsub);dailyUnsub=null;}
-  updateDayLabel();populateCatSel();
+  updateDayLabel();
+  if(D.categories && D.categories.length > 0) populateCatSel();
   const path=dayKey(dailyDate);
   dailyRefPath=path;
   loadDailyPath(path);

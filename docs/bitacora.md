@@ -165,6 +165,17 @@ agregar gasto → Firebase daily → syncDailyMonth() → save() → listener �
 
 ---
 
+### 🐛 Bug #9 — Pestaña Hoy no carga las categorías al abrir por primera vez
+**Fecha:** Junio 2026  
+**Causa:** La cola offline introdujo una condición de carrera: al abrir la pestaña Hoy, `subDaily()` llamaba `populateCatSel()` inmediatamente, pero `D.categories` todavía estaba vacío porque Firebase no había respondido. El select quedaba sin opciones. Al navegar a otro día o volver al tab, `D` ya estaba listo y las categorías aparecían.  
+**Solución:** Dos cambios coordinados:
+1. En `subDaily()`: solo llamar `populateCatSel()` si `D.categories` ya tiene datos — evita poblar un select vacío.
+2. En `renderAll()`: llamar `populateCatSel()` al final si `curTab === 'd'` — cuando Firebase entrega los datos y renderiza, el select se repuebla automáticamente.
+
+**Estado:** ✅ Resuelto
+
+---
+
 ### Tabla resumen de issues
 
 | Fecha | Problema | Solución | Estado |
@@ -179,6 +190,7 @@ agregar gasto → Firebase daily → syncDailyMonth() → save() → listener �
 | May 2026 | Firebase rules no cubren `viaje/` | Regla explícita en Console | ✅ |
 | May 2026 | iOS decimales en `type="number"` | Pendiente: `type="text"` | 🔲 |
 | May 2026 | `manifest.json` tiene apellidos | Pendiente: actualizar name/description | 🔲 |
+| Jun 2026 | Pestaña Hoy sin categorías al abrir | Guard en `subDaily()` + `populateCatSel()` en `renderAll()` | ✅ |
 
 ---
 
@@ -281,6 +293,7 @@ hist/[uid]/[pushId]/
 | [pendiente] | 10 mayo 2026 | feat: agregar pestaña Análisis con Semáforo, Tendencia y Hormiga |
 | [pendiente] | Mayo 2026 | feat: agregar módulo Viaje con cola offline |
 | [pendiente] | Mayo 2026 | feat: implementar offline queue para gastos diarios y viaje |
+| [pendiente] | Jun 2026 | fix: pestaña Hoy sin categorías por condición de carrera con offline queue |
 
 ---
 
