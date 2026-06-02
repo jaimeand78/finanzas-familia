@@ -203,6 +203,65 @@ KEYS.forEach((t,i)=>{
 
 ---
 
+### 🐛 Bug #10 — Tab Análisis no funcionaba tras limpieza de módulos
+**Fecha:** 2 junio 2026
+
+**Síntoma:** Al hacer clic en "Análisis 📊" no pasaba nada — la pestaña no se activaba y el contenido no aparecía.
+
+**Causa:** Al limpiar las referencias huérfanas de los módulos Anual e Historial, el tab Análisis (`x:'px'`) no se incluyó en el objeto `PAGES`. Con solo 6 entradas en `PAGES` pero 7 tabs en el HTML, el índice del botón Análisis (posición 6) nunca recibía la clase `on`, y la página `px` nunca se mostraba ni ocultaba.
+
+**Solución:** Agregar `x:'px'` al objeto `PAGES`:
+```javascript
+const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',v:'pv',x:'px'};
+```
+
+**Estado:** ✅ Resuelto
+
+---
+
+### 🐛 Bug #11 — Textos de pwab, offlineBanner y hint sin estilo
+**Fecha:** 2 junio 2026
+
+**Síntoma:** Tres mensajes aparecían en tamaño grande (16px) con estilos incorrectos:
+- "📱 Instalar en iPhone..."
+- "📵 Sin conexión — los gastos se guardan localmente"
+- "🔒 Toca el candado para marcar como fijo..."
+
+**Causa:** Al eliminar los módulos Anual e Historial se borraron también los estilos CSS de `#pwab`, `#offlineBanner`, `.hint` y `.pending-badge`. Sin esos estilos los elementos heredaban el `font-size` del body (16px) y perdían su presentación visual correcta.
+
+**Solución:** Restaurar los estilos:
+```css
+#pwab{display:none;background:#E1F5EE;border-bottom:1px solid #9FE1CB;padding:10px 16px;}
+#offlineBanner{display:none;background:#FEF3C7;...font-size:12px;...}
+#offlineBanner.on{display:block;}
+.pending-badge{background:#D85A30;...}
+.hint{font-size:12px;color:#9b9b97;line-height:1.5;margin-bottom:10px;}
+```
+
+**Estado:** ✅ Resuelto
+
+---
+
+### 🐛 Bug #12 — Toast visible permanentemente en todos los módulos
+**Fecha:** 2 junio 2026
+
+**Síntoma:** El mensaje "👋 Hola Jaime!" aparecía estático en la esquina inferior izquierda en todas las pestañas, sin desaparecer.
+
+**Causa:** El estilo `#toast` también se perdió en la limpieza de módulos. Sin él, el `div#toast` es visible todo el tiempo con texto negro sobre fondo transparente, mostrando el último mensaje enviado.
+
+**Solución:** Restaurar el estilo con `opacity:0` por defecto y `opacity:1` con la clase `.on`:
+```css
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#1a1a18;color:#fff;padding:10px 18px;border-radius:99px;
+  font-size:13px;font-weight:500;opacity:0;pointer-events:none;
+  transition:opacity .3s;z-index:99;white-space:nowrap;}
+#toast.on{opacity:1;}
+```
+
+**Estado:** ✅ Resuelto
+
+---
+
 ### Tabla resumen de issues
 
 | Fecha | Problema | Solución | Estado |
@@ -219,6 +278,9 @@ KEYS.forEach((t,i)=>{
 | May 2026 | `manifest.json` tiene apellidos | Pendiente: actualizar name/description | 🔲 |
 | Jun 2026 | Pestaña Hoy sin categorías al abrir | Referencias huérfanas `pa`/`ph` en `PAGES` rompían `go()` con TypeError | ✅ |
 | Jun 2026 | Referencias huérfanas post-eliminación de módulos | Limpieza de CSS, JS y variables de módulos Anual e Historial eliminados | ✅ |
+| Jun 2026 | Tab Análisis no se activaba | `x:'px'` faltaba en objeto `PAGES` | ✅ |
+| Jun 2026 | Textos pwab/offlineBanner/hint sin estilo | Estilos CSS eliminados junto con módulos huérfanos | ✅ |
+| Jun 2026 | Toast visible permanentemente | Estilo `#toast` eliminado junto con módulos huérfanos | ✅ |
 
 ---
 
@@ -323,6 +385,7 @@ hist/[uid]/[pushId]/
 | [pendiente] | Mayo 2026 | feat: implementar offline queue para gastos diarios y viaje |
 | [pendiente] | Jun 2026 | fix: KEYS.forEach robusto para evitar TypeError con módulos eliminados (bug #9) |
 | [pendiente] | Jun 2026 | chore: eliminar referencias huérfanas de módulos Anual e Historial (161 líneas) |
+| [pendiente] | 2 jun 2026 | fix: restaurar tab Análisis, estilos toast/pwab/offlineBanner/hint (bugs #10-12) |
 
 ---
 
@@ -372,6 +435,9 @@ hist/[uid]/[pushId]/
 > **Eliminar módulos deja deuda oculta en CSS, JS y variables globales.**  
 > Al eliminar los módulos Anual e Historial quedaron activos: un listener Firebase permanente (`subHist()`), ~80 líneas de JS muerto, ~25 líneas de CSS huérfano, y 4 variables globales sin uso. Ninguno causaba errores visibles pero consumían recursos y ensuciaban el codebase. Después de eliminar cualquier módulo, hacer barrido explícito de: variables globales, funciones JS, clases CSS, y llamadas en `DOMContentLoaded`.
 
+> **Al limpiar referencias huérfanas, verificar que todos los tabs estén en PAGES.**  
+> Los bugs #10, #11 y #12 fueron consecuencia directa de la misma limpieza del bug #9. Al eliminar entradas de `PAGES`, el índice de los tabs restantes se desalineó y el tab Análisis quedó fuera del objeto. Adicionalmente, los estilos de `#toast`, `#pwab`, `#offlineBanner` y `.hint` vivían en el bloque CSS de los módulos eliminados y se perdieron con ellos. Regla: después de cualquier limpieza de módulos, revisar explícitamente (1) que todos los tabs activos estén en `PAGES`, (2) que los estilos de elementos globales como toast, banners y hints no estén mezclados con CSS de módulos específicos.
+
 ---
 
-*Organiza2 — Bitácora Técnica v1.2 | Mayo 2026*
+*Organiza2 — Bitácora Técnica v1.2 | Junio 2026*

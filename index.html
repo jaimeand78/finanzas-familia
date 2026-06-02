@@ -204,7 +204,14 @@ body{font-family:'DM Sans',sans-serif;background:#F5F3EE;color:#1a1a18;min-heigh
 .dempty{text-align:center;color:#ccc;font-size:13px;padding:2.5rem 0;}
 .dsync{font-size:11px;color:#9b9b97;text-align:center;margin-top:10px;line-height:1.5;}
 
+#pwab{display:none;background:#E1F5EE;border-bottom:1px solid #9FE1CB;padding:10px 16px;}
 #pwab p{font-size:13px;color:#085041;line-height:1.5;}
+#offlineBanner{display:none;background:#FEF3C7;border-bottom:1px solid #F0D070;padding:9px 16px;text-align:center;font-size:12px;color:#92400E;font-weight:500;}
+#offlineBanner.on{display:block;}
+.pending-badge{background:#D85A30;color:#fff;border-radius:99px;padding:2px 7px;font-size:11px;font-weight:600;margin-left:6px;}
+.hint{font-size:12px;color:#9b9b97;line-height:1.5;margin-bottom:10px;}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;z-index:99;white-space:nowrap;}
+#toast.on{opacity:1;}
 .inactive-row{opacity:.4;}
 
 /* ANÁLISIS */
@@ -1143,7 +1150,7 @@ function renderMLabel(){
 }
 
 // ── TABS ──
-const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',v:'pv'};
+const PAGES={m:'pm',b:'pb',n:'pn',e:'pe',d:'pd',v:'pv',x:'px'};
 const KEYS=Object.keys(PAGES);
 window.go=function(tab){
   curTab=tab;
