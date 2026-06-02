@@ -218,6 +218,7 @@ KEYS.forEach((t,i)=>{
 | May 2026 | iOS decimales en `type="number"` | Pendiente: `type="text"` | 🔲 |
 | May 2026 | `manifest.json` tiene apellidos | Pendiente: actualizar name/description | 🔲 |
 | Jun 2026 | Pestaña Hoy sin categorías al abrir | Referencias huérfanas `pa`/`ph` en `PAGES` rompían `go()` con TypeError | ✅ |
+| Jun 2026 | Referencias huérfanas post-eliminación de módulos | Limpieza de CSS, JS y variables de módulos Anual e Historial eliminados | ✅ |
 
 ---
 
@@ -321,6 +322,7 @@ hist/[uid]/[pushId]/
 | [pendiente] | Mayo 2026 | feat: agregar módulo Viaje con cola offline |
 | [pendiente] | Mayo 2026 | feat: implementar offline queue para gastos diarios y viaje |
 | [pendiente] | Jun 2026 | fix: KEYS.forEach robusto para evitar TypeError con módulos eliminados (bug #9) |
+| [pendiente] | Jun 2026 | chore: eliminar referencias huérfanas de módulos Anual e Historial (161 líneas) |
 
 ---
 
@@ -366,6 +368,9 @@ hist/[uid]/[pushId]/
 
 > **La consola del navegador primero, siempre.**  
 > El bug #9 parecía un problema de Firebase o de sincronización offline. Era un `TypeError` silencioso por referencias huérfanas a módulos eliminados. Un error JavaScript previo puede producir síntomas completamente no relacionados. Antes de investigar Firebase, revisar la consola.
+
+> **Eliminar módulos deja deuda oculta en CSS, JS y variables globales.**  
+> Al eliminar los módulos Anual e Historial quedaron activos: un listener Firebase permanente (`subHist()`), ~80 líneas de JS muerto, ~25 líneas de CSS huérfano, y 4 variables globales sin uso. Ninguno causaba errores visibles pero consumían recursos y ensuciaban el codebase. Después de eliminar cualquier módulo, hacer barrido explícito de: variables globales, funciones JS, clases CSS, y llamadas en `DOMContentLoaded`.
 
 ---
 
