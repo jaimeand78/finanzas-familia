@@ -72,7 +72,9 @@ Cuando describes tu hogar — quiénes viven ahí, si tienes hijos, si tienes ve
 ### 💰 Finanzas
 Responde tres preguntas: ¿cuánto entra? ¿en qué se va? ¿cómo vamos?
 
-Incluye presupuesto mensual, registro diario de gastos, nómina familiar, empleadas del hogar con prestaciones sociales colombianas, y análisis de tendencias.
+El corazón de Finanzas es el **Presupuesto Base**: cada gasto del hogar declara su frecuencia (mensual, semestral, anual) y la app calcula automáticamente cuánto provisionar cada mes. El SOAT de agosto, la prima de la empleada en junio, las vacaciones de enero — todo está previsto desde el primer día del año.
+
+Incluye además presupuesto mensual, registro diario de gastos, nómina familiar, empleadas del hogar con prestaciones sociales colombianas, y análisis de tendencias.
 
 **Estado:** En producción desde abril 2026 (v1). Migración a v2.0 en progreso.
 
@@ -131,6 +133,10 @@ Organiza2 está en transición activa entre dos versiones:
 | **Alimentación** | 🔲 Planificado para v4.0 |
 
 > La versión en producción es Finanzas v1 — un módulo de presupuesto y gastos familiar funcional, en uso real desde abril 2026. La arquitectura completa de Organiza2 (hogar como entidad central, módulos conectados, pantallas dinámicas) está documentada y lista para construirse sobre esa base.
+
+### ⛔ Regla de validación
+
+**El Planeador y la Alimentación no se construyen hasta que Finanzas v2.0 haya sido validado con 5-10 familias reales durante al menos 4 semanas.** El piloto debe confirmar que el onboarding, el Presupuesto Base, las pantallas dinámicas y la transparencia en pareja funcionan correctamente antes de agregar nuevos módulos.
 
 ---
 

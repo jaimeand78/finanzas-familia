@@ -1,0 +1,86 @@
+/* css/base.css
+   Responsabilidad: variables globales, reset, tipografía, colores base. */
+
+:root {
+  --color-primary:   #1D9E75;
+  --color-bg:        #F5F5F5;
+  --color-surface:   #FFFFFF;
+  --color-text:      #1A1A1A;
+  --color-muted:     #6B6B68;
+  --color-border:    #E0E0E0;
+  --color-error:     #D85A30;
+  --radius:          12px;
+  --shadow:          0 2px 8px rgba(0,0,0,0.08);
+  --font:            'DM Sans', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: var(--font);
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: 52px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Chip de usuario */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Botón logout */
+.btn-logout {
+  background: none;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.btn-logout:hover {
+  background: var(--color-bg);
+}
