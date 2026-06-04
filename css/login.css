@@ -14,56 +14,108 @@
   background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 2.5rem 2rem;
   width: 100%;
   max-width: 360px;
-  text-align: center;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  gap: 0;
+}
+
+/* ── Parte superior con logo ── */
+.login-hero {
+  background: #FAF8F4;
+  padding: 2rem 1.5rem 1.5rem;
+  display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.login-hero img {
+  width: 130px;
+  height: 130px;
+  border-radius: 22px;
+}
+
+/* ── Parte inferior con beneficios y botón ── */
+.login-body {
+  padding: 1.25rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
-.login-logo {
-  font-size: 3rem;
-  line-height: 1;
+.login-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
 }
 
-.login-card h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.login-card p {
+.login-benefit {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  font-size: .875rem;
   color: var(--color-muted);
-  font-size: 0.95rem;
-  margin-top: -0.5rem;
+}
+
+.login-benefit-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .btn-google {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: .75rem;
   width: 100%;
-  padding: 0.75rem 1rem;
-  margin-top: 0.5rem;
+  padding: .75rem 1rem;
   background: white;
   border: 1.5px solid var(--color-border);
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: .95rem;
   font-weight: 500;
   color: var(--color-text);
-  transition: box-shadow 0.2s;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: box-shadow .2s;
 }
 
 .btn-google:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
 }
 
 .login-error {
   color: var(--color-error);
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
+  font-size: .85rem;
+  margin-top: .25rem;
+  text-align: center;
+}
+
+/* ── Estilos del onboarding de hogar (crear/unirse) ── */
+.login-logo { font-size: 3rem; line-height: 1; }
+
+.ob-label { font-size: .85rem; font-weight: 600; display: block; margin-bottom: .4rem; }
+.ob-input {
+  width: 100%; padding: .7rem; border: 1.5px solid var(--color-border);
+  border-radius: 8px; font-size: 1rem; font-family: var(--font);
+  margin-bottom: 1rem; outline: none; box-sizing: border-box;
+}
+.ob-input:focus { border-color: var(--color-primary); }
+.ob-codigo {
+  font-size: 1.5rem; font-family: monospace; letter-spacing: .2em;
+  text-align: center; text-transform: uppercase;
+}
+.ob-radio { display: flex; align-items: center; gap: .6rem; font-size: .95rem; cursor: pointer; }
+.ob-error { color: var(--color-error); font-size: .85rem; margin-bottom: .5rem; }
+.conf-codigo-box {
+  font-size: 2rem; font-weight: 700; font-family: monospace;
+  letter-spacing: .2em; color: var(--color-primary); background: #E8F5EF;
+  border-radius: 10px; padding: 1rem; margin: .75rem 0; cursor: pointer;
+}
+.btn-volver {
+  background: none; border: none; color: var(--color-muted); font-size: .9rem;
+  margin-top: .5rem; padding: .4rem 0; width: 100%; cursor: pointer;
+  font-family: var(--font);
 }
