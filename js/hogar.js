@@ -43,10 +43,9 @@ async function unirseHogar(uid, codigoHogar) {
     await db.ref(`usuarios/${uid}/codigoHogar`).set(codigo);
     return { ok: true, meta: snap.val(), yaEraMiembro: true };
   }
-  const updates = {};
-  updates[`hogares/${codigo}/miembros/${uid}`] = { rol: 'miembro' };
-  updates[`usuarios/${uid}/codigoHogar`]       = codigo;
-  await db.ref().update(updates);
+  // Escrituras separadas — evita evaluación de reglas en path raíz
+  await db.ref(`hogares/${codigo}/miembros/${uid}`).set({ rol: 'miembro' });
+  await db.ref(`usuarios/${uid}/codigoHogar`).set(codigo);
   return { ok: true, meta: snap.val() };
 }
 
