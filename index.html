@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/login.css">
   <link rel="stylesheet" href="css/finanzas.css">
+  <link rel="stylesheet" href="css/presupuesto.css">
 </head>
 <body>
 
@@ -92,6 +93,9 @@
       </div>
     </div>
 
+    <!-- Banner ¿Estás de acuerdo? — solo visible para miembro 2 en primera visita -->
+    <div id="bannerMiembro2" style="display:none;"></div>
+
     <!-- Banner offline -->
     <div id="offlineBanner" class="offline-banner"></div>
 
@@ -113,16 +117,23 @@
         </div>
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">Registrar gasto</span></div>
-          <div class="daily-form">
+           <div class="daily-form">
             <input id="dAmt" type="text" inputmode="decimal" placeholder="$0" class="inp inp-amount"/>
-            <select id="dCat" class="inp inp-select"></select>
+
+            <!-- Selector categoría → ítem (DA-10: usa DAILY_ITEMS, no defD) -->
+            <select id="dCat" class="inp inp-select" onchange="onDailyCatChange()"></select>
+            <select id="dItem" class="inp inp-select" onchange="onDailyItemChange()"></select>
+
+            <!-- Nota: obligatoria si ítem = "Otros" -->
             <input id="dNote" type="text" placeholder="Nota (opcional)" class="inp inp-note"/>
+            <div id="dNoteHint" class="daily-note-hint" style="display:none;"></div>
+
             <div class="daily-who">
-              <span class="who-label">¿Quién?</span>
-              <span id="dWhoChip" class="chip"></span>
+            <span class="who-label">¿Quién?</span>
+            <span id="dWhoChip" class="chip"></span>
             </div>
             <button class="btn-primary" onclick="submitDaily()">+ Registrar</button>
-          </div>
+           </div>
         </div>
         <div class="sec">
           <div class="sec-hdr">
@@ -205,6 +216,8 @@
     <!-- ═══ TAB CONFIGURACIÓN ═══ -->
     <div id="pc" class="pg">
       <div class="pg-inner">
+      <!-- Presupuesto Base — renderizado por presupuesto.js -->
+      <div id="configPresupuesto"></div>
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">🏠 Mi Hogar</span></div>
           <div id="hogarInfo" class="hogar-info"></div>
@@ -247,6 +260,12 @@
   <script src="js/analisis.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/presupuesto.js"></script>
+
+  <!-- ── MODAL PRESUPUESTO BASE (onboarding Etapa E) ── -->
+  <div id="presupuestoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; align-items:center; justify-content:center; padding:1rem;">
+    <div class="onb-inner"></div>
+  </div>
 
 </body>
 </html>

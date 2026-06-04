@@ -1,0 +1,406 @@
+/* ── ETAPA E — Onboarding Presupuesto Base ────────────────────────────────────
+   Agregar al final de css/finanzas.css
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── MODAL CONTENEDOR ── */
+#presupuestoModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.onb-inner {
+  background: var(--color-surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+}
+
+/* ── PÁGINA DEL ONBOARDING ── */
+.onb-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+}
+
+.onb-body {
+  flex: 1;
+  padding: 1.5rem 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.onb-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: .75rem;
+  justify-content: flex-end;
+  border-top: 1px solid var(--color-border);
+  margin-top: 1rem;
+}
+
+/* ── BARRA DE PROGRESO ── */
+.onb-prog {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: 1rem 1.5rem .5rem;
+}
+.onb-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background .2s;
+}
+.onb-dot.act { background: var(--color-primary); }
+.onb-step-lbl {
+  margin-left: auto;
+  font-size: .75rem;
+  color: var(--color-muted);
+}
+
+/* ── CABECERA ── */
+.onb-emoji {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: .25rem;
+}
+.onb-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+  margin: 0;
+}
+.onb-sub {
+  font-size: .875rem;
+  color: var(--color-muted);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── OPCIONES (pantallas 1 y 2) ── */
+.onb-options {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+.onb-opt {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+}
+.onb-opt:hover { border-color: var(--color-primary); }
+.onb-opt.sel {
+  border-color: var(--color-primary);
+  background: rgba(29,158,117,.07);
+}
+.onb-opt-icon { font-size: 1.5rem; flex-shrink: 0; }
+.onb-opt-label {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+.onb-opt-sub {
+  font-size: .78rem;
+  color: var(--color-muted);
+  display: block;
+  margin-top: 1px;
+}
+.onb-opt-badge {
+  font-size: .7rem;
+  background: var(--color-border);
+  color: var(--color-muted);
+  border-radius: 8px;
+  padding: 1px 6px;
+  margin-left: .4rem;
+}
+
+/* ── CAMPOS (pantallas 3, 4, 5) ── */
+.onb-fields {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-top: .25rem;
+}
+.onb-field {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+.onb-field label {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.onb-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+.onb-input-wrap:focus-within { border-color: var(--color-primary); }
+.onb-prefix {
+  padding: 0 .6rem;
+  color: var(--color-muted);
+  font-family: 'DM Mono', monospace;
+  font-size: .9rem;
+  background: transparent;
+}
+.onb-input-wrap input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  font-family: 'DM Mono', monospace;
+  padding: .6rem .5rem .6rem 0;
+  color: var(--color-text);
+}
+
+/* ── BOTONES ── */
+.onb-btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .65rem 1.25rem;
+  font-weight: 600;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.onb-btn-primary:disabled { opacity: .4; cursor: default; }
+.onb-btn-primary:hover:not(:disabled) { opacity: .88; }
+.onb-btn-primary.sm { padding: .45rem .9rem; font-size: .82rem; }
+
+.onb-btn-sec {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: 10px;
+  padding: .6rem 1.1rem;
+  font-weight: 600;
+  font-size: .88rem;
+  cursor: pointer;
+}
+.onb-btn-sec.sm { padding: .4rem .85rem; font-size: .8rem; }
+
+.onb-btn-skip {
+  background: transparent;
+  color: var(--color-muted);
+  border: none;
+  font-size: .85rem;
+  cursor: pointer;
+  padding: .5rem;
+  margin-right: auto;
+}
+.onb-btn-skip:hover { color: var(--color-text); }
+
+.onb-btn-ghost {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: .5rem .9rem;
+  font-size: .84rem;
+  cursor: pointer;
+}
+
+/* ── RESUMEN ── */
+.onb-resumen { gap: .9rem; }
+
+.onb-res-cards {
+  display: flex;
+  gap: .5rem;
+  margin-top: .25rem;
+}
+.onb-res-card {
+  flex: 1;
+  background: var(--color-bg);
+  border-radius: 10px;
+  padding: .6rem .5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .2rem;
+}
+.onb-res-label { font-size: .72rem; color: var(--color-muted); text-align: center; }
+.onb-res-val {
+  font-size: .95rem;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--color-text);
+}
+.onb-res-val.g { color: var(--color-primary); }
+.onb-res-val.r { color: #D85A30; }
+
+.onb-barra-wrap {
+  position: relative;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.onb-barra-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 4px;
+  transition: width .4s;
+}
+.onb-barra-pct {
+  display: block;
+  font-size: .72rem;
+  color: var(--color-muted);
+  margin-top: .3rem;
+  text-align: right;
+}
+
+.onb-insight {
+  font-size: .85rem;
+  color: var(--color-muted);
+  background: var(--color-bg);
+  border-radius: 10px;
+  padding: .65rem .85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.onb-invitacion {
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.onb-invitacion p { margin: 0; font-size: .875rem; font-weight: 600; color: var(--color-text); }
+.onb-inv-btns { display: flex; gap: .5rem; }
+
+/* ── BANNER MIEMBRO 2 ── */
+#bannerMiembro2 { position: sticky; top: 0; z-index: 100; }
+
+.banner-m2 {
+  background: #FFF8E1;
+  border-bottom: 2px solid #BA7517;
+  padding: .75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+.banner-m2-txt {
+  flex: 1;
+  font-size: .875rem;
+  color: #5a3e0a;
+  min-width: 200px;
+}
+.banner-m2-btns { display: flex; gap: .5rem; flex-shrink: 0; }
+
+/* ── DAILY — Selector de ítem detallado ── */
+.daily-note-hint {
+  font-size: .78rem;
+  color: #D85A30;
+  padding: .15rem .25rem;
+}
+
+/* ── CONFIG — Sección Presupuesto Base ── */
+.config-section {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-border);
+}
+.config-sec-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: .95rem;
+  margin-bottom: .4rem;
+}
+.config-sec-desc {
+  font-size: .8rem;
+  color: var(--color-muted);
+  margin: 0 0 .75rem;
+}
+.config-cat {
+  margin-bottom: .75rem;
+}
+.config-cat-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: .875rem;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: .35rem;
+}
+.config-cat-total {
+  font-family: 'DM Mono', monospace;
+  font-size: .8rem;
+  color: var(--color-primary);
+}
+.config-item-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .3rem 0;
+}
+.config-item-lbl {
+  flex: 1;
+  font-size: .82rem;
+  color: var(--color-text);
+}
+.config-item-inp-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg);
+  width: 130px;
+  flex-shrink: 0;
+}
+.config-item-inp-wrap:focus-within { border-color: var(--color-primary); }
+.config-item-inp-wrap input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: .875rem;
+  font-family: 'DM Mono', monospace;
+  padding: .35rem .4rem .35rem 0;
+  color: var(--color-text);
+}
+.config-item-prov {
+  font-size: .72rem;
+  color: var(--color-muted);
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

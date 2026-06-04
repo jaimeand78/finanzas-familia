@@ -25,6 +25,110 @@ const ICONS = {
   'Otros':                 '💸'
 };
 
+// ── CATÁLOGO REGISTRO DIARIO — DA-10 ─────────────────────────────────────────
+// Constante SEPARADA de defD(). Solo para el selector del registro diario.
+// El análisis cruza estos ítems con las categorías del presupuesto.
+// Regla: cuando el usuario elige "Otros", el campo nota es OBLIGATORIO.
+
+const DAILY_ITEMS = {
+  '🏠 Vivienda': [
+    'Arriendo / Hipoteca',
+    'Administración',
+    'Agua y Energía',
+    'Gas',
+    'Internet',
+    'Telefonía',
+    'Servicio doméstico',
+    'Mantenimiento hogar',
+    'Otros'
+  ],
+  '🍽️ Alimentación': [
+    'Frutas y verduras',
+    'Aseo y víveres',
+    'Loncheras',
+    'Otros'
+  ],
+  '🚗 Transporte': [
+    'Cuota crédito / leasing',
+    'Combustible',
+    'Transporte público',
+    'Peajes',
+    'Parqueadero',
+    'Mantenimiento vehículo',
+    'Otros'
+  ],
+  '🎬 Entretenimiento': [
+    'Streaming',
+    'Restaurantes',
+    'Cine',
+    'Salidas',
+    'Viajes',
+    'Vacaciones',
+    'Otros'
+  ],
+  '👕 Vestuario': [
+    'Ropa',
+    'Zapatos',
+    'Uniforme',
+    'Otros'
+  ],
+  '❤️ Salud y Belleza': [
+    'Medicina prepagada',
+    'Gimnasio',
+    'Droguería',
+    'Cita médica',
+    'Cita pediátrica',
+    'Peluquería',
+    'Servicios estéticos',
+    'Otros'
+  ],
+  '📚 Educación': [
+    'Universidad',
+    'Colegio',
+    'Jardín',
+    'Matrícula',
+    'Actividades extracurriculares',
+    'Otros'
+  ],
+  '🛡️ Seguros e Impuestos': [
+    'Seguro de vida',
+    'Seguro de hogar',
+    'Seguro vehículo',
+    'SOAT',
+    'Impuestos vehículo',
+    'Impuesto predial'
+  ],
+  '🎁 Regalos y Celebraciones': [
+    'Regalos',
+    'Celebraciones',
+    'Otros'
+  ],
+  '💰 Ahorro': [
+    'Ahorro programado',
+    'Fondo emergencia',
+    'Otros'
+  ]
+};
+
+// Mapa: ítem diario → categoría de presupuesto (para cruzar análisis)
+// DA-10: los ítems detallados se agrupan bajo la categoría del presupuesto
+const DAILY_TO_BUDGET_CAT = {
+  'Frutas y verduras': '🍽️ Alimentación',
+  'Aseo y víveres':    '🍽️ Alimentación',
+  'Loncheras':         '🍽️ Alimentación',
+  'Restaurantes':      '🎬 Entretenimiento',  // Decisión: es ocio, no mercado
+  'Droguería':         '❤️ Salud y Belleza',
+  'Cita médica':       '❤️ Salud y Belleza',
+  'Cita pediátrica':   '❤️ Salud y Belleza',
+  'Medicina prepagada':'❤️ Salud y Belleza',
+  'Gimnasio':          '❤️ Salud y Belleza',
+  'Peluquería':        '❤️ Salud y Belleza',
+  'Servicios estéticos':'❤️ Salud y Belleza',
+  'Agua y Energía':    '🏠 Vivienda',
+  'Gas':               '🏠 Vivienda',
+  'Internet':          '🏠 Vivienda',
+};
+
 // ── RENOMBRES HISTÓRICOS ─────────────────────────────────────────────────────
 // Necesario para migración de datos v1 → v2
 
@@ -111,7 +215,7 @@ function canonicalLabel(label) {
     'Seguro veh?culo':'Seguro vehículo',
     'Impuestos veh?culo':'Impuestos vehículo',
     'SOAT veh?culo':'SOAT vehículo',
-    // versión rombo (�)
+    // versión rombo (â–)
     'Agua y Energ\uFFFDa':'Agua y Energía','Administraci\uFFFDn':'Administración',
     'Alimentaci\uFFFDn':'Alimentación','Aseo y v\uFFFDveres':'Aseo y víveres',
     'Transporte p\uFFFDblico':'Transporte público','Educaci\uFFFDn':'Educación',
@@ -235,6 +339,5 @@ function migrateCategories(data) {
     items = normalizeCategoryItems({ items });
     return { ...cat, items };
   });
-  // Nota: el guardado lo hace quien llama (subMonth en finanzas.js) — no aquí
   return { data, changed };
 }

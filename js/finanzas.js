@@ -1,6 +1,7 @@
 // js/finanzas.js
 // Responsabilidad: presupuesto mensual — subMonth, save, recalc, renderAll.
 // Depende de: config.js (db), utils.js, offline.js, firebase-paths.js, ui.js
+// v2.0 — defD con 10 categorías, calcPresupuestoBase, buildIncomeFromPerfil
 
 // ── ESTADO ────────────────────────────────────────────────────────────────────
 
@@ -34,50 +35,139 @@ function updateWhoChip() {
   if (dw) dw.textContent = user;
 }
 
-// ── DEFAULT DATA ──────────────────────────────────────────────────────────────
+// ── INGRESOS DINÁMICOS — DA-11 ────────────────────────────────────────────────
+// Los labels NUNCA se hardcodean con nombres. Siempre vienen del perfil.
+
+function buildIncomeFromPerfil(perfil) {
+  const miembros = Object.values((perfil && perfil.miembros) || {})
+    .filter(m => m.rol === 'adulto' && m.nombre);
+  const income = miembros.map(m => ({
+    label: 'Ingreso ' + m.nombre,
+    value: 0,
+    fixed: true
+  }));
+  // Si no hay perfil todavía, usar label genérico
+  if (!income.length) {
+    income.push({ label: 'Ingreso principal', value: 0, fixed: true });
+  }
+  income.push({ label: 'Otros ingresos', value: 0, fixed: false });
+  return income;
+}
+
+// ── DEFAULT DATA v2.0 — 10 categorías oficiales ───────────────────────────────
 
 function defD() {
   return {
-    income: [
-      { label:'Salario',       value:0, fixed:true  },
-      { label:'Otros ingresos',value:0, fixed:false }
-    ],
+    _v2: true,
+    income: buildIncomeFromPerfil(window.PERFIL || {}),
     categories: [
-      { name:'Vivienda', items:[
-        { label:'Hipoteca / Arriendo', value:0, budget:0, fixed:true  },
-        { label:'Agua y Energía',      value:0, budget:0, fixed:true  },
-        { label:'Gas',                 value:0, budget:0, fixed:true  },
-        { label:'Internet',            value:0, budget:0, fixed:true  },
-        { label:'Administración',      value:0, budget:0, fixed:true  }
+      { name: '🏠 Vivienda', items: [
+        { label: 'Arriendo / Hipoteca', value:0, budget:0, fixed:true  },
+        { label: 'Administración',      value:0, budget:0, fixed:true  },
+        { label: 'Agua y Energía',      value:0, budget:0, fixed:true  },
+        { label: 'Gas',                 value:0, budget:0, fixed:true  },
+        { label: 'Internet',            value:0, budget:0, fixed:true  },
+        { label: 'Telefonía',           value:0, budget:0, fixed:true  },
+        { label: 'Servicio doméstico',  value:0, budget:0, fixed:true  },
+        { label: 'Mantenimiento hogar', value:0, budget:0, fixed:false },
+        { label: 'Otros',               value:0, budget:0, fixed:false },
       ]},
-      { name:'Alimentación', items:[
-        { label:'Mercado',      value:0, budget:0, fixed:false },
-        { label:'Restaurantes', value:0, budget:0, fixed:false }
+      { name: '🍽️ Alimentación', items: [
+        { label: 'Mercado',   value:0, budget:0, fixed:false },
+        { label: 'Loncheras', value:0, budget:0, fixed:false },
+        { label: 'Otros',     value:0, budget:0, fixed:false },
       ]},
-      { name:'Transporte', items:[
-        { label:'Gasolina',           value:0, budget:0, fixed:false },
-        { label:'Transporte público', value:0, budget:0, fixed:false }
+      { name: '🚗 Transporte', items: [
+        { label: 'Cuota crédito / leasing', value:0, budget:0, fixed:true  },
+        { label: 'Combustible',             value:0, budget:0, fixed:false },
+        { label: 'Transporte público',      value:0, budget:0, fixed:false },
+        { label: 'Peajes',                  value:0, budget:0, fixed:false },
+        { label: 'Parqueadero',             value:0, budget:0, fixed:false },
+        { label: 'Mantenimiento vehículo',  value:0, budget:0, fixed:false },
+        { label: 'Otros',                   value:0, budget:0, fixed:false },
       ]},
-      { name:'Salud y Belleza', items:[
-        { label:'Droguería',    value:0, budget:0, fixed:false },
-        { label:'Citas médicas',value:0, budget:0, fixed:false }
+      { name: '🎬 Entretenimiento', items: [
+        { label: 'Streaming',    value:0, budget:0, fixed:true  },
+        { label: 'Restaurantes', value:0, budget:0, fixed:false },
+        { label: 'Cine',         value:0, budget:0, fixed:false },
+        { label: 'Salidas',      value:0, budget:0, fixed:false },
+        { label: 'Viajes',       value:0, budget:0, fixed:false },
+        { label: 'Vacaciones',   value:0, budget:0, fixed:false },
+        { label: 'Otros',        value:0, budget:0, fixed:false },
       ]},
-      { name:'Entretenimiento', items:[
-        { label:'Streaming', value:0, budget:0, fixed:true  },
-        { label:'Salidas',   value:0, budget:0, fixed:false }
+      { name: '👕 Vestuario', items: [
+        { label: 'Ropa',     value:0, budget:0, fixed:false },
+        { label: 'Zapatos',  value:0, budget:0, fixed:false },
+        { label: 'Uniforme', value:0, budget:0, fixed:false },
+        { label: 'Otros',    value:0, budget:0, fixed:false },
       ]},
-      { name:'Seguros e Impuestos', items:[
-        { label:'Seguro de vida / hogar', value:0, budget:0, fixed:true },
-        { label:'Seguro vehículo',        value:0, budget:0, fixed:true },
-        { label:'Impuesto predial',       value:0, budget:0, fixed:true, months:[3] },
-        { label:'Impuestos vehículo',     value:0, budget:0, fixed:true, months:[4] },
-        { label:'SOAT vehículo',          value:0, budget:0, fixed:true, months:[8] }
+      { name: '❤️ Salud y Belleza', items: [
+        { label: 'Medicina prepagada', value:0, budget:0, fixed:true  },
+        { label: 'Gimnasio',           value:0, budget:0, fixed:true  },
+        { label: 'Salud',              value:0, budget:0, fixed:false },
+        { label: 'Belleza',            value:0, budget:0, fixed:false },
+        { label: 'Otros',              value:0, budget:0, fixed:false },
       ]},
-      { name:'Ahorro', items:[
-        { label:'Ahorro mensual', value:0, budget:0, fixed:true }
-      ]}
-    ]
+      { name: '📚 Educación', items: [
+        { label: 'Universidad',                   value:0, budget:0, fixed:true  },
+        { label: 'Colegio',                       value:0, budget:0, fixed:true  },
+        { label: 'Jardín',                        value:0, budget:0, fixed:true  },
+        { label: 'Matrícula',                     value:0, budget:0, fixed:false },
+        { label: 'Actividades extracurriculares', value:0, budget:0, fixed:false },
+        { label: 'Otros',                         value:0, budget:0, fixed:false },
+      ]},
+      { name: '🛡️ Seguros e Impuestos', items: [
+        { label: 'Seguro de vida',     value:0, budget:0, fixed:true, frecuencia:'anual'             },
+        { label: 'Seguro de hogar',    value:0, budget:0, fixed:true, frecuencia:'anual'             },
+        { label: 'Seguro vehículo',    value:0, budget:0, fixed:true, frecuencia:'anual'             },
+        { label: 'SOAT',               value:0, budget:0, fixed:true, frecuencia:'anual', months:[7] },
+        { label: 'Impuestos vehículo', value:0, budget:0, fixed:true, frecuencia:'anual', months:[3] },
+        { label: 'Impuesto predial',   value:0, budget:0, fixed:true, frecuencia:'anual', months:[2] },
+        { label: 'Otros',              value:0, budget:0, fixed:false                               },
+      ]},
+      { name: '🎁 Regalos y Celebraciones', items: [
+        { label: 'Regalos',       value:0, budget:0, fixed:false },
+        { label: 'Celebraciones', value:0, budget:0, fixed:false },
+        { label: 'Otros',         value:0, budget:0, fixed:false },
+      ]},
+      { name: '💰 Ahorro', items: [
+        { label: 'Ahorro programado', value:0, budget:0, fixed:true  },
+        { label: 'Fondo emergencia',  value:0, budget:0, fixed:true  },
+        { label: 'Otros',             value:0, budget:0, fixed:false },
+      ]},
+    ],
+    nomina:    null,
+    empleadas: null
   };
+}
+
+// ── PRESUPUESTO BASE — DA-8 ───────────────────────────────────────────────────
+// ÚNICA función que calcula provisión mensual. Nunca calcular inline.
+// frecuencia: 'mensual' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
+// Si el ítem tiene months[], solo aplica en esos meses — los demás meses
+// reciben la provisión prorrateada (budget / divisor).
+
+function calcPresupuestoBase(item, mesActual) {
+  const b = item.budget || 0;
+  if (!b) return 0;
+  const frec = item.frecuencia || 'mensual';
+  if (frec === 'mensual') return b;
+  // Ítems con meses específicos (SOAT, predial, etc.)
+  if (item.months && item.months.length) {
+    return item.months.includes(mesActual) ? b : 0;
+  }
+  // Ítems con frecuencia periódica sin mes fijo: provisión mensual prorrateada
+  const divisores = { bimestral: 2, trimestral: 3, semestral: 6, anual: 12 };
+  return Math.round(b / (divisores[frec] || 1));
+}
+
+// Total presupuestado para el mes actual, considerando frecuencias
+function totalPresupuestoMes(categories) {
+  return (categories || []).reduce((s, cat) => {
+    return s + planItems(cat).reduce((ss, item) => {
+      return ss + calcPresupuestoBase(item, curM);
+    }, 0);
+  }, 0);
 }
 
 // ── SUBSCRIBE MES ─────────────────────────────────────────────────────────────
@@ -250,6 +340,8 @@ window.cleanDuplicates = async function() {
 };
 
 // ── RECALC ────────────────────────────────────────────────────────────────────
+// Usa calcPresupuestoBase() para el total presupuestado (DA-8).
+// No calcula inline — siempre delega a la función canónica.
 
 function recalc() {
   if (!D.income) return;
@@ -259,7 +351,10 @@ function recalc() {
     const catHormiga = dailyTotals[c.name] || 0;
     return s + catReal + catHormiga;
   }, 0);
-  const tBud = D.categories.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
+  // DA-8: usar calcPresupuestoBase para el total presupuestado del mes
+  const tBud = D.categories.reduce((s, c) =>
+    s + planItems(c).reduce((ss, r) => ss + calcPresupuestoBase(r, curM), 0), 0
+  );
   const tFix = D.categories.reduce((s, c) => s + planItems(c).filter(r => r.fixed).reduce((ss, r) => ss + (r.value || 0), 0), 0);
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
@@ -294,7 +389,7 @@ function recalc() {
   const cats = D.categories.map(c => ({
     name: c.name,
     act:  planItems(c).reduce((s, r) => s + (r.value || 0), 0) + (dailyTotals[c.name] || 0),
-    bud:  planItems(c).reduce((s, r) => s + (r.budget || 0), 0)
+    bud:  planItems(c).reduce((s, r) => s + calcPresupuestoBase(r, curM), 0)
   })).filter(c => c.act > 0 || c.bud > 0).sort((a, b) => b.act - a.act);
 
   if (!cats.length) { chart.innerHTML = '<div style="font-size:.85rem;color:#9b9b97;padding:.5rem 0;">Ingresa gastos para ver la distribución</div>'; return; }
@@ -335,13 +430,14 @@ function renderAll() {
     const items    = planItems(cat);
     const cHormiga = dailyTotals[cat.name] || 0;
     const cAct     = items.reduce((s, r) => s + (r.value || 0), 0) + cHormiga;
-    const cBud     = items.reduce((s, r) => s + (r.budget || 0), 0);
+    // DA-8: usar calcPresupuestoBase para el presupuesto de la categoría
+    const cBud     = items.reduce((s, r) => s + calcPresupuestoBase(r, curM), 0);
     const fc       = items.filter(r => r.fixed).length;
     const cpct     = cBud > 0 ? Math.round((cAct / cBud) * 100) : 0;
     const bcol     = cBud > 0 && cAct > cBud ? '#D85A30' : cpct > 85 ? '#BA7517' : '#1D9E75';
     return `<div class="sec">
       <div class="sec-hdr">
-        <span class="sec-title">${ICONS[cat.name] || '📁'} ${cat.name}${fc > 0 ? `<span class="fbadge">${fc}🔒</span>` : ''}</span>
+        <span class="sec-title">${ICONS[cat.name.replace(/^[\u{1F300}-\u{1FFFF}🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸\s]+/u, '').trim()] || cat.name.split(' ').slice(0,2).join(' ')}${fc > 0 ? `<span class="fbadge">${fc}🔒</span>` : ''}</span>
         <span style="display:flex;align-items:center;gap:.4rem;">
           ${cBud > 0 ? `<span style="font-size:.75rem;color:#9b9b97;font-family:'DM Mono',monospace;">/${fmt(cBud)}</span>` : ''}
           <span class="sec-val">${fmt(cAct)}</span>
@@ -352,11 +448,12 @@ function renderAll() {
       ${items.map((r, ri) => {
         const ms       = r.months ? r.months.map(x => MSHORT[x]).join('/') : null;
         const inactive = r.months && !r.months.includes(curM);
+        const budItem  = calcPresupuestoBase(r, curM);
         return `<div class="row" style="${inactive ? 'opacity:.35;' : ''}">
-          <span class="rl">${r.label}${ms ? `<span class="mbadge">${ms}</span>` : ''}</span>
+          <span class="rl">${r.label}${ms ? `<span class="mbadge">${ms}</span>` : ''}${r.frecuencia && r.frecuencia !== 'mensual' ? `<span class="mbadge">${r.frecuencia}</span>` : ''}</span>
           <span class="lock ${r.fixed ? 'on' : ''}" onclick="togFx(${ci},${ri})">🔒</span>
-          <span style="font-size:.7rem;color:#9b9b97;font-family:'DM Mono',monospace;min-width:52px;text-align:right;flex-shrink:0;">${r.budget > 0 ? fmt(r.budget) : ''}</span>
-          <input class="inp ${r.fixed ? 'fx' : ''} ${r.budget > 0 && (r.value || 0) > r.budget ? 'ov' : ''}" type="text" inputmode="decimal" value="${r.value || ''}" placeholder="0" ${inactive ? 'disabled' : ''} oninput="updExp(${ci},${ri},this.value)"/>
+          <span style="font-size:.7rem;color:#9b9b97;font-family:'DM Mono',monospace;min-width:52px;text-align:right;flex-shrink:0;">${budItem > 0 ? fmt(budItem) : ''}</span>
+          <input class="inp ${r.fixed ? 'fx' : ''} ${budItem > 0 && (r.value || 0) > budItem ? 'ov' : ''}" type="text" inputmode="decimal" value="${r.value || ''}" placeholder="0" ${inactive ? 'disabled' : ''} oninput="updExp(${ci},${ri},this.value)"/>
           <button class="del" onclick="delItem(${ci},${ri})">&#215;</button>
         </div>`;
       }).join('')}
