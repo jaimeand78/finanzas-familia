@@ -253,3 +253,11 @@ body { padding-bottom: 80px; }
 .btn-volver { background: none; border: none; color: var(--color-muted); font-size: .9rem;
   margin-top: .5rem; padding: .4rem 0; width: 100%; cursor: pointer;
   font-family: var(--font); }
+
+/* ── RESUMEN — disponible grande ─────────────────────────────────────────────── */
+.r-disp-val { font-size:2.2rem; font-weight:700; font-family:'DM Mono',monospace; margin:0; }
+.r-disp-val.g { color:#0F6E56; }
+.r-disp-val.r { color:#993C1D; }
+
+/* ── RESUMEN — tarjetas de categoría ─────────────────────────────────────────── */
+.res-cat { transition: none; }

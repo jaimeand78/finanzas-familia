@@ -24,7 +24,7 @@ function go(tab) {
     if (typeof subDaily       === 'function') subDaily();
   }
   if (tab === 'm') {
-    if (typeof renderAll === 'function') renderAll();
+    if (typeof renderResumen === 'function') renderResumen();
   }
   if (tab === 'x') {
     if (typeof curYx !== 'undefined') { curYx = curY; curMx = curM; }
@@ -33,6 +33,7 @@ function go(tab) {
   if (tab === 'c') {
     renderConfigHogar();
     if (typeof renderConfigPresupuesto === 'function') renderConfigPresupuesto();
+    if (typeof renderExpSecs           === 'function') renderExpSecs();
   }
 }
 
@@ -90,7 +91,7 @@ function updateDayLabel() {
   const ayer   = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
   const esAyer = dailyDate.toDateString() === ayer.toDateString();
   const dias   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  el.textContent = esHoy  ? 'Hoy' : esAyer ? 'Ayer' :
+  el.textContent = esHoy ? 'Hoy' : esAyer ? 'Ayer' :
     dias[dailyDate.getDay()] + ' ' + dailyDate.getDate() + ' ' + MSHORT[dailyDate.getMonth()];
 }
 

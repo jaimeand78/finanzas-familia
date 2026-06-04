@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    <!-- Banner miembro 2 — visible solo cuando aplica -->
+    <!-- Banner miembro 2 -->
     <div id="bannerMiembro2" style="display:none;"></div>
 
     <!-- Banner offline -->
@@ -118,19 +118,11 @@
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">Registrar gasto</span></div>
           <div class="daily-form">
-            <!-- Monto -->
             <input id="dAmt" type="text" inputmode="decimal" placeholder="$0" class="inp inp-amount"/>
-
-            <!-- Categoría (DAILY_ITEMS) -->
             <select id="dCat" class="inp inp-select" onchange="onDailyCatChange()"></select>
-
-            <!-- Ítem detallado dentro de la categoría -->
             <select id="dItem" class="inp inp-select" onchange="onDailyItemChange()"></select>
-
-            <!-- Nota — obligatoria si ítem = "Otros" -->
             <input id="dNote" type="text" placeholder="Nota (opcional)" class="inp inp-note"/>
             <div id="dNoteHint" class="daily-note-hint" style="display:none;"></div>
-
             <div class="daily-who">
               <span class="who-label">¿Quién?</span>
               <span id="dWhoChip" class="chip"></span>
@@ -148,52 +140,33 @@
       </div>
     </div>
 
-    <!-- ═══ TAB RESUMEN ═══ -->
+    <!-- ═══ TAB RESUMEN — solo lectura ═══ -->
     <div id="pm" class="pg">
       <div class="pg-inner">
+
+        <!-- Navegación mes -->
         <div class="mnav">
           <button class="mb" onclick="chM(-1)">&#8592;</button>
           <span class="mlbl" id="mLbl"></span>
           <button class="mb" onclick="chM(1)">&#8594;</button>
         </div>
-        <div class="alert" id="alertBox">
-          <div class="alert-t">⚠️ Gastos fijos exceden el ingreso</div>
-          <div class="alert-b" id="alertMsg"></div>
+
+        <!-- Cabecera — disponible -->
+        <div class="sec" style="text-align:center; padding:1.25rem 1rem;">
+          <p id="rEstado" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--color-muted);margin:0 0 6px;"></p>
+          <p id="rDisp" class="r-disp-val g" style="font-size:2.2rem;font-weight:700;font-family:'DM Mono',monospace;margin:0;"></p>
+          <p style="font-size:.8rem;color:var(--color-muted);margin:4px 0 0;">disponible este mes</p>
         </div>
-        <div class="cards">
-          <div class="card"><div class="cl">Ingresos</div><div class="cv g" id="cInc">$0</div></div>
-          <div class="card"><div class="cl">Gasto real</div><div class="cv r" id="cExp">$0</div></div>
-          <div class="card card-blue"><div class="cl">Presupuesto</div><div class="cv" id="cBud">$0</div></div>
-          <div class="card"><div class="cl">Disponible</div><div class="cv" id="cAvail">$0</div></div>
-          <div class="card card-green"><div class="cl">Gastos fijos 🔒</div><div class="cv g" id="cFix">$0</div></div>
-          <div class="card"><div class="cl">% del presupuesto</div><div class="cv" id="cPct">0%</div></div>
+
+        <!-- Mini cards ingresos / gastado -->
+        <div class="cards" style="grid-template-columns:1fr 1fr;">
+          <div class="card"><div class="cl">Ingresan</div><div class="cv g" id="rInc">$0</div></div>
+          <div class="card"><div class="cl">Gastado</div><div class="cv r" id="rExp">$0</div></div>
         </div>
-        <div class="pw">
-          <div class="pm-row"><span>Gasto real vs presupuesto</span><span id="pPct">0%</span></div>
-          <div class="pb"><div class="pf" id="pFill" style="width:0%;background:#1D9E75;"></div></div>
-        </div>
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">Ingresos</span><span class="sec-val" id="incTot">$0</span></div>
-          <div id="incRows"></div>
-          <div class="add-row">
-            <input type="text" id="niLbl" placeholder="Nueva fuente de ingreso..."/>
-            <button class="btn-add" onclick="addInc()">+ Agregar</button>
-          </div>
-        </div>
-        <div id="expSecs"></div>
-        <div class="sec new-cat-sec">
-          <div class="sec-title" style="margin-bottom:.6rem;">Nueva categoría</div>
-          <div class="add-row">
-            <input type="text" id="ncLbl" placeholder="Nombre categoría..."/>
-            <button class="btn-add" onclick="addCat()">+ Categoría</button>
-          </div>
-        </div>
-        <div class="chart-sec">
-          <div class="chart-title">Distribución por categoría</div>
-          <div id="barChart"></div>
-        </div>
-        <button class="btn-secondary apply-btn" onclick="applyFixedYear()">🔒 Aplicar gastos fijos a todo el año</button>
-        <div class="apply-hint">Copia los ítems fijos del mes actual a los meses que aún no tienen datos</div>
+
+        <!-- Categorías semáforo -->
+        <div id="resumenCats" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
+
       </div>
     </div>
 
@@ -219,18 +192,50 @@
     <!-- ═══ TAB CONFIGURACIÓN ═══ -->
     <div id="pc" class="pg">
       <div class="pg-inner">
+
+        <!-- Info hogar -->
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">🏠 Mi Hogar</span></div>
           <div id="hogarInfo" class="hogar-info"></div>
         </div>
+
+        <!-- Presupuesto Base -->
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">📊 Presupuesto Base</span></div>
           <div id="budgetConfig"></div>
         </div>
-        <div class="sec danger-sec">
+
+        <!-- Ingresos editables -->
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">Ingresos</span><span class="sec-val" id="incTot">$0</span></div>
+          <div id="incRows"></div>
+          <div class="add-row">
+            <input type="text" id="niLbl" placeholder="Nueva fuente de ingreso..."/>
+            <button class="btn-add" onclick="addInc()">+ Agregar</button>
+          </div>
+        </div>
+
+        <!-- Gastos editables por categoría -->
+        <div id="expSecs"></div>
+
+        <!-- Nueva categoría -->
+        <div class="sec new-cat-sec">
+          <div class="sec-title" style="margin-bottom:.6rem;">Nueva categoría</div>
+          <div class="add-row">
+            <input type="text" id="ncLbl" placeholder="Nombre categoría..."/>
+            <button class="btn-add" onclick="addCat()">+ Categoría</button>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <button class="btn-secondary apply-btn" onclick="applyFixedYear()">🔒 Aplicar gastos fijos a todo el año</button>
+        <div class="apply-hint">Copia los ítems fijos del mes actual a los meses que aún no tienen datos</div>
+
+        <div class="sec danger-sec" style="margin-top:.5rem;">
           <button class="btn-secondary" onclick="signOutUser()">Cerrar sesión</button>
           <button class="btn-danger" onclick="cleanDuplicates()">🧹 Limpiar duplicados</button>
         </div>
+
       </div>
     </div>
 
@@ -244,7 +249,7 @@
     📱 <strong>Instalar en iPhone:</strong> Safari → botón compartir ⬆️ → "Agregar a pantalla de inicio"
   </div>
 
-  <!-- ── MODAL PRESUPUESTO BASE (Etapa E) ── -->
+  <!-- Modal Presupuesto Base -->
   <div id="presupuestoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
     <div id="onbInner"></div>
   </div>
