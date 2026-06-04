@@ -342,6 +342,10 @@ function renderResumen() {
     return ICONS[clean] || ICONS[name] || '💸';
   };
 
+  // Quitar solo el emoji inicial, no palabras del nombre
+  const displayName = name => name.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\uFE0F\u20E3\u200D🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸]+\s*/u, '').trim() || name;
+
+
   // Render de una tarjeta de categoría
   const tarjeta = (c, expandida) => {
     const esAhorro  = c.name.includes('Ahorro');
@@ -364,12 +368,12 @@ function renderResumen() {
       badge = '✓ cumplido';
       detailText = `<p style="font-size:12px;color:${textColor};margin:0;">Guardado ${fmt(c.act)} de ${fmt(c.bud)}</p>`;
     } else if (verde && c.bud > 0) {
-      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)} de ${fmt(c.bud)} · quedan ${fmt(c.bud - c.act)}</p>`;
     } else {
       // Sin presupuesto definido
-      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)}</p>`;
     }
@@ -390,7 +394,7 @@ function renderResumen() {
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:18px;">${icon(c.name)}</span>
-          <span style="font-size:14px;font-weight:600;color:${textColor};">${c.name.replace(/^\S+\s/, '')}</span>
+          <span style="font-size:14px;font-weight:600;color:${textColor};">${displayName(c.name)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           ${badge ? `<span style="font-size:12px;color:${textColor};font-weight:600;">${badge}</span>` : miniBar}
@@ -407,8 +411,17 @@ function renderResumen() {
     </div>`;
   };
 
+  // Ordenar: rojo → amarillo → ahorro cumplido → verde → sin presupuesto
+  const rojos    = cats.filter(c => c.pct > 100);
+  const amarillos= cats.filter(c => c.pct > 85 && c.pct <= 100);
+  const ahorroCumplido = cats.filter(c => c.name.includes('Ahorro') && c.bud > 0 && c.act >= c.bud);
+  const verdes   = cats.filter(c => c.pct >= 0 && c.pct <= 85 && !c.name.includes('Ahorro'));
+  const sinBud   = cats.filter(c => c.pct === -1 && !c.name.includes('Ahorro'));
+  const ahorroSinCumplir = cats.filter(c => c.name.includes('Ahorro') && !(c.bud > 0 && c.act >= c.bud));
+  const ordenadas = [...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud, ...ahorroSinCumplir];
+
   const el = document.getElementById('resumenCats');
-  if (el) el.innerHTML = cats.map(c => tarjeta(c, false)).join('');
+  if (el) el.innerHTML = ordenadas.map(c => tarjeta(c, false)).join('');
 
   // Actualizar cabecera
   const dEl = document.getElementById('rDisp');
