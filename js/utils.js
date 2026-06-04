@@ -9,128 +9,64 @@ const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto
 const MSHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const COLORS  = ['#1D9E75','#378ADD','#D85A30','#BA7517','#D4537E','#534AB7','#639922','#6b6b68'];
 
-// Categorías oficiales v2.0 — íconos por nombre
+// Categorías oficiales v2.0 — íconos por nombre (sin emoji en la clave)
 const ICONS = {
-  'Vivienda':              '🏠',
-  'Alimentación':          '🍽️',
-  'Transporte':            '🚗',
-  'Entretenimiento':       '🎬',
-  'Vestuario':             '👕',
-  'Salud y Belleza':       '❤️',
-  'Educación':             '📚',
-  'Seguros e Impuestos':   '🛡️',
+  'Vivienda':               '🏠',
+  'Alimentación':           '🍽️',
+  'Transporte':             '🚗',
+  'Entretenimiento':        '🎬',
+  'Vestuario':              '👕',
+  'Salud y Belleza':        '❤️',
+  'Educación':              '📚',
+  'Seguros e Impuestos':    '🛡️',
   'Regalos y Celebraciones':'🎁',
-  'Ahorro':                '💰',
-  'Servicio Doméstico':    '🏡',
-  'Otros':                 '💸'
+  'Ahorro':                 '💰',
+  'Servicio Doméstico':     '🏡',
+  'Otros':                  '💸'
 };
 
-// ── CATÁLOGO REGISTRO DIARIO — DA-10 ─────────────────────────────────────────
-// Constante SEPARADA de defD(). Solo para el selector del registro diario.
-// El análisis cruza estos ítems con las categorías del presupuesto.
-// Regla: cuando el usuario elige "Otros", el campo nota es OBLIGATORIO.
+// ── CATÁLOGO DE REGISTRO DIARIO — DA-10 ──────────────────────────────────────
+// SEPARADO de defD(). Solo para el selector del tab Hoy.
+// Regla: cuando el usuario elige "Otros", la nota es OBLIGATORIA.
 
 const DAILY_ITEMS = {
   '🏠 Vivienda': [
-    'Arriendo / Hipoteca',
-    'Administración',
-    'Agua y Energía',
-    'Gas',
-    'Internet',
-    'Telefonía',
-    'Servicio doméstico',
-    'Mantenimiento hogar',
-    'Otros'
+    'Arriendo / Hipoteca','Administración','Agua y Energía',
+    'Gas','Internet','Telefonía','Servicio doméstico','Mantenimiento hogar','Otros'
   ],
   '🍽️ Alimentación': [
-    'Frutas y verduras',
-    'Aseo y víveres',
-    'Loncheras',
-    'Otros'
+    'Frutas y verduras','Aseo y víveres','Loncheras','Otros'
   ],
   '🚗 Transporte': [
-    'Cuota crédito / leasing',
-    'Combustible',
-    'Transporte público',
-    'Peajes',
-    'Parqueadero',
-    'Mantenimiento vehículo',
-    'Otros'
+    'Cuota crédito / leasing','Combustible','Transporte público',
+    'Peajes','Parqueadero','Mantenimiento vehículo','Otros'
   ],
   '🎬 Entretenimiento': [
-    'Streaming',
-    'Restaurantes',
-    'Cine',
-    'Salidas',
-    'Viajes',
-    'Vacaciones',
-    'Otros'
+    'Streaming','Restaurantes','Cine','Salidas','Viajes','Vacaciones','Otros'
   ],
   '👕 Vestuario': [
-    'Ropa',
-    'Zapatos',
-    'Uniforme',
-    'Otros'
+    'Ropa','Zapatos','Uniforme','Otros'
   ],
   '❤️ Salud y Belleza': [
-    'Medicina prepagada',
-    'Gimnasio',
-    'Droguería',
-    'Cita médica',
-    'Cita pediátrica',
-    'Peluquería',
-    'Servicios estéticos',
-    'Otros'
+    'Medicina prepagada','Gimnasio','Droguería',
+    'Cita médica','Cita pediátrica','Peluquería','Servicios estéticos','Otros'
   ],
   '📚 Educación': [
-    'Universidad',
-    'Colegio',
-    'Jardín',
-    'Matrícula',
-    'Actividades extracurriculares',
-    'Otros'
+    'Universidad','Colegio','Jardín','Matrícula','Actividades extracurriculares','Otros'
   ],
   '🛡️ Seguros e Impuestos': [
-    'Seguro de vida',
-    'Seguro de hogar',
-    'Seguro vehículo',
-    'SOAT',
-    'Impuestos vehículo',
-    'Impuesto predial'
+    'Seguro de vida','Seguro de hogar','Seguro vehículo',
+    'SOAT','Impuestos vehículo','Impuesto predial'
   ],
   '🎁 Regalos y Celebraciones': [
-    'Regalos',
-    'Celebraciones',
-    'Otros'
+    'Regalos','Celebraciones','Otros'
   ],
   '💰 Ahorro': [
-    'Ahorro programado',
-    'Fondo emergencia',
-    'Otros'
+    'Ahorro programado','Fondo emergencia','Otros'
   ]
 };
 
-// Mapa: ítem diario → categoría de presupuesto (para cruzar análisis)
-// DA-10: los ítems detallados se agrupan bajo la categoría del presupuesto
-const DAILY_TO_BUDGET_CAT = {
-  'Frutas y verduras': '🍽️ Alimentación',
-  'Aseo y víveres':    '🍽️ Alimentación',
-  'Loncheras':         '🍽️ Alimentación',
-  'Restaurantes':      '🎬 Entretenimiento',  // Decisión: es ocio, no mercado
-  'Droguería':         '❤️ Salud y Belleza',
-  'Cita médica':       '❤️ Salud y Belleza',
-  'Cita pediátrica':   '❤️ Salud y Belleza',
-  'Medicina prepagada':'❤️ Salud y Belleza',
-  'Gimnasio':          '❤️ Salud y Belleza',
-  'Peluquería':        '❤️ Salud y Belleza',
-  'Servicios estéticos':'❤️ Salud y Belleza',
-  'Agua y Energía':    '🏠 Vivienda',
-  'Gas':               '🏠 Vivienda',
-  'Internet':          '🏠 Vivienda',
-};
-
-// ── RENOMBRES HISTÓRICOS ─────────────────────────────────────────────────────
-// Necesario para migración de datos v1 → v2
+// ── RENOMBRES HISTÓRICOS ──────────────────────────────────────────────────────
 
 const ITEM_RENAMES = {
   'Seguro vida / hogar':      'Seguro de vida / hogar',
@@ -171,6 +107,7 @@ function mergeItem(base, item) {
   base.budget = Math.max(base.budget || 0, item.budget || 0);
   base.fixed  = !!(base.fixed || item.fixed);
   if (item.by) base.by = item.by;
+  if (item.frecuencia && !base.frecuencia) base.frecuencia = item.frecuencia;
   if (item.months || base.months)
     base.months = [...new Set([...(base.months || []), ...(item.months || [])])].sort((a, b) => a - b);
 }
@@ -186,14 +123,12 @@ function normalizeCategoryItems(cat) {
   return Object.values(byLabel);
 }
 
-// ── CANONICAL LABEL ───────────────────────────────────────────────────────────
-// DA-3: Repara encodings corruptos de tildes y eñes al leer de Firebase.
-// NUNCA modificar este mapa sin revisar migraciones históricas.
+// ── CANONICAL LABEL — DA-3 ────────────────────────────────────────────────────
+// Repara encodings corruptos. NUNCA modificar sin revisar migraciones históricas.
 
 function canonicalLabel(label) {
   if (!label) return '';
   const EXACT = {
-    // versión ? (ASCII 003f)
     'Agua y Energ?a':'Agua y Energía','Administraci?n':'Administración',
     'Alimentaci?n':'Alimentación','Aseo y v?veres':'Aseo y víveres',
     'Transporte p?blico':'Transporte público','Educaci?n':'Educación',
@@ -215,7 +150,6 @@ function canonicalLabel(label) {
     'Seguro veh?culo':'Seguro vehículo',
     'Impuestos veh?culo':'Impuestos vehículo',
     'SOAT veh?culo':'SOAT vehículo',
-    // versión rombo (â–)
     'Agua y Energ\uFFFDa':'Agua y Energía','Administraci\uFFFDn':'Administración',
     'Alimentaci\uFFFDn':'Alimentación','Aseo y v\uFFFDveres':'Aseo y víveres',
     'Transporte p\uFFFDblico':'Transporte público','Educaci\uFFFDn':'Educación',
@@ -237,13 +171,10 @@ function canonicalLabel(label) {
     'Seguro veh\uFFFDculo':'Seguro vehículo',
     'Impuestos veh\uFFFDculo':'Impuestos vehículo',
     'SOAT veh\uFFFDculo':'SOAT vehículo',
-    // versión mojibake Ã
+    'Servicio Dom\uFFFDstico':'Servicio Doméstico',
     'Seguro vehÃ­culo':'Seguro vehículo',
     'Impuestos vehÃ­culo':'Impuestos vehículo',
     'SOAT vehÃ­culo':'SOAT vehículo',
-    // Categorías
-    'Servicio Dom\uFFFDstico':'Servicio Doméstico',
-    // Otros históricos
     'Medicina prepagadaJaime':'Medicina prepagada',
     'Impuestos vehiculoMay':'Impuestos vehículo'
   };
@@ -256,8 +187,6 @@ function canonicalLabel(label) {
 }
 
 // ── MIGRACIÓN DE CATEGORÍAS ───────────────────────────────────────────────────
-// Mantiene compatibilidad con datos históricos de v1.
-// Se llama en subMonth() al leer datos de Firebase.
 
 function migrateCategories(data) {
   if (!data || !data.categories) return data;
@@ -301,16 +230,16 @@ function migrateCategories(data) {
     'Servicio Doméstico': {
       remove: [],
       ensure: [
-        { label:'Salario Empleada',                fixed:true              },
-        { label:'Intereses Cesantías Empleada',    fixed:true, months:[0]  },
-        { label:'Cesantías Empleada',              fixed:true, months:[1]  },
-        { label:'Prima Junio Empleada',            fixed:true, months:[5]  },
-        { label:'Prima Diciembre Empleada',        fixed:true, months:[11] },
-        { label:'Salario Niñera',                  fixed:true              },
-        { label:'Intereses Cesantías Niñera',      fixed:true, months:[0]  },
-        { label:'Cesantías Niñera',                fixed:true, months:[1]  },
-        { label:'Prima Junio Niñera',              fixed:true, months:[5]  },
-        { label:'Prima Diciembre Niñera',          fixed:true, months:[11] }
+        { label:'Salario Empleada',             fixed:true              },
+        { label:'Intereses Cesantías Empleada', fixed:true, months:[0]  },
+        { label:'Cesantías Empleada',           fixed:true, months:[1]  },
+        { label:'Prima Junio Empleada',         fixed:true, months:[5]  },
+        { label:'Prima Diciembre Empleada',     fixed:true, months:[11] },
+        { label:'Salario Niñera',               fixed:true              },
+        { label:'Intereses Cesantías Niñera',   fixed:true, months:[0]  },
+        { label:'Cesantías Niñera',             fixed:true, months:[1]  },
+        { label:'Prima Junio Niñera',           fixed:true, months:[5]  },
+        { label:'Prima Diciembre Niñera',       fixed:true, months:[11] }
       ]
     }
   };
@@ -324,8 +253,7 @@ function migrateCategories(data) {
     }).filter(it => {
       if (!(mig.remove || []).includes(it.label)) return true;
       if ((it.value || 0) > 0 || (it.budget || 0) > 0) return true;
-      changed = true;
-      return false;
+      changed = true; return false;
     });
     mig.ensure.forEach(newIt => {
       const exists = items.find(it => it.label === newIt.label);

@@ -1,19 +1,17 @@
 // js/finanzas.js
 // Responsabilidad: presupuesto mensual — subMonth, save, recalc, renderAll.
 // Depende de: config.js (db), utils.js, offline.js, firebase-paths.js, ui.js
-// v2.0 — defD con 10 categorías, calcPresupuestoBase, buildIncomeFromPerfil
+// v2.0 — defD 10 categorías, buildIncomeFromPerfil, calcPresupuestoBase
 
 // ── ESTADO ────────────────────────────────────────────────────────────────────
 
 let curY = new Date().getFullYear();
 let curM = new Date().getMonth();
 let D    = {};
-let unsub = null;
-let wTimer = null;
-let dailyTotals = {}; // totales hormiga por categoría — solo en memoria
+let unsub    = null;
+let wTimer   = null;
+let dailyTotals = {};
 let _migrating  = false;
-
-// Quién registra — primer nombre del usuario Google
 let user = '';
 
 // ── ARRANQUE ──────────────────────────────────────────────────────────────────
@@ -23,7 +21,7 @@ function arrancarFinanzas() {
   if (fu) user = (fu.displayName || fu.email || '').split(' ')[0].split('@')[0];
   updateWhoChip();
   subMonth();
-  appLista(); // avisa a app.js que todo está listo
+  appLista();
 }
 
 function updateWhoChip() {
@@ -36,20 +34,13 @@ function updateWhoChip() {
 }
 
 // ── INGRESOS DINÁMICOS — DA-11 ────────────────────────────────────────────────
-// Los labels NUNCA se hardcodean con nombres. Siempre vienen del perfil.
+// Labels NUNCA hardcodeados. Siempre desde el perfil del hogar.
 
 function buildIncomeFromPerfil(perfil) {
   const miembros = Object.values((perfil && perfil.miembros) || {})
     .filter(m => m.rol === 'adulto' && m.nombre);
-  const income = miembros.map(m => ({
-    label: 'Ingreso ' + m.nombre,
-    value: 0,
-    fixed: true
-  }));
-  // Si no hay perfil todavía, usar label genérico
-  if (!income.length) {
-    income.push({ label: 'Ingreso principal', value: 0, fixed: true });
-  }
+  const income = miembros.map(m => ({ label: 'Ingreso ' + m.nombre, value: 0, fixed: true }));
+  if (!income.length) income.push({ label: 'Ingreso principal', value: 0, fixed: true });
   income.push({ label: 'Otros ingresos', value: 0, fixed: false });
   return income;
 }
@@ -59,7 +50,7 @@ function buildIncomeFromPerfil(perfil) {
 function defD() {
   return {
     _v2: true,
-    income: buildIncomeFromPerfil(window.PERFIL || {}),
+    income: buildIncomeFromPerfil(window.PERFIL || (window.HOGAR && window.HOGAR.perfil) || {}),
     categories: [
       { name: '🏠 Vivienda', items: [
         { label: 'Arriendo / Hipoteca', value:0, budget:0, fixed:true  },
@@ -143,31 +134,17 @@ function defD() {
 
 // ── PRESUPUESTO BASE — DA-8 ───────────────────────────────────────────────────
 // ÚNICA función que calcula provisión mensual. Nunca calcular inline.
-// frecuencia: 'mensual' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
-// Si el ítem tiene months[], solo aplica en esos meses — los demás meses
-// reciben la provisión prorrateada (budget / divisor).
 
 function calcPresupuestoBase(item, mesActual) {
   const b = item.budget || 0;
   if (!b) return 0;
   const frec = item.frecuencia || 'mensual';
   if (frec === 'mensual') return b;
-  // Ítems con meses específicos (SOAT, predial, etc.)
   if (item.months && item.months.length) {
     return item.months.includes(mesActual) ? b : 0;
   }
-  // Ítems con frecuencia periódica sin mes fijo: provisión mensual prorrateada
-  const divisores = { bimestral: 2, trimestral: 3, semestral: 6, anual: 12 };
+  const divisores = { bimestral:2, trimestral:3, semestral:6, anual:12 };
   return Math.round(b / (divisores[frec] || 1));
-}
-
-// Total presupuestado para el mes actual, considerando frecuencias
-function totalPresupuestoMes(categories) {
-  return (categories || []).reduce((s, cat) => {
-    return s + planItems(cat).reduce((ss, item) => {
-      return ss + calcPresupuestoBase(item, curM);
-    }, 0);
-  }, 0);
 }
 
 // ── SUBSCRIBE MES ─────────────────────────────────────────────────────────────
@@ -235,16 +212,13 @@ function save() {
     const data = stripAutoItems(JSON.parse(JSON.stringify(D)));
     if (!navigator.onLine) {
       oqAdd({ type:'set', path:dKey(curY, curM), data });
-      updateOfflineUI();
-      return;
+      updateOfflineUI(); return;
     }
     db.ref(dKey(curY, curM)).set(data)
       .then(() => setSS('ok'))
       .catch(() => { oqAdd({ type:'set', path:dKey(curY, curM), data }); updateOfflineUI(); });
   }, 800);
 }
-
-// ── HISTORIAL ─────────────────────────────────────────────────────────────────
 
 function logH(type, desc, amt, cat) {
   db.ref(hKey()).push({ user: user || '?', type, description: desc, amount: amt || 0, category: cat || '', ts: new Date().toISOString() });
@@ -262,7 +236,7 @@ window.chM = function(d) {
 
 // ── INGRESOS ──────────────────────────────────────────────────────────────────
 
-window.addInc = function() {
+window.addInc    = function() {
   const l = document.getElementById('niLbl').value.trim();
   if (!l) return;
   D.income.push({ label:l, value:0, fixed:false, by:user });
@@ -309,8 +283,6 @@ window.togFx = function(ci, ri) {
   toast(D.categories[ci].items[ri].fixed ? '🔒 Gasto fijo' : '🔓 Desmarcado');
 };
 
-// ── APPLY FIXED TO YEAR ───────────────────────────────────────────────────────
-
 window.applyFixedYear = async function() {
   if (!confirm('¿Copiar ítems fijos 🔒 a todos los meses de ' + curY + ' que aún no tienen datos?')) return;
   let applied = 0, skipped = 0;
@@ -331,31 +303,26 @@ window.applyFixedYear = async function() {
   toast('✅ Aplicado a ' + applied + ' meses · ' + skipped + ' omitidos');
 };
 
-// ── LIMPIAR DUPLICADOS ────────────────────────────────────────────────────────
-
 window.cleanDuplicates = async function() {
   if (!D.categories) return;
   D.categories = D.categories.map(cat => ({ ...cat, name: canonicalLabel(cat.name || ''), items: normalizeCategoryItems(cat) }));
   renderAll(); save(); toast('🧹 Duplicados limpiados');
 };
 
-// ── RECALC ────────────────────────────────────────────────────────────────────
-// Usa calcPresupuestoBase() para el total presupuestado (DA-8).
-// No calcula inline — siempre delega a la función canónica.
+// ── RECALC — usa calcPresupuestoBase (DA-8) ───────────────────────────────────
 
 function recalc() {
   if (!D.income) return;
   const tInc = D.income.reduce((s, r) => s + (r.value || 0), 0);
   const tExp = D.categories.reduce((s, c) => {
-    const catReal    = planItems(c).reduce((ss, r) => ss + (r.value || 0), 0);
-    const catHormiga = dailyTotals[c.name] || 0;
-    return s + catReal + catHormiga;
+    return s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
   }, 0);
-  // DA-8: usar calcPresupuestoBase para el total presupuestado del mes
   const tBud = D.categories.reduce((s, c) =>
     s + planItems(c).reduce((ss, r) => ss + calcPresupuestoBase(r, curM), 0), 0
   );
-  const tFix = D.categories.reduce((s, c) => s + planItems(c).filter(r => r.fixed).reduce((ss, r) => ss + (r.value || 0), 0), 0);
+  const tFix = D.categories.reduce((s, c) =>
+    s + planItems(c).filter(r => r.fixed).reduce((ss, r) => ss + (r.value || 0), 0), 0
+  );
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
   const pct   = base > 0 ? Math.round((tExp / base) * 100) : 0;
@@ -363,12 +330,12 @@ function recalc() {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   const cls = (id, c)   => { const el = document.getElementById(id); if (el) el.className = 'cv ' + c; };
 
-  set('cInc', fmt(tInc));
-  set('cExp', fmt(tExp));
-  set('cBud', tBud > 0 ? fmt(tBud) : 'Sin definir'); cls('cBud', tBud > 0 ? '' : 'cv gr');
+  set('cInc',   fmt(tInc));
+  set('cExp',   fmt(tExp));
+  set('cBud',   tBud > 0 ? fmt(tBud) : 'Sin definir'); cls('cBud', tBud > 0 ? '' : 'cv gr');
   set('cAvail', fmt(avail)); cls('cAvail', avail >= 0 ? 'cv g' : 'cv r');
-  set('cFix', fmt(tFix));
-  set('cPct', pct + '%'); cls('cPct', pct > 100 ? 'cv r' : pct > 85 ? 'cv am' : 'cv g');
+  set('cFix',   fmt(tFix));
+  set('cPct',   pct + '%'); cls('cPct', pct > 100 ? 'cv r' : pct > 85 ? 'cv am' : 'cv g');
   set('incTot', fmt(tInc));
 
   const pf = document.getElementById('pFill');
@@ -383,7 +350,6 @@ function recalc() {
     } else ab.classList.remove('on');
   }
 
-  // Gráfico de barras
   const chart = document.getElementById('barChart');
   if (!chart) return;
   const cats = D.categories.map(c => ({
@@ -395,8 +361,8 @@ function recalc() {
   if (!cats.length) { chart.innerHTML = '<div style="font-size:.85rem;color:#9b9b97;padding:.5rem 0;">Ingresa gastos para ver la distribución</div>'; return; }
   const mx = Math.max(...cats.map(c => Math.max(c.act, c.bud)));
   chart.innerHTML = cats.map((c, i) => {
-    const wA  = Math.round((c.act / mx) * 100);
-    const wB  = c.bud > 0 ? Math.round((c.bud / mx) * 100) : 0;
+    const wA = Math.round((c.act / mx) * 100);
+    const wB = c.bud > 0 ? Math.round((c.bud / mx) * 100) : 0;
     const col = c.bud > 0 && c.act > c.bud ? '#D85A30' : COLORS[i % COLORS.length];
     return `<div class="br">
       <div class="bc">${c.name}</div>
@@ -416,7 +382,6 @@ function renderAll() {
   if (D.categories) D.categories = D.categories.map(cat => ({ ...cat, items: normalizeCategoryItems(cat) }));
   renderMLabel();
 
-  // Ingresos
   document.getElementById('incRows').innerHTML = D.income.map((r, i) => `
     <div class="row">
       <span class="rl">${r.label}</span>
@@ -425,19 +390,17 @@ function renderAll() {
       <button class="del" onclick="delInc(${i})">&#215;</button>
     </div>`).join('');
 
-  // Categorías y gastos
   document.getElementById('expSecs').innerHTML = D.categories.map((cat, ci) => {
     const items    = planItems(cat);
     const cHormiga = dailyTotals[cat.name] || 0;
     const cAct     = items.reduce((s, r) => s + (r.value || 0), 0) + cHormiga;
-    // DA-8: usar calcPresupuestoBase para el presupuesto de la categoría
     const cBud     = items.reduce((s, r) => s + calcPresupuestoBase(r, curM), 0);
     const fc       = items.filter(r => r.fixed).length;
     const cpct     = cBud > 0 ? Math.round((cAct / cBud) * 100) : 0;
     const bcol     = cBud > 0 && cAct > cBud ? '#D85A30' : cpct > 85 ? '#BA7517' : '#1D9E75';
     return `<div class="sec">
       <div class="sec-hdr">
-        <span class="sec-title">${ICONS[cat.name.replace(/^[\u{1F300}-\u{1FFFF}🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸\s]+/u, '').trim()] || cat.name.split(' ').slice(0,2).join(' ')}${fc > 0 ? `<span class="fbadge">${fc}🔒</span>` : ''}</span>
+        <span class="sec-title">${cat.name}${fc > 0 ? `<span class="fbadge">${fc}🔒</span>` : ''}</span>
         <span style="display:flex;align-items:center;gap:.4rem;">
           ${cBud > 0 ? `<span style="font-size:.75rem;color:#9b9b97;font-family:'DM Mono',monospace;">/${fmt(cBud)}</span>` : ''}
           <span class="sec-val">${fmt(cAct)}</span>

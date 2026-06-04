@@ -2,46 +2,40 @@
 // Responsabilidad: navegación entre tabs, toast, setSS, renderMLabel, go().
 // Depende de: utils.js (MONTHS), offline.js (oqSize, updateOfflineUI)
 
-// ── ESTADO DE NAVEGACIÓN ──────────────────────────────────────────────────────
-
-let curTab = 'd'; // tab activo por defecto: Hoy
+let curTab = 'd';
 
 // ── NAVEGACIÓN TABS ───────────────────────────────────────────────────────────
 
 function go(tab) {
-  // Ocultar página actual
   const cur = document.getElementById('p' + curTab);
   if (cur) cur.classList.remove('on');
   const curBtn = document.getElementById('tab-' + curTab);
   if (curBtn) curBtn.classList.remove('on');
 
-  // Mostrar nueva
   curTab = tab;
   const next = document.getElementById('p' + tab);
   if (next) next.classList.add('on');
   const nextBtn = document.getElementById('tab-' + tab);
   if (nextBtn) nextBtn.classList.add('on');
 
-  // Callbacks por tab
   if (tab === 'd') {
     updateDayLabel();
-    if (typeof populateCatSel  === 'function') populateCatSel();
-    if (typeof refreshDaily    === 'function') refreshDaily();
+    if (typeof populateCatSel === 'function') populateCatSel();
+    if (typeof subDaily       === 'function') subDaily();
   }
   if (tab === 'm') {
     if (typeof renderAll === 'function') renderAll();
   }
   if (tab === 'x') {
-    // Sincronizar mes del análisis con el mes actual del resumen
     if (typeof curYx !== 'undefined') { curYx = curY; curMx = curM; }
     if (typeof renderAnalisis === 'function') renderAnalisis();
   }
   if (tab === 'c') {
     renderConfigHogar();
+    if (typeof renderConfigPresupuesto === 'function') renderConfigPresupuesto();
   }
 }
 
-// Sub-tabs de Análisis
 function goAn(sub) {
   ['sem','ten','hor'].forEach(s => {
     document.getElementById('an-' + s)?.classList.remove('on');
@@ -49,7 +43,6 @@ function goAn(sub) {
   });
   document.getElementById('an-'  + sub)?.classList.add('on');
   document.getElementById('ant-' + sub)?.classList.add('on');
-
   if (sub === 'sem' && typeof renderSemaforo  === 'function') renderSemaforo();
   if (sub === 'ten' && typeof renderTendencia === 'function') renderTendencia();
   if (sub === 'hor' && typeof renderHormiga   === 'function') renderHormiga();
@@ -93,13 +86,12 @@ function updateDayLabel() {
   const el = document.getElementById('dayLbl');
   if (!el) return;
   const hoy  = new Date();
-  const esHoy = dailyDate.toDateString() === hoy.toDateString();
-  const ayer  = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  const esHoy  = dailyDate.toDateString() === hoy.toDateString();
+  const ayer   = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
   const esAyer = dailyDate.toDateString() === ayer.toDateString();
-  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const label = esHoy ? 'Hoy' : esAyer ? 'Ayer' :
+  const dias   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  el.textContent = esHoy  ? 'Hoy' : esAyer ? 'Ayer' :
     dias[dailyDate.getDay()] + ' ' + dailyDate.getDate() + ' ' + MSHORT[dailyDate.getMonth()];
-  el.textContent = label;
 }
 
 // ── CONFIG TAB ────────────────────────────────────────────────────────────────

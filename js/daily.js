@@ -62,25 +62,16 @@ window.chDay = function(d) {
   subDaily();
 };
 
-// ── SELECTOR DE CATEGORÍAS + ÍTEMS — DA-10 ───────────────────────────────────
-// El selector usa DAILY_ITEMS (catálogo detallado), no defD().categories.
-// Estructura: selector categoría → selector ítem → nota (obligatoria si "Otros")
+// ── SELECTOR CATEGORÍA + ÍTEM — DA-10 ────────────────────────────────────────
+// Usa DAILY_ITEMS, NUNCA defD().categories
 
 function populateCatSel() {
-  const catSel  = document.getElementById('dCat');
-  const itemSel = document.getElementById('dItem');
+  const catSel = document.getElementById('dCat');
   if (!catSel) return;
-
   const prevCat = catSel.value;
   const cats    = Object.keys(DAILY_ITEMS);
-
-  catSel.innerHTML = cats.map(c =>
-    `<option value="${c}">${c}</option>`
-  ).join('');
-
+  catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
   if (prevCat && cats.includes(prevCat)) catSel.value = prevCat;
-
-  // Llenar ítems según categoría seleccionada
   populateItemSel();
 }
 
@@ -88,45 +79,31 @@ function populateItemSel() {
   const catSel  = document.getElementById('dCat');
   const itemSel = document.getElementById('dItem');
   if (!catSel || !itemSel) return;
-
-  const cat   = catSel.value;
-  const items = DAILY_ITEMS[cat] || [];
-
-  itemSel.innerHTML = items.map(it =>
-    `<option value="${it}">${it}</option>`
-  ).join('');
-
-  // Actualizar visibilidad de nota según ítem actual
+  const items = DAILY_ITEMS[catSel.value] || [];
+  itemSel.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
   updateNoteRequired();
 }
 
-// Cuando cambia la categoría, actualizar ítems y limpiar ítem seleccionado
 window.onDailyCatChange = function() {
   populateItemSel();
-  const itemSel = document.getElementById('dItem');
-  if (itemSel) itemSel.selectedIndex = 0;
   updateNoteRequired();
 };
 
-// Cuando cambia el ítem, verificar si nota es obligatoria
 window.onDailyItemChange = function() {
   updateNoteRequired();
 };
 
-// Nota obligatoria cuando ítem = "Otros" — DA-10 regla
+// Nota obligatoria si ítem = "Otros"
 function updateNoteRequired() {
   const itemSel  = document.getElementById('dItem');
   const noteEl   = document.getElementById('dNote');
-  const noteHint = document.getElementById('dNoteHint');
+  const hintEl   = document.getElementById('dNoteHint');
   if (!itemSel || !noteEl) return;
-
   const isOtros = itemSel.value === 'Otros';
-  noteEl.required = isOtros;
-  noteEl.placeholder = isOtros ? '¿Qué fue este gasto? (obligatorio)' : 'Nota (opcional)';
-
-  if (noteHint) {
-    noteHint.style.display = isOtros ? 'block' : 'none';
-    noteHint.textContent   = isOtros ? '⚠️ Describe el gasto para poder analizarlo después' : '';
+  noteEl.placeholder = isOtros ? '¿Qué fue? (obligatorio)' : 'Nota (opcional)';
+  if (hintEl) {
+    hintEl.style.display = isOtros ? 'block' : 'none';
+    hintEl.textContent   = isOtros ? '⚠️ Agrega una nota para poder analizarlo después' : '';
   }
 }
 
@@ -136,52 +113,49 @@ window.submitDaily = async function() {
   const amt     = parseFloat(document.getElementById('dAmt').value) || 0;
   const catSel  = document.getElementById('dCat');
   const itemSel = document.getElementById('dItem');
-  const note    = document.getElementById('dNote').value.trim();
+  const noteEl  = document.getElementById('dNote');
+  const note    = noteEl ? noteEl.value.trim() : '';
 
   if (!amt) { toast('Ingresa un monto'); return; }
   if (!catSel || !catSel.value) { toast('Selecciona una categoría'); return; }
 
-  const cat      = catSel.value;           // categoría con emoji: '🍽️ Alimentación'
+  const cat      = catSel.value;
   const itemName = itemSel ? itemSel.value : cat;
 
-  // Nota obligatoria si ítem = "Otros"
   if (itemName === 'Otros' && !note) {
-    toast('⚠️ Describe el gasto para continuar');
-    document.getElementById('dNote').focus();
+    toast('⚠️ Escribe una nota para continuar');
+    if (noteEl) noteEl.focus();
     return;
   }
 
-  // Guardar categoría limpia (sin emoji) para cruzar con dailyTotals
-  // dailyTotals usa cat.name de D.categories — mantener compatibilidad
-  const catClean = cat.replace(/^[\u{1F300}-\u{1FFFF}🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸\s]+/u, '').trim();
-
   const entry = {
     amount:   amt,
-    category: cat,        // categoría con emoji (DAILY_ITEMS key)
-    catClean: catClean,   // categoría sin emoji (para compatibilidad con dailyTotals)
-    item:     itemName,   // ítem detallado
+    category: cat,
+    item:     itemName,
     note:     note || '',
     who:      user,
     ts:       new Date().toISOString()
   };
 
   // Limpiar formulario
-  document.getElementById('dAmt').value  = '';
-  document.getElementById('dNote').value = '';
+  document.getElementById('dAmt').value = '';
+  if (noteEl) noteEl.value = '';
   updateNoteRequired();
 
   // UI optimista
   const list = document.getElementById('dList');
   if (list) {
-    const icon = ICONS[catClean] || ICONS[cat] || '💸';
-    const time = new Date().toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
-    const div  = document.createElement('div');
+    // Extraer nombre sin emoji para buscar en ICONS
+    const catName = cat.replace(/^\S+\s/, '');
+    const icon    = ICONS[catName] || '💸';
+    const time    = new Date().toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
+    const div     = document.createElement('div');
     div.className = 'ditem pending';
     div.innerHTML = `
       <div class="ditem-icon">${icon}</div>
       <div class="ditem-info">
         <div class="ditem-note">${note || itemName}</div>
-        <div class="ditem-cat">${cat} · ${itemName} · ${user} · ${time}</div>
+        <div class="ditem-cat">${cat} · ${user} · ${time}</div>
       </div>
       <div class="ditem-amt">${fmt(amt)}</div>`;
     list.insertBefore(div, list.firstChild);
@@ -234,19 +208,17 @@ function renderDailyList(items) {
     return;
   }
   list.innerHTML = items.map(item => {
-    const time     = new Date(item.ts).toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
-    const catClean = (item.catClean || item.category || '').replace(/^[\u{1F300}-\u{1FFFF}🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸\s]+/u, '').trim();
-    const icon     = ICONS[catClean] || ICONS[item.category] || '💸';
-    // Mostrar ítem detallado si existe, sino nota, sino categoría
-    const label    = item.item && item.item !== item.category
+    const time    = new Date(item.ts).toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
+    const catName = (item.category || '').replace(/^\S+\s/, '');
+    const icon    = ICONS[catName] || ICONS[item.category] || '💸';
+    const label   = item.item && item.item !== item.category
       ? item.item + (item.note ? ' — ' + item.note : '')
       : (item.note || item.category);
-    const subLabel = item.category + ' · ' + (item.who || '?') + ' · ' + time;
     return `<div class="ditem">
       <div class="ditem-icon">${icon}</div>
       <div class="ditem-info">
         <div class="ditem-note">${label}</div>
-        <div class="ditem-cat">${subLabel}</div>
+        <div class="ditem-cat">${item.category} · ${item.who || '?'} · ${time}</div>
       </div>
       <div class="ditem-amt">${fmt(item.amount)}</div>
       <button class="ditem-del" onclick="delDaily('${item.id}')">&#215;</button>
@@ -254,10 +226,9 @@ function renderDailyList(items) {
   }).join('');
 }
 
-// ── SYNC TOTALES CON MES ──────────────────────────────────────────────────────
-// DA-1: los gastos diarios NUNCA se escriben en el nodo mensual.
-// Se suman en memoria (dailyTotals) y recalc() los incluye al mostrar.
-// Agrupa por categoría de DAILY_ITEMS para cruzar con D.categories.
+// ── SYNC TOTALES CON MES — DA-1 ───────────────────────────────────────────────
+// Los gastos diarios NUNCA se escriben en el nodo mensual.
+// Se suman en memoria (dailyTotals) por categoría para que recalc() los use.
 
 async function syncDailyMonth() {
   if (!D.categories) return;
@@ -268,8 +239,8 @@ async function syncDailyMonth() {
     dailyTotals = {};
     snap.forEach(daySnap => daySnap.forEach(itemSnap => {
       const v = itemSnap.val();
-      // Usar catClean si existe (v2), sino usar category directamente (v1)
-      const catKey = v.catClean || v.category || '';
+      // Compatibilidad v1 (solo category) y v2 (category con emoji)
+      const catKey = v.category || '';
       if (!catKey) return;
       if (!dailyTotals[catKey]) dailyTotals[catKey] = 0;
       dailyTotals[catKey] += v.amount || 0;
