@@ -103,7 +103,7 @@ function _tpl2() {
   <div class="onb-body">
     <div class="onb-emoji">💭</div>
     <h2 class="onb-title">¿Cuál es su mayor reto?</h2>
-    <p class="onb-sub">Esto nos ayuda a mostrarte lo que más importa para su situación.</p>
+    <p class="onb-sub">Así podemos mostrarte lo que más importa para ustedes.</p>
     <div class="onb-opts">
       ${opts.map(o => `
       <button class="onb-opt${_onbData.reto === o.id ? ' sel' : ''}" onclick="onbReto('${o.id}')">
@@ -182,7 +182,7 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>💡 Servicios <span class="onb-badge">agua, gas, internet juntos</span></label>
+        <label>💡 Servicios <span class="onb-badge">agua, energía, gas, internet</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oSvc"
             value="${_onbData.servicios || ''}" placeholder="0"
@@ -190,7 +190,7 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>🚗 Transporte del mes</label>
+        <label>🚗 Transporte <span class="onb-badge">gasolina, peajes, taxis</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oTrn"
             value="${_onbData.transporte || ''}" placeholder="0"
@@ -227,7 +227,7 @@ function _tpl5() {
     <p class="onb-sub">Un estimado está bien. Lo ajustan con el tiempo.</p>
     <div class="onb-fields">
       <div class="onb-field">
-        <label>🍽️ Mercado y comida del hogar</label>
+        <label>🍽️ Mercado y loncheras</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oMrc"
             value="${_onbData.mercado || ''}" placeholder="0"
@@ -310,6 +310,7 @@ function _tplResumen() {
     ${invHtml}
   </div>
   <div class="onb-foot" style="border-top:1px solid var(--color-border);margin-top:1rem;">
+    <button class="onb-skip" onclick="cerrarOnboarding()">Cancelar</button>
     <button class="onb-pri" onclick="guardarPresupuestoBase()">Guardar y empezar →</button>
   </div>
 </div>`;
