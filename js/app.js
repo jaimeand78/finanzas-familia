@@ -30,6 +30,20 @@ function onHogarReady() {
 // Llamado por finanzas.js cuando todo está listo para mostrar la app.
 function appLista() {
   updateOfflineUI();
-  if (navigator.onLine) { setSS('ok'); syncOfflineQueue(); }
+
+  if (navigator.onLine) {
+    setSS('ok');
+    syncOfflineQueue();
+  }
+
   go('d');
+
+  // Etapa E
+  if (typeof verificarPresupuestoBase === 'function') {
+    verificarPresupuestoBase();
+  }
+
+  if (typeof verificarBannerMiembro2 === 'function') {
+    verificarBannerMiembro2();
+  }
 }
