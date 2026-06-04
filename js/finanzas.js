@@ -278,6 +278,8 @@ function renderAll() {
   renderMLabel();
   recalc();
   if (curTab === 'd' && typeof populateCatSel === 'function') populateCatSel();
+  if (curTab === 'm' && typeof renderResumen   === 'function') renderResumen();
+  if (curTab === 'c' && typeof renderExpSecs   === 'function') renderExpSecs();
 }
 
 // ── RENDER RESUMEN — tab 📊 ───────────────────────────────────────────────────
