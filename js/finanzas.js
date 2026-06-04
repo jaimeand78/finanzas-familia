@@ -335,12 +335,12 @@ function renderResumen() {
       badge = '✓ cumplido';
       detailText = `<p style="font-size:12px;color:${textColor};margin:0;">Guardado ${fmt(c.act)} de ${fmt(c.bud)}</p>`;
     } else if (verde && c.bud > 0) {
-      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)} de ${fmt(c.bud)} · quedan ${fmt(c.bud - c.act)}</p>`;
     } else {
       // Sin presupuesto definido
-      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)}</p>`;
     }
