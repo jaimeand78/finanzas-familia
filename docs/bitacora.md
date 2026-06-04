@@ -23,7 +23,7 @@ En junio 2026 se tomó la decisión de reconstruir Organiza2 desde cero en lugar
 | Autenticación | Firebase Auth — proveedor Google |
 | Base de datos | Firebase Realtime Database (`organiza2-a09ef`) |
 | Hosting | GitHub Pages — `organiza2.github.io/finanzas-familia` |
-| Orden de carga JS | config → auth → hogar → app (orden estricto via `<script src>`) |
+| Orden de carga JS | config → utils → offline → firebase-paths → auth → hogar → finanzas → daily → analisis → ui → app |
 
 ---
 
@@ -31,22 +31,30 @@ En junio 2026 se tomó la decisión de reconstruir Organiza2 desde cero en lugar
 
 ```
 finanzas-familia/
-├── index.html          ← HTML + imports únicamente
-├── index-v1.html       ← Monolito original congelado — NO eliminar hasta piloto
+├── index.html              ← HTML + imports únicamente
+├── index-v1.html           ← Monolito original congelado — NO eliminar hasta piloto
 ├── css/
-│   ├── base.css        ← Variables, reset, tipografía, topbar, chip
-│   └── login.css       ← Pantalla de login Google
+│   ├── base.css            ← Variables, reset, tipografía, topbar, chip
+│   ├── login.css           ← Pantalla de login Google y onboarding hogar
+│   └── finanzas.css        ← Tabs, páginas, cards, forms, análisis
 ├── js/
-│   ├── config.js       ← Firebase initializeApp + db + auth globales
-│   ├── auth.js         ← initLogin(), onAuthStateChanged, signOut
-│   ├── hogar.js        ← crearHogar(), unirseHogar(), loadHogar(), onboarding UI
-│   └── app.js          ← Punto de entrada — orquesta el arranque
+│   ├── config.js           ← Firebase initializeApp + db + auth globales
+│   ├── utils.js            ← Constantes, fmt, canonicalLabel, planItems, migrateCategories
+│   ├── offline.js          ← Cola offline, syncOfflineQueue, updateOfflineUI
+│   ├── firebase-paths.js   ← dKey(), dayKey(), hKey(), vKey() por codigoHogar
+│   ├── auth.js             ← initLogin(), onAuthStateChanged, signOut
+│   ├── hogar.js            ← crearHogar(), unirseHogar(), loadHogar(), onboarding UI
+│   ├── finanzas.js         ← subMonth(), save(), recalc(), renderAll(), defD()
+│   ├── daily.js            ← subDaily(), submitDaily(), renderDailyList(), syncDailyMonth()
+│   ├── analisis.js         ← renderAnalisis(), renderSemaforo(), renderTendencia(), renderHormiga()
+│   ├── ui.js               ← go(), goAn(), toast(), setSS(), renderMLabel(), checkPWA()
+│   └── app.js              ← Punto de entrada — orquesta el arranque
 └── docs/
     ├── producto_v2.2.md
     ├── arquitectura_v2.2.md
     ├── decision_arquitectura_v2.md
     ├── auditoria_v2.md
-    └── bitacora.md     ← este archivo
+    └── bitacora.md         ← este archivo
 ```
 
 ---
@@ -59,22 +67,22 @@ finanzas-familia/
 │   └── [uid]/
 │       └── codigoHogar: string
 │
-├── hogares/
-│   └── [codigoHogar]/
-│       ├── meta/
-│       │   ├── nombre:    string
-│       │   ├── tipo:      "soltero" | "pareja" | "familia"
-│       │   ├── creadoPor: uid
-│       │   └── creadoEn:  timestamp
-│       ├── miembros/
-│       │   └── [uid]/
-│       │       └── rol: "propietario" | "miembro"
-│       └── perfil/
-│           └── _init: true   ← nodo placeholder hasta Etapa D
-│
-├── pl/[uid]/...        ← datos v1 — pendiente migración Etapa C
-├── daily/[uid]/...     ← datos v1 — pendiente migración Etapa C
-└── viaje/[uid]/...     ← datos v1 — pendiente migración Etapa C
+└── hogares/
+    └── [codigoHogar]/
+        ├── meta/
+        │   ├── nombre:    string
+        │   ├── tipo:      "soltero" | "pareja" | "familia"
+        │   ├── creadoPor: uid
+        │   └── creadoEn:  timestamp
+        ├── miembros/
+        │   └── [uid]/
+        │       └── rol: "propietario" | "miembro"
+        ├── perfil/
+        │   └── _init: true
+        ├── pl/[año]/[mes]/         ← presupuesto mensual
+        ├── daily/[año]/[mes]/[día]/ ← gastos diarios
+        ├── viaje/[año]/[mes]/[día]/ ← módulo viaje (congelado)
+        └── hist/                    ← historial de cambios
 ```
 
 ---
@@ -95,17 +103,13 @@ finanzas-familia/
         ".read":  "auth !== null",
         ".write": "auth !== null"
       }
-    },
-    "pl":     { ".read": "auth !== null", ".write": "auth !== null" },
-    "daily":  { ".read": "auth !== null", ".write": "auth !== null" },
-    "viaje":  { ".read": "auth !== null", ".write": "auth !== null" },
-    "hist":   { ".read": "auth !== null", ".write": "auth !== null" }
+    }
   }
 }
 ```
 
-> ⚠️ Las reglas de `hogares` y nodos v1 son permisivas para cualquier usuario autenticado.
-> Se ajustan en la Etapa C cuando los datos migren al nodo del hogar.
+> Los nodos `pl/`, `daily/`, `viaje/` y `hist/` fueron eliminados al migrar los datos a `hogares/`.
+> Las reglas de `hogares` son permisivas para cualquier usuario autenticado — se ajustan en Etapa E.
 
 ---
 
@@ -125,12 +129,6 @@ finanzas-familia/
 - `js/auth.js` — `initLogin()`, `onAuthStateChanged`, `loginWithGoogle()`, `signOutUser()`
 - `js/app.js` — `DOMContentLoaded` → `initLogin()`, callback `onUserReady()`
 
-**Resultado:**
-- Usuario autenticado con Google
-- `window.UID` contiene el uid real
-- Sesión persistente con `firebase.auth.Auth.Persistence.LOCAL`
-- `index-v1.html` congelado — monolito original preservado
-
 **Criterio de éxito cumplido:** Login con Google funcional. uid real en sesión.
 
 ---
@@ -140,18 +138,13 @@ finanzas-familia/
 **Objetivo:** Validar que múltiples usuarios pueden pertenecer al mismo hogar.
 
 **Archivos creados:**
-- `js/hogar.js` — lógica completa de hogar + UI de onboarding
+- `js/hogar.js` — lógica completa de hogar + UI de onboarding (4 pasos)
 
 **Archivos modificados:**
-- `js/app.js` — `onUserReady()` ahora verifica hogar antes de arrancar
-- `index.html` — pantalla de onboarding con 4 pasos
+- `js/app.js` — `onUserReady()` verifica hogar antes de arrancar
+- `index.html` — pantalla de onboarding agregada
 
-**Flujo implementado:**
-1. Usuario autenticado → `getCodigoHogar(uid)`
-2. Sin hogar → `mostrarOnboarding()` (4 pasos: decisión, crear, unirse, confirmación)
-3. Con hogar → `loadHogar(codigoHogar)` → `onHogarReady()`
-
-**Funciones implementadas en `hogar.js`:**
+**Funciones implementadas:**
 
 | Función | Descripción |
 |---|---|
@@ -160,36 +153,22 @@ finanzas-familia/
 | `crearHogar(uid, nombre, tipo)` | Crea hogar + vincula usuario como propietario |
 | `unirseHogar(uid, codigoHogar)` | Valida código + vincula usuario como miembro |
 | `loadHogar(codigoHogar)` | Lee hogar completo → `window.HOGAR` |
-| `mostrarOnboarding()` | Muestra `#hogarScreen` en paso-decision |
-| `mostrarPaso(id)` | Navega entre los 4 pasos del onboarding |
 
-**Bugs encontrados y resueltos:**
+**Bugs resueltos:**
 
-#### Bug B-1 — `hogar.js` no cargaba (404)
-**Causa:** `index.html` en GitHub no tenía `<script src="js/hogar.js">` — se subió `hogar.js` pero no el `index.html` actualizado.
-**Solución:** Push del `index.html` correcto.
+**Bug B-1** — `hogar.js` no cargaba: `index.html` no tenía el `<script>` — push del index correcto.
 
-#### Bug B-2 — `permission_denied` al unirse al hogar
-**Causa 1:** `db.ref().update(updates)` con paths de dos nodos diferentes (`hogares/` y `usuarios/`) — Firebase evalúa la escritura en el path raíz `/` que no tiene regla permisiva.
-**Solución 1:** Separar en dos escrituras independientes: `db.ref('hogares/...').set()` y `db.ref('usuarios/...').set()`.
+**Bug B-2** — `permission_denied` al unirse: `db.ref().update()` con paths de dos nodos raíz falla porque Firebase evalúa en `/`. Solución: escrituras separadas. Además la regla exigía ser miembro para escribir — se simplificó a `auth !== null`.
 
-**Causa 2:** Regla de escritura de `hogares` exigía que el usuario ya fuera miembro para poder escribir — pero Anny necesita escribirse como miembro antes de serlo.
-**Solución 2:** Simplificar regla a `"auth !== null"` para esta etapa.
-
-**Resultado validado en Firebase Console:**
+**Resultado validado:**
 ```
 usuarios/[uid_jaime]/codigoHogar: "SNBDPA"
 usuarios/[uid_anny]/codigoHogar:  "SNBDPA"
-hogares/SNBDPA/meta/nombre:       "Hogar Ibarra"
 hogares/SNBDPA/miembros/[uid_jaime]/rol: "propietario"
 hogares/SNBDPA/miembros/[uid_anny]/rol:  "miembro"
 ```
 
-**Criterio de éxito cumplido:** Jaime y Anny tienen uid diferentes, comparten el mismo `codigoHogar`, están registrados en `miembros/`, y recuperan el hogar al volver a iniciar sesión.
-
 ---
-
-## Próximas etapas
 
 ### ✅ Etapa C — Migración de datos Anny1130
 **Fecha:** Junio 2026
@@ -197,9 +176,6 @@ hogares/SNBDPA/miembros/[uid_anny]/rol:  "miembro"
 
 **Archivos creados:**
 - `js/firebase-paths.js` — `dKey()`, `dayKey()`, `hKey()`, `vKey()` usando `window.HOGAR.codigoHogar`
-
-**Archivos modificados:**
-- `index.html` — agregado `<script src="js/firebase-paths.js">` entre `hogar.js` y `app.js`
 
 **Migración ejecutada desde consola del navegador:**
 
@@ -210,39 +186,82 @@ hogares/SNBDPA/miembros/[uid_anny]/rol:  "miembro"
 | `daily/Anny1130/2026` | `hogares/SNBDPA/daily/2026` | ✅ |
 | `viaje/Anny1130/2026` | `hogares/SNBDPA/viaje/2026` | ✅ |
 
-4 nodos copiados, 0 errores.
-
-**Nodos originales eliminados** desde Firebase Console:
-- `pl/Anny1130` ✅
-- `daily/Anny1130` ✅
-- `viaje/Anny1130` ✅
-
-> Firebase eliminó automáticamente los nodos padre `pl/`, `daily/` y `viaje/` al quedar vacíos. Comportamiento esperado.
+4 nodos copiados, 0 errores. Nodos originales eliminados desde Firebase Console.
 
 **Validación:**
 ```javascript
 dKey(2026, 5) // → "hogares/SNBDPA/pl/2026/5" ✅
 ```
 
-**Estructura Firebase al finalizar Etapa C:**
-```
-hogares/SNBDPA/
-├── meta/
-├── miembros/
-├── perfil/
-├── pl/2025/ + pl/2026/
-├── daily/2026/
-└── viaje/2026/
-```
+---
 
-**Criterio de éxito cumplido:** Todos los datos reales están en el nodo del hogar. Los paths apuntan a `hogares/[codigoHogar]/`. Los nodos `Anny1130` eliminados.
+### ✅ Etapa D — Finanzas v2 reconstruida
+**Fecha:** Junio 2026
+**Objetivo:** Reconstruir los módulos de Finanzas sobre el modelo de hogar con arquitectura modular.
+
+**Decisiones de producto tomadas antes de codificar:**
+- MVP reducido a 4 tabs: Hoy / Resumen / Análisis / Config
+- `nomina.js`, `empleados.js` y `viaje.js` pospuestos — no críticos para el piloto
+- `viaje.js` pasa a ser parte del Planeador v3.0, no de Finanzas
+- Tab Análisis con navegación de mes independiente — perfil de usuario distinto al del Tab Hoy
+
+**Archivos creados:**
+
+| Archivo | Líneas | Responsabilidad |
+|---|---|---|
+| `css/finanzas.css` | 255 | Estilos completos de la app |
+| `js/utils.js` | 240 | Constantes, fmt, canonicalLabel, planItems, migrateCategories |
+| `js/offline.js` | 92 | Cola offline — lógica validada en viaje Europa 2026 |
+| `js/finanzas.js` | 279 | subMonth, loadFixed, save, recalc, renderAll, defD |
+| `js/daily.js` | 184 | subDaily, submitDaily, renderDailyList, syncDailyMonth |
+| `js/analisis.js` | 167 | renderSemaforo, renderTendencia, renderHormiga |
+| `js/ui.js` | 124 | go(), goAn(), toast(), setSS(), checkPWA() |
+
+**Archivos modificados:**
+- `index.html` — estructura 4 tabs, scripts actualizados
+- `js/app.js` — orquesta arranque completo via `arrancarFinanzas()` → `appLista()`
+
+**Cambios respecto al v1:**
+- `type="number"` → `type="text" inputmode="decimal"` en todos los inputs de monto (fix iOS)
+- `dailyTotals` calculados con path `hogares/[codigoHogar]/daily/` en lugar de `daily/FBK/`
+- Tab Análisis tiene `curYx`/`curMx` propios — se sincroniza al mes del Resumen al abrirse pero navega independientemente
+- "Gastos hormiga" renombrado a "Gastos del día" en el Resumen
+- Categorías por defecto simplificadas en `defD()` — sin nombres hardcodeados Jaime/Anny
+
+**Bugs resueltos:**
+
+**Bug D-1** — `onHogarReady` fallaba con `Cannot set properties of null`: intentaba escribir en `#mainContent` que ya no existe en el nuevo HTML. Solución: reemplazar por llamada a `arrancarFinanzas()`.
+
+**Bug D-2** — Tab Análisis sin navegación de mes: comportamiento intencional inicial pero corregido por decisión de producto — usuarios que consultan análisis quieren navegar meses libremente.
+
+**Criterio de éxito cumplido:**
+- ✅ 4 tabs funcionando con datos reales
+- ✅ Registro de gastos diarios operativo
+- ✅ Presupuesto mensual cargando desde `hogares/SNBDPA/`
+- ✅ Análisis con Semáforo, Tendencia y Hormiga
+- ✅ Navegación de mes independiente en Análisis
+- ✅ Offline queue operativo
+- ✅ Sin errores en consola (solo warnings cosméticos)
 
 ---
 
-### 🔲 Etapa D — Finanzas v2 reconstruida
-**Objetivo:** Reconstruir los módulos de Finanzas sobre el modelo de hogar.
+## Próximas etapas
 
-Incluye: presupuesto mensual, gastos diarios, nómina dinámica, empleados, análisis.
+### 🔲 Etapa E — Onboarding progresivo
+**Objetivo:** La app sugiere completar el perfil del hogar según el uso real.
+- Detectar categorías usadas → sugerir completar perfil (vehículos, hijos, personal)
+- Banners de sugerencia no intrusivos
+- Pantalla de Configuración del Hogar editable
+
+### 🔲 Etapa F — Piloto con familias (v2.3)
+**Objetivo:** Validar con 5-10 familias reales durante 4 semanas antes de construir el Planeador.
+- Condición de salida: ≥5 hogares activos · ≥3 con Presupuesto Base configurado
+
+### 🔲 Pendientes técnicos menores
+- Corregir meta tag `apple-mobile-web-app-capable` deprecado
+- Agregar `favicon.ico`
+- `nomina.js` y `empleados.js` — implementar después del piloto
+- Reglas Firebase más estrictas por hogar
 
 ---
 
@@ -250,11 +269,14 @@ Incluye: presupuesto mensual, gastos diarios, nómina dinámica, empleados, aná
 
 | # | Aprendizaje |
 |---|---|
-| 1 | `db.ref().update()` con paths de múltiples nodos raíz falla si las reglas no cubren el path `/` — separar en escrituras individuales por nodo |
-| 2 | Las reglas de Firebase se cachean en el cliente — después de cambiar reglas, hacer hard refresh (Ctrl+Shift+R) |
-| 3 | GitHub Pages cachea agresivamente — siempre hacer hard refresh al probar cambios recién pusheados |
-| 4 | El SDK compat de Firebase Auth genera warnings de `Cross-Origin-Opener-Policy` con `signInWithPopup` — es un warning del navegador, no un error funcional |
-| 5 | `firebase.auth.Auth.Persistence.LOCAL` persiste la sesión entre recargas — el popup de Google no vuelve a aparecer si ya hay sesión activa. Comportamiento esperado y correcto |
+| 1 | `db.ref().update()` con paths de múltiples nodos raíz falla si las reglas no cubren `/` — separar en escrituras individuales |
+| 2 | Las reglas de Firebase se cachean en el cliente — hard refresh después de cambiar reglas |
+| 3 | GitHub Pages cachea agresivamente — hard refresh al probar cambios recién pusheados |
+| 4 | `Cross-Origin-Opener-Policy` con `signInWithPopup` es un warning del navegador, no un error funcional |
+| 5 | `firebase.auth.Auth.Persistence.LOCAL` persiste la sesión — el popup de Google no reaparece. Comportamiento correcto |
+| 6 | El orden de carga de `<script src>` es crítico — `utils.js` debe ir antes que cualquier módulo que use `fmt()` o `canonicalLabel()` |
+| 7 | `migrateCategories()` en el monolito llamaba `db.ref().set()` directamente — en la arquitectura modular el guardado lo hace `finanzas.js`, no `utils.js` |
+| 8 | El tab Análisis necesita estado de mes propio (`curYx/curMx`) — perfiles de uso distintos dentro del mismo hogar |
 
 ---
 
