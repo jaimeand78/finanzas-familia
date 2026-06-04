@@ -32,6 +32,8 @@ function go(tab) {
     if (typeof renderAll === 'function') renderAll();
   }
   if (tab === 'x') {
+    // Sincronizar mes del análisis con el mes actual del resumen
+    if (typeof curYx !== 'undefined') { curYx = curY; curMx = curM; }
     if (typeof renderAnalisis === 'function') renderAnalisis();
   }
   if (tab === 'c') {

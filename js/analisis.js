@@ -2,30 +2,61 @@
 // Responsabilidad: tab Análisis — Semáforo, Tendencia, Hormiga.
 // Depende de: utils.js, firebase-paths.js, finanzas.js (D, curY, curM, dailyTotals)
 
+// Mes propio del tab Análisis — independiente del tab Resumen
+let curYx = new Date().getFullYear();
+let curMx = new Date().getMonth();
+
+function updateXLabel() {
+  const el = document.getElementById('xLbl');
+  if (el) el.textContent = MONTHS[curMx] + ' ' + curYx;
+}
+
+window.chMx = function(d) {
+  curMx += d;
+  if (curMx > 11) { curMx = 0; curYx++; }
+  if (curMx < 0)  { curMx = 11; curYx--; }
+  renderAnalisis();
+};
+
 async function renderAnalisis() {
+  updateXLabel();
   renderSemaforo();
   await renderTendencia();
   await renderHormiga();
-  // Activar primer sub-tab si ninguno está activo
   if (!document.querySelector('.an-tab.on')) goAn('sem');
 }
 
 // ── SEMÁFORO ──────────────────────────────────────────────────────────────────
 
 function renderSemaforo() {
-  if (!D.categories) return;
   const sem = document.getElementById('an-sem');
   if (!sem) return;
 
-  const tInc = D.income ? D.income.reduce((s, r) => s + (r.value || 0), 0) : 0;
-  const tExp = D.categories.reduce((s, c) =>
-    s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (dailyTotals[c.name] || 0), 0);
-  const tBud = D.categories.reduce((s, c) =>
+  // Si el mes del análisis es el mismo que el resumen, usar D en memoria
+  // Si es diferente, cargar de Firebase
+  const mismomes = (curYx === curY && curMx === curM);
+
+  if (mismomes) {
+    _renderSemaforoConData(sem, D, dailyTotals);
+  } else {
+    db.ref(dKey(curYx, curMx)).once('value').then(snap => {
+      const d = snap.val() || { income:[], categories:[] };
+      _renderSemaforoConData(sem, d, {});
+    });
+  }
+}
+
+function _renderSemaforoConData(sem, data, totals) {
+  if (!data.categories) { sem.innerHTML = '<div style="font-size:.85rem;color:#9b9b97;padding:1rem 0;">Sin datos este mes</div>'; return; }
+  const tInc = data.income ? data.income.reduce((s, r) => s + (r.value || 0), 0) : 0;
+  const tExp = data.categories.reduce((s, c) =>
+    s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (totals[c.name] || 0), 0);
+  const tBud = data.categories.reduce((s, c) =>
     s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
   const avail = (tBud > 0 ? tBud : tInc) - tExp;
 
-  const cats = D.categories.map(c => {
-    const act = planItems(c).reduce((s, r) => s + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
+  const cats = data.categories.map(c => {
+    const act = planItems(c).reduce((s, r) => s + (r.value || 0), 0) + (totals[c.name] || 0);
     const bud = planItems(c).reduce((s, r) => s + (r.budget || 0), 0);
     return { name: c.name, act, bud };
   }).filter(c => c.act > 0 || c.bud > 0);
@@ -68,7 +99,7 @@ async function renderTendencia() {
 
   const meses = [];
   for (let i = 5; i >= 0; i--) {
-    let m = curM - i, y = curY;
+    let m = curMx - i, y = curYx;
     if (m < 0) { m += 12; y--; }
     meses.push({ m, y, lbl: MSHORT[m] });
   }
@@ -113,8 +144,8 @@ async function renderHormiga() {
   if (!el) return;
 
   try {
-    const mm   = String(curM + 1).padStart(2, '0');
-    const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curY}/${mm}`).once('value');
+    const mm   = String(curMx + 1).padStart(2, '0');
+    const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curYx}/${mm}`).once('value');
     const catTotals = {};
     const diaTotals = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
     let total = 0, count = 0;
