@@ -33,7 +33,6 @@ function go(tab) {
   if (tab === 'c') {
     renderConfigHogar();
     if (typeof renderConfigPresupuesto === 'function') renderConfigPresupuesto();
-    if (typeof renderExpSecs           === 'function') renderExpSecs();
   }
 }
 

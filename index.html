@@ -226,32 +226,6 @@
           <div id="budgetConfig"></div>
         </div>
 
-        <!-- Ingresos editables -->
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">Ingresos</span><span class="sec-val" id="incTot">$0</span></div>
-          <div id="incRows"></div>
-          <div class="add-row">
-            <input type="text" id="niLbl" placeholder="Nueva fuente de ingreso..."/>
-            <button class="btn-add" onclick="addInc()">+ Agregar</button>
-          </div>
-        </div>
-
-        <!-- Gastos editables por categoría -->
-        <div id="expSecs"></div>
-
-        <!-- Nueva categoría -->
-        <div class="sec new-cat-sec">
-          <div class="sec-title" style="margin-bottom:.6rem;">Nueva categoría</div>
-          <div class="add-row">
-            <input type="text" id="ncLbl" placeholder="Nombre categoría..."/>
-            <button class="btn-add" onclick="addCat()">+ Categoría</button>
-          </div>
-        </div>
-
-        <!-- Acciones -->
-        <button class="btn-secondary apply-btn" onclick="applyFixedYear()">🔒 Aplicar gastos fijos a todo el año</button>
-        <div class="apply-hint">Copia los ítems fijos del mes actual a los meses que aún no tienen datos</div>
-
         <div class="sec danger-sec" style="margin-top:.5rem;">
           <button class="btn-secondary" onclick="signOutUser()">Cerrar sesión</button>
           <button class="btn-danger" onclick="cleanDuplicates()">🧹 Limpiar duplicados</button>
