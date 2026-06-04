@@ -2,50 +2,39 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Organiza2">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#1D9E75">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icono-181.png">
   <title>Organiza2 — Finanzas</title>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/finanzas.css">
 </head>
 <body>
 
-  <!-- PANTALLA DE LOGIN -->
+  <!-- ── PANTALLA DE LOGIN ── -->
   <div id="loginScreen">
     <div class="login-card">
       <div class="login-logo">🏠</div>
       <h1>Organiza2</h1>
       <p>Organizamos tu vida en pareja.</p>
       <button class="btn-google" onclick="loginWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-             alt="Google" width="20">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
         Entrar con Google
       </button>
       <p id="loginError" class="login-error" style="display:none"></p>
     </div>
   </div>
 
-  <!-- APP SHELL (oculto hasta autenticación) -->
-  <div id="appShell" style="display:none">
-    <div class="topbar">
-      <span class="app-title">Organiza2</span>
-      <div class="topbar-right">
-        <span id="uChip" class="chip" style="display:none"></span>
-        <button onclick="signOutUser()" class="btn-logout">Salir</button>
-      </div>
-    </div>
-    <div id="mainContent" style="padding:2rem;text-align:center;color:#666;">
-      ✅ Login exitoso. Construyendo Finanzas v2...
-    </div>
-  </div>
-
-  <!-- ONBOARDING HOGAR (se muestra sobre appShell si no tiene hogar) -->
+  <!-- ── ONBOARDING HOGAR ── -->
   <div id="hogarScreen" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; padding:1rem;">
     <div class="login-card" style="text-align:left; gap:.75rem;">
-
-      <!-- Paso 1: Decisión -->
       <div id="paso-decision">
         <div class="login-logo" style="text-align:center;">🏠</div>
         <h2 style="text-align:center; font-size:1.2rem;">Bienvenido</h2>
@@ -55,51 +44,185 @@
           <button class="btn-google" onclick="onbUnirse()">Tengo un código</button>
         </div>
       </div>
-
-      <!-- Paso 2: Crear hogar -->
       <div id="paso-crear" style="display:none;">
         <h2 style="font-size:1.2rem; margin-bottom:1rem;">Crear hogar</h2>
-        <label style="font-size:.85rem; font-weight:600; display:block; margin-bottom:.4rem;">Nombre del hogar</label>
-        <input id="ob-nombre" type="text" placeholder="Ej: Hogar Ibarra"
-          style="width:100%; padding:.7rem; border:1.5px solid var(--color-border); border-radius:8px; font-size:1rem; font-family:var(--font); margin-bottom:1rem; outline:none;"
-          onkeydown="if(event.key==='Enter') onbSubmitCrear()"/>
-        <label style="font-size:.85rem; font-weight:600; display:block; margin-bottom:.5rem;">Tipo de hogar</label>
+        <label class="ob-label">Nombre del hogar</label>
+        <input id="ob-nombre" type="text" placeholder="Ej: Hogar Ibarra" class="ob-input" onkeydown="if(event.key==='Enter') onbSubmitCrear()"/>
+        <label class="ob-label">Tipo de hogar</label>
         <div style="display:flex; flex-direction:column; gap:.5rem; margin-bottom:1rem;">
-          <label style="display:flex; align-items:center; gap:.6rem; font-size:.95rem; cursor:pointer;"><input type="radio" name="ob-tipo" value="soltero"> Soltero</label>
-          <label style="display:flex; align-items:center; gap:.6rem; font-size:.95rem; cursor:pointer;"><input type="radio" name="ob-tipo" value="pareja"> Pareja</label>
-          <label style="display:flex; align-items:center; gap:.6rem; font-size:.95rem; cursor:pointer;"><input type="radio" name="ob-tipo" value="familia"> Familia</label>
+          <label class="ob-radio"><input type="radio" name="ob-tipo" value="soltero"> Soltero</label>
+          <label class="ob-radio"><input type="radio" name="ob-tipo" value="pareja"> Pareja</label>
+          <label class="ob-radio"><input type="radio" name="ob-tipo" value="familia"> Familia</label>
         </div>
-        <p id="ob-error-crear" style="display:none; color:var(--color-error); font-size:.85rem; margin-bottom:.5rem;"></p>
+        <p id="ob-error-crear" class="ob-error" style="display:none;"></p>
         <button id="btn-crear-hogar" class="btn-google" onclick="onbSubmitCrear()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Crear hogar</button>
-        <button onclick="mostrarPaso('paso-decision')" style="background:none; border:none; color:var(--color-muted); font-size:.9rem; margin-top:.5rem; padding:.4rem 0; width:100%;">← Volver</button>
+        <button onclick="mostrarPaso('paso-decision')" class="btn-volver">← Volver</button>
       </div>
-
-      <!-- Paso 3: Unirse a hogar -->
       <div id="paso-unirse" style="display:none;">
         <h2 style="font-size:1.2rem; margin-bottom:1rem;">Unirse a un hogar</h2>
-        <label style="font-size:.85rem; font-weight:600; display:block; margin-bottom:.4rem;">Código del hogar</label>
-        <input id="ob-codigo" type="text" placeholder="Ej: K8M4XQ" maxlength="6"
-          style="width:100%; padding:.7rem; border:1.5px solid var(--color-border); border-radius:8px; font-size:1.5rem; font-family:monospace; letter-spacing:.2em; text-align:center; text-transform:uppercase; margin-bottom:1rem; outline:none;"
-          oninput="this.value=this.value.toUpperCase()"
-          onkeydown="if(event.key==='Enter') onbSubmitUnirse()"/>
-        <p id="ob-error-unirse" style="display:none; color:var(--color-error); font-size:.85rem; margin-bottom:.5rem;"></p>
+        <label class="ob-label">Código del hogar</label>
+        <input id="ob-codigo" type="text" placeholder="Ej: K8M4XQ" maxlength="6" class="ob-input ob-codigo"
+          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter') onbSubmitUnirse()"/>
+        <p id="ob-error-unirse" class="ob-error" style="display:none;"></p>
         <button id="btn-unirse-hogar" class="btn-google" onclick="onbSubmitUnirse()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Unirme</button>
-        <button onclick="mostrarPaso('paso-decision')" style="background:none; border:none; color:var(--color-muted); font-size:.9rem; margin-top:.5rem; padding:.4rem 0; width:100%;">← Volver</button>
+        <button onclick="mostrarPaso('paso-decision')" class="btn-volver">← Volver</button>
       </div>
-
-      <!-- Paso 4: Confirmación -->
       <div id="paso-confirmacion" style="display:none; text-align:center;">
         <div style="font-size:2.5rem; margin-bottom:.5rem;">🎉</div>
         <h2 style="font-size:1.1rem;">¡Hogar <span id="conf-nombre"></span> creado!</h2>
         <p style="color:var(--color-muted); font-size:.9rem; margin:.5rem 0;">Comparte este código con tu pareja:</p>
-        <div id="conf-codigo" onclick="onbCopiarCodigo()"
-          style="font-size:2rem; font-weight:700; font-family:monospace; letter-spacing:.2em; color:var(--color-primary); background:#E8F5EF; border-radius:10px; padding:1rem; margin:.75rem 0; cursor:pointer;"
-          title="Toca para copiar"></div>
+        <div id="conf-codigo" onclick="onbCopiarCodigo()" class="conf-codigo-box"></div>
         <p style="font-size:.75rem; color:var(--color-muted); margin-bottom:.75rem;">Toca el código para copiarlo</p>
         <button class="btn-google" onclick="onbConfirmado()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Entrar a Organiza2 →</button>
       </div>
-
     </div>
+  </div>
+
+  <!-- ── APP SHELL ── -->
+  <div id="appShell" style="display:none">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="app-title">💰 Finanzas</span>
+      <div class="topbar-right">
+        <span class="sdot" id="sdot"></span>
+        <span class="slbl" id="slbl">Conectando...</span>
+        <span id="uChip" class="chip" style="display:none"></span>
+        <button onclick="signOutUser()" class="btn-logout">Salir</button>
+      </div>
+    </div>
+
+    <!-- Banner offline -->
+    <div id="offlineBanner" class="offline-banner"></div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabBar">
+      <button class="tab on"  id="tab-d" onclick="go('d')">💰 Hoy</button>
+      <button class="tab"     id="tab-m" onclick="go('m')">📊 Resumen</button>
+      <button class="tab"     id="tab-x" onclick="go('x')">📈 Análisis</button>
+      <button class="tab"     id="tab-c" onclick="go('c')">⚙️ Config</button>
+    </div>
+
+    <!-- ═══ TAB HOY ═══ -->
+    <div id="pd" class="pg on">
+      <div class="pg-inner">
+        <div class="day-nav">
+          <button class="mb" onclick="chDay(-1)">&#8592;</button>
+          <span class="day-lbl" id="dayLbl"></span>
+          <button class="mb" onclick="chDay(1)">&#8594;</button>
+        </div>
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">Registrar gasto</span></div>
+          <div class="daily-form">
+            <input id="dAmt" type="text" inputmode="decimal" placeholder="$0" class="inp inp-amount"/>
+            <select id="dCat" class="inp inp-select"></select>
+            <input id="dNote" type="text" placeholder="Nota (opcional)" class="inp inp-note"/>
+            <div class="daily-who">
+              <span class="who-label">¿Quién?</span>
+              <span id="dWhoChip" class="chip"></span>
+            </div>
+            <button class="btn-primary" onclick="submitDaily()">+ Registrar</button>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-hdr">
+            <span class="sec-title">Gastos del día</span>
+            <span class="sec-val" id="dDayTotal">$0</span>
+          </div>
+          <div id="dList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB RESUMEN ═══ -->
+    <div id="pm" class="pg">
+      <div class="pg-inner">
+        <div class="mnav">
+          <button class="mb" onclick="chM(-1)">&#8592;</button>
+          <span class="mlbl" id="mLbl"></span>
+          <button class="mb" onclick="chM(1)">&#8594;</button>
+        </div>
+        <div class="alert" id="alertBox">
+          <div class="alert-t">⚠️ Gastos fijos exceden el ingreso</div>
+          <div class="alert-b" id="alertMsg"></div>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="cl">Ingresos</div><div class="cv g" id="cInc">$0</div></div>
+          <div class="card"><div class="cl">Gasto real</div><div class="cv r" id="cExp">$0</div></div>
+          <div class="card card-blue"><div class="cl">Presupuesto</div><div class="cv" id="cBud">$0</div></div>
+          <div class="card"><div class="cl">Disponible</div><div class="cv" id="cAvail">$0</div></div>
+          <div class="card card-green"><div class="cl">Gastos fijos 🔒</div><div class="cv g" id="cFix">$0</div></div>
+          <div class="card"><div class="cl">% del presupuesto</div><div class="cv" id="cPct">0%</div></div>
+        </div>
+        <div class="pw">
+          <div class="pm-row"><span>Gasto real vs presupuesto</span><span id="pPct">0%</span></div>
+          <div class="pb"><div class="pf" id="pFill" style="width:0%;background:#1D9E75;"></div></div>
+        </div>
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">Ingresos</span><span class="sec-val" id="incTot">$0</span></div>
+          <div id="incRows"></div>
+          <div class="add-row">
+            <input type="text" id="niLbl" placeholder="Nueva fuente de ingreso..."/>
+            <button class="btn-add" onclick="addInc()">+ Agregar</button>
+          </div>
+        </div>
+        <div id="expSecs"></div>
+        <div class="sec new-cat-sec">
+          <div class="sec-title" style="margin-bottom:.6rem;">Nueva categoría</div>
+          <div class="add-row">
+            <input type="text" id="ncLbl" placeholder="Nombre categoría..."/>
+            <button class="btn-add" onclick="addCat()">+ Categoría</button>
+          </div>
+        </div>
+        <div class="chart-sec">
+          <div class="chart-title">Distribución por categoría</div>
+          <div id="barChart"></div>
+        </div>
+        <button class="btn-secondary apply-btn" onclick="applyFixedYear()">🔒 Aplicar gastos fijos a todo el año</button>
+        <div class="apply-hint">Copia los ítems fijos del mes actual a los meses que aún no tienen datos</div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB ANÁLISIS ═══ -->
+    <div id="px" class="pg">
+      <div class="pg-inner">
+        <div class="an-tabs">
+          <button class="an-tab on" id="ant-sem" onclick="goAn('sem')">🚦 Semáforo</button>
+          <button class="an-tab"    id="ant-ten" onclick="goAn('ten')">📈 Tendencia</button>
+          <button class="an-tab"    id="ant-hor" onclick="goAn('hor')">🐜 Hormiga</button>
+        </div>
+        <div id="an-sem" class="an-pg on"></div>
+        <div id="an-ten" class="an-pg"></div>
+        <div id="an-hor" class="an-pg"></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB CONFIGURACIÓN ═══ -->
+    <div id="pc" class="pg">
+      <div class="pg-inner">
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">🏠 Mi Hogar</span></div>
+          <div id="hogarInfo" class="hogar-info"></div>
+        </div>
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">📊 Presupuesto</span></div>
+          <div id="budgetConfig"></div>
+        </div>
+        <div class="sec danger-sec">
+          <button class="btn-secondary" onclick="signOutUser()">Cerrar sesión</button>
+          <button class="btn-danger" onclick="cleanDuplicates()">🧹 Limpiar duplicados</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /appShell -->
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- PWA Banner iOS -->
+  <div id="pwab" style="display:none; background:#E8F5EF; padding:.75rem 1rem; font-size:.8rem; text-align:center; color:#085041;">
+    📱 <strong>Instalar en iPhone:</strong> Safari → botón compartir ⬆️ → "Agregar a pantalla de inicio"
   </div>
 
   <!-- Firebase SDK compat v9 -->
@@ -109,9 +232,15 @@
 
   <!-- Módulos propios — orden estricto -->
   <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/offline.js"></script>
+  <script src="js/firebase-paths.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/hogar.js"></script>
-  <script src="js/firebase-paths.js"></script>
+  <script src="js/finanzas.js"></script>
+  <script src="js/daily.js"></script>
+  <script src="js/analisis.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
 
 </body>
