@@ -78,6 +78,33 @@ function defD() {
   };
 }
 
+
+// ── INGRESOS DINÁMICOS — DA-11 ────────────────────────────────────────────────
+
+function buildIncomeFromPerfil(perfil) {
+  const miembros = Object.values((perfil && perfil.miembros) || {})
+    .filter(m => m.rol === 'adulto' && m.nombre);
+  const income = miembros.map(m => ({ label: 'Ingreso ' + m.nombre, value: 0, fixed: true }));
+  if (!income.length) income.push({ label: 'Ingreso principal', value: 0, fixed: true });
+  income.push({ label: 'Otros ingresos', value: 0, fixed: false });
+  return income;
+}
+
+// ── PRESUPUESTO BASE — DA-8 ───────────────────────────────────────────────────
+// ÚNICA función que calcula provisión mensual. Nunca calcular inline.
+
+function calcPresupuestoBase(item, mesActual) {
+  const b = item.budget || 0;
+  if (!b) return 0;
+  const frec = item.frecuencia || 'mensual';
+  if (frec === 'mensual') return b;
+  if (item.months && item.months.length) {
+    return item.months.includes(mesActual) ? b : 0;
+  }
+  const divisores = { bimestral:2, trimestral:3, semestral:6, anual:12 };
+  return Math.round(b / (divisores[frec] || 1));
+}
+
 // ── SUBSCRIBE MES ─────────────────────────────────────────────────────────────
 
 function subMonth() {
@@ -337,12 +364,12 @@ function renderResumen() {
       badge = '✓ cumplido';
       detailText = `<p style="font-size:12px;color:${textColor};margin:0;">Guardado ${fmt(c.act)} de ${fmt(c.bud)}</p>`;
     } else if (verde && c.bud > 0) {
-      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)} de ${fmt(c.bud)} · quedan ${fmt(c.bud - c.act)}</p>`;
     } else {
       // Sin presupuesto definido
-      bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
+      bg = 'var(--color-bg)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)}</p>`;
     }
