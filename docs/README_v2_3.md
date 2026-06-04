@@ -74,19 +74,17 @@ Responde tres preguntas: ¿cuánto entra? ¿en qué se va? ¿cómo vamos?
 
 El corazón de Finanzas es el **Presupuesto Base**: cada gasto del hogar declara su frecuencia (mensual, semestral, anual) y la app calcula automáticamente cuánto provisionar cada mes. El SOAT de agosto, la prima de la empleada en junio, las vacaciones de enero — todo está previsto desde el primer día del año.
 
-Incluye además presupuesto mensual, registro diario de gastos, nómina familiar, empleadas del hogar con prestaciones sociales colombianas, y análisis de tendencias.
+El registro diario usa un catálogo de 56 ítems en 10 categorías — suficientemente detallado para tomar decisiones reales, suficientemente simple para registrar en 10 segundos.
 
-**Estado:** En producción desde abril 2026 (v1). Migración a v2.0 en progreso.
+**Estado:** Login + Hogar implementados (v2.1). Presupuesto Base y onboarding en construcción (v2.2).
 
 ### 📋 Planeador
 Organiza todo lo que no es dinero pero que afecta el dinero y el tiempo: eventos, cumpleaños, viajes, compromisos del colegio, vencimientos, recordatorios.
 
-Conectado con Finanzas: cada evento puede originar gastos que se registran automáticamente.
-
 **Estado:** Planificado para v3.0. Base validada con el módulo Viaje (Europa, mayo 2026).
 
 ### 🍽️ Alimentación
-Menú semanal, lista de mercado automática, perfil por hijo con alergias y preferencias. Conectado con Finanzas: lo que gastas en mercado afecta tu presupuesto de alimentación.
+Menú semanal, lista de mercado automática, perfil por hijo con alergias y preferencias.
 
 **Estado:** Planificado para v4.0.
 
@@ -112,44 +110,46 @@ Menú semanal, lista de mercado automática, perfil por hijo con alergias y pref
 
 | Diferencial | Descripción |
 |-------------|-------------|
-| **Pensado para Latinoamérica** | Cesantías, prima semestral, SOAT, empleada doméstica, retención en la fuente, PSE, Nequi. Realidades que apps globales ignoran. |
+| **Pensado para Latinoamérica** | Cesantías, prima semestral, SOAT, empleada doméstica, retención en la fuente. Realidades que apps globales ignoran. |
 | **Diseñado para parejas** | La transparencia financiera entre pareja no es una función — es el propósito. Pasar de "mi presupuesto" a "nuestro hogar". |
-| **Se adapta a ti** | Un soltero, una pareja sin hijos y una familia con tres hijos, vehículo y empleada ven experiencias completamente diferentes. La app no te obliga a adaptarte a ella. |
-| **Todo conectado** | Los eventos originan gastos. El colegio genera recordatorios. La empleada genera prestaciones. Todo fluye hacia las finanzas del hogar. |
-| **Progresivo** | Empiezas con lo mínimo. La app sugiere agregar más información solo cuando tiene sentido hacerlo. Sin formularios largos al inicio. |
+| **Se adapta a ti** | Un soltero, una pareja sin hijos y una familia con tres hijos ven experiencias completamente diferentes. |
+| **Todo conectado** | Los eventos originan gastos. El colegio genera recordatorios. La empleada genera prestaciones. |
+| **Progresivo** | Empiezas con lo mínimo. La app sugiere agregar más información solo cuando tiene sentido hacerlo. |
 
 ---
 
 ## Estado actual del proyecto
 
-Organiza2 está en transición activa entre dos versiones:
-
 | Capa | Estado |
 |------|--------|
-| **Visión estratégica** | ✅ Definida — Organiza2 v2.0 documentada |
-| **App en producción** | ✅ Finanzas v1 — funcional, en uso real |
-| **Próximo hito** | 🔄 Login Google + Modelo de Hogar (v2.1) |
-| **Planeador** | 🔲 Planificado para v3.0 |
-| **Alimentación** | 🔲 Planificado para v4.0 |
+| **Visión estratégica v2.0** | ✅ Definida y documentada |
+| **Login Google + Firebase Auth** | ✅ Implementado (Etapa A) |
+| **Modelo de Hogar** | ✅ Implementado — crear/unirse por código (Etapa B) |
+| **Migración datos a hogares/** | ✅ Implementado (Etapa C) |
+| **Finanzas v2 — arquitectura modular** | ✅ Implementado (Etapa D) |
+| **Presupuesto Base + Onboarding** | 🔄 En construcción (v2.2 / Etapa E) |
+| **Piloto con familias** | 🔲 v2.3 |
+| **Planeador** | 🔲 v3.0 |
+| **Alimentación** | 🔲 v4.0 |
 
-> La versión en producción es Finanzas v1 — un módulo de presupuesto y gastos familiar funcional, en uso real desde abril 2026. La arquitectura completa de Organiza2 (hogar como entidad central, módulos conectados, pantallas dinámicas) está documentada y lista para construirse sobre esa base.
+> **Hogar activo:** SNBDPA ("Hogar Ibarra") — 2 miembros en producción.
 
 ### ⛔ Regla de validación
 
-**El Planeador y la Alimentación no se construyen hasta que Finanzas v2.0 haya sido validado con 5-10 familias reales durante al menos 4 semanas.** El piloto debe confirmar que el onboarding, el Presupuesto Base, las pantallas dinámicas y la transparencia en pareja funcionan correctamente antes de agregar nuevos módulos.
+**El Planeador y la Alimentación no se construyen hasta que Finanzas v2.0 haya sido validado con 5-10 familias reales durante al menos 4 semanas.**
 
 ---
 
 ## Roadmap
 
-| Versión | Qué incluye |
-|---------|-------------|
-| **v2.1** | Login Google · Creación del hogar · Código de invitación para pareja |
-| **v2.2** | Finanzas reconstruida sobre modelo de hogar · Pantallas dinámicas · Onboarding progresivo |
-| **v2.3** | Piloto con 10 familias reales · Feedback · Sin nuevas funciones hasta validar |
-| **v3.0** | Planeador — eventos, recordatorios, compromisos del hogar |
-| **v4.0** | Alimentación — menú semanal, lista de mercado, perfiles por hijo |
-| **v5.0** | Monetización · Planes freemium · PSE / Nequi |
+| Versión | Qué incluye | Estado |
+|---------|-------------|--------|
+| **v2.1** *(Etapas A-D)* | Login Google · Hogar · Código de invitación · Migración Anny1130 · Finanzas modular | ✅ |
+| **v2.2** *(Etapa E)* | Presupuesto Base · Onboarding 5 pantallas · defD() v2.0 · Registro diario detallado · Pantallas dinámicas | 🔄 |
+| **v2.3** | Piloto con 10 familias reales · Feedback · Sin nuevas funciones hasta validar | 🔲 |
+| **v3.0** | Planeador — eventos, recordatorios, compromisos del hogar | 🔲 |
+| **v4.0** | Alimentación — menú semanal, lista de mercado, perfiles por hijo | 🔲 |
+| **v5.0** | Monetización · Planes freemium · PSE / Nequi | 🔲 |
 
 ---
 
@@ -170,8 +170,8 @@ Organiza2 está en transición activa entre dos versiones:
 
 | Documento | Contenido |
 |-----------|-----------|
-| [producto.md](./docs/producto.md) | Visión, propuesta de valor, módulos, modelo de hogar, roadmap estratégico |
-| [arquitectura.md](./docs/arquitectura.md) | Estructura técnica, Firebase, decisiones arquitecturales, flujos de datos |
+| [producto_v2_3.md](./docs/producto_v2_3.md) | Visión, propuesta de valor, módulos, onboarding, modelo de hogar, roadmap |
+| [arquitectura_v2_3.md](./docs/arquitectura_v2_3.md) | Estructura técnica, Firebase, decisiones arquitecturales DA-0 a DA-13 |
 | [bitacora.md](./docs/bitacora.md) | Historial de desarrollo, bugs resueltos, aprendizajes, deuda técnica |
 
 ---
@@ -180,15 +180,19 @@ Organiza2 está en transición activa entre dos versiones:
 
 Antes de tocar cualquier línea de código, leer estas reglas:
 
-1. **El Hogar es la entidad principal** — los datos viven en `hogares/[codigoHogar]/`, nunca en nodos personales de usuario. Ver DA-0 en `arquitectura.md`.
+1. **El Hogar es la entidad principal** — los datos viven en `hogares/[codigoHogar]/`, nunca en nodos personales de usuario. Ver DA-0.
 2. **Nunca usar `cat.items` directamente** — siempre `planItems(cat)`. Ver DA-2.
 3. **Los gastos diarios NO van al nodo mensual** — viven en `daily/` y se suman en memoria. Ver DA-1.
-4. **`canonicalLabel()` se aplica al leer de Firebase** — corrige encodings corruptos de tildes y eñes. Ver DA-3. No modificar nunca.
-5. **Login antes de separar código** — el Login reemplaza `FBK = 'Anny1130'` en ~30 funciones. Separar antes es trabajo doble. Ver DA-5.
-6. **Cada nuevo nodo Firebase requiere regla explícita** — no hay herencia automática de reglas de seguridad.
-7. **iOS Safari ignora `inputmode="decimal"` en `type="number"`** — usar `type="text" inputmode="decimal"` en todos los campos de monto.
+4. **`canonicalLabel()` se aplica al leer de Firebase** — nunca modificar. Ver DA-3.
+5. **Login antes de separar código** — el Login afecta ~30 funciones. Separar antes es trabajo doble. Ver DA-5.
+6. **Cada nuevo nodo Firebase requiere regla explícita** — no hay herencia automática.
+7. **iOS Safari:** `type="text" inputmode="decimal"` en todos los campos de monto.
 8. **El perfil del hogar determina qué se muestra** — toda lógica de visibilidad pasa por `getCapabilidades(perfil)`. Ver DA-7.
-9. **El hogar se construye progresivamente** — nunca pedir información que todavía no genera valor. Ver DA-9.
+9. **El hogar se construye progresivamente** — nunca pedir información que no genera valor todavía. Ver DA-9.
+10. **Dos niveles de detalle** — `defD()` para el presupuesto (agrupado), `DAILY_ITEMS` para el registro diario (detallado). Nunca mezclar. Ver DA-10.
+11. **Ingresos dinámicos** — los labels de ingresos vienen del perfil del hogar, nunca hardcodeados con nombres. Ver DA-11.
+12. **`calcPresupuestoBase(item, mes)`** — única función que calcula provisión mensual por frecuencia. Nunca calcular inline. Ver DA-8.
+13. **Cuota crédito vehículo va en Transporte** — no en Vivienda. Ver DA-12.
 
 ---
 
