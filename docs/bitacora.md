@@ -191,16 +191,53 @@ hogares/SNBDPA/miembros/[uid_anny]/rol:  "miembro"
 
 ## Próximas etapas
 
-### 🔲 Etapa C — Migración de datos Anny1130
-**Objetivo:** Mover los datos reales de `pl/Anny1130/` y `daily/Anny1130/` al nodo del hogar.
+### ✅ Etapa C — Migración de datos Anny1130
+**Fecha:** Junio 2026
+**Objetivo:** Mover los datos reales al nodo del hogar y actualizar los paths de Firebase.
 
-**Pasos:**
-1. Backup manual de `pl/Anny1130/` desde Firebase Console (descargar JSON)
-2. Script de migración en consola del navegador
-3. Actualizar `dKey()`, `dayKey()`, `hKey()` para usar `window.HOGAR.codigoHogar`
-4. Activar reglas de seguridad estrictas por hogar
+**Archivos creados:**
+- `js/firebase-paths.js` — `dKey()`, `dayKey()`, `hKey()`, `vKey()` usando `window.HOGAR.codigoHogar`
 
-> ⚠️ Hacer backup ANTES de cualquier cambio. Los datos son reales.
+**Archivos modificados:**
+- `index.html` — agregado `<script src="js/firebase-paths.js">` entre `hogar.js` y `app.js`
+
+**Migración ejecutada desde consola del navegador:**
+
+| Nodo origen | Nodo destino | Estado |
+|---|---|---|
+| `pl/Anny1130/2025` | `hogares/SNBDPA/pl/2025` | ✅ |
+| `pl/Anny1130/2026` | `hogares/SNBDPA/pl/2026` | ✅ |
+| `daily/Anny1130/2026` | `hogares/SNBDPA/daily/2026` | ✅ |
+| `viaje/Anny1130/2026` | `hogares/SNBDPA/viaje/2026` | ✅ |
+
+4 nodos copiados, 0 errores.
+
+**Nodos originales eliminados** desde Firebase Console:
+- `pl/Anny1130` ✅
+- `daily/Anny1130` ✅
+- `viaje/Anny1130` ✅
+
+> Firebase eliminó automáticamente los nodos padre `pl/`, `daily/` y `viaje/` al quedar vacíos. Comportamiento esperado.
+
+**Validación:**
+```javascript
+dKey(2026, 5) // → "hogares/SNBDPA/pl/2026/5" ✅
+```
+
+**Estructura Firebase al finalizar Etapa C:**
+```
+hogares/SNBDPA/
+├── meta/
+├── miembros/
+├── perfil/
+├── pl/2025/ + pl/2026/
+├── daily/2026/
+└── viaje/2026/
+```
+
+**Criterio de éxito cumplido:** Todos los datos reales están en el nodo del hogar. Los paths apuntan a `hogares/[codigoHogar]/`. Los nodos `Anny1130` eliminados.
+
+---
 
 ### 🔲 Etapa D — Finanzas v2 reconstruida
 **Objetivo:** Reconstruir los módulos de Finanzas sobre el modelo de hogar.
