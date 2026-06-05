@@ -1,4 +1,4 @@
-# 📓 Organiza2 — Bitácora Técnica v2.3
+# 📓 Organiza2 — Bitácora Técnica v2.5
 
 > Historial completo de desarrollo, decisiones y aprendizajes
 > Abril — Junio 2026
@@ -7,48 +7,41 @@
 
 ## 1. Resumen Ejecutivo
 
-| ✅ Logros | 🔲 Pendientes (Etapa E+) |
-|-----------|--------------------------|
-| App PWA en producción | Onboarding 5 pantallas |
-| Sincronización tiempo real multiusuario | Presupuesto Base v2 con frecuencias |
-| Módulo Nómina y Empleadas | Registro diario con catálogo detallado |
-| Cola offline validada (viaje Europa) | Fix iOS decimal `type="text"` |
-| Análisis: Semáforo, Tendencia, Hormiga | Piloto 5-10 familias |
-| Login Google + Firebase Auth (Etapa A) | Fix iOS decimal `type="text"` |
-| Modelo de Hogar + código invitación (Etapa B) | Exportar PDF / Excel |
-| Migración datos a hogares/ (Etapa C) | |
-| Finanzas v2 arquitectura modular (Etapa D) | |
-| Migración Anny1130 → hogares/SNBDPA/ ✅ | |
-| Visión v2.0 definida y documentada | |
-| Diseño onboarding aprobado | |
-| Reglas Firebase por uid autenticado ✅ | |
+| ✅ Logros | 🔲 Pendientes |
+|-----------|--------------|
+| App PWA en producción | Rediseño tab Config (mockup pendiente) |
+| Login Google + Firebase Auth (Etapa A) | Pantallas dinámicas según perfil (getCapabilidades) |
+| Modelo de Hogar + código invitación (Etapa B) | Fix iOS decimal `type="text"` |
+| Migración datos a hogares/ (Etapa C) | Exportar mes a PDF |
+| Finanzas v2 arquitectura modular (Etapa D) | Exportar año a Excel |
+| Migración Anny1130 → hogares/SNBDPA/ ✅ | Piloto 5-10 familias |
+| Etapa E completa ✅ | Tab Análisis — afinar pendiente |
+| Tab Resumen rediseñado — solo lectura ✅ | |
+| Semáforo por categoría ✅ | |
+| Pantalla login con logo ✅ | |
+| Config limpio — sin residuos v1 ✅ | |
+| REGLAS_IA.md creado ✅ | |
+| Proyecto Claude con todos los archivos ✅ | |
 
 ---
 
 ## 2. Cronología de Desarrollo
 
-### 📅 Fase 1-6 — v1.x (Abril — Mayo 2026)
-*(ver secciones anteriores de la bitácora)*
+### 📅 Fases 1-6 — v1.x (Abril — Mayo 2026)
+*(ver versiones anteriores de la bitácora)*
 
 ### 📅 Fase 7 — Auditoría estratégica y redefinición v2.0 (Junio 2026)
 
-> La app funcionaba pero había una pregunta de fondo: ¿estamos construyendo la app correcta?
+**Decisión:** Organiza2 no es una app financiera. Es una plataforma de decisiones familiares.
+Lema redefinido: *"Organizamos tu vida en pareja."*
 
-**Decisión:** Organiza2 no es una app financiera. Es una plataforma de decisiones familiares. Lema redefinido: *"Organizamos tu vida en pareja."*
-
-**Cambios de visión:**
 - El Hogar pasa a ser la entidad principal (DA-0)
 - Módulos redefinidos: Finanzas · Planeador · Alimentación
-- Roadmap reordenado: Login → Hogar → Finanzas v2 → Piloto → Planeador → Alimentación
 - Regla de validación: no construir Planeador ni Alimentación hasta validar Finanzas v2 con familias reales
 
-**Documentos generados:** `producto_v2_2.md`, `arquitectura_v2_2.md`, `auditoria_v2.md`, `README_v2_2.md`
+**Documentos generados:** `producto_v2_3.md`, `arquitectura_v2_3.md`, `README_v2_3.md`, `bitacora_v2_3.md`
 
----
-
-### 📅 Fase 8 — v2.1 / Etapas A-D implementadas (Junio 2026)
-
-> **Nota de nomenclatura:** Las Etapas A-D son la nomenclatura interna de desarrollo de v2.1. Etapa E corresponde a v2.2. Las versiones describen el producto; las etapas describen el proceso de construcción.
+### 📅 Fase 8 — v2.1 / Etapas A-D (Junio 2026)
 
 - **Etapa A:** Login Google con Firebase Auth
 - **Etapa B:** Modelo de Hogar — crear/unirse por código de invitación
@@ -56,122 +49,195 @@
 - **Etapa D:** Finanzas v2 reconstruida con arquitectura modular (14 archivos JS)
 
 **Estado:** App en producción en `organiza2.github.io/finanzas-familia`
-**Hogar activo:** SNBDPA ("Hogar Ibarra") — 2 miembros (Jaime + Anny)
-
----
+**Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros (Jaime + Anny)
 
 ### 📅 Fase 9 — Diseño del Presupuesto Base y Onboarding (Junio 2026)
 
-> Sesión de diseño completa antes de implementar la Etapa E. Las decisiones tomadas redefinieron la arquitectura de categorías, el onboarding y el modelo de colaboración en pareja.
+Sesión de diseño antes de implementar Etapa E. Decisiones principales:
+- DA-10: dos niveles de detalle (presupuesto agrupado vs registro diario detallado)
+- 10 categorías oficiales v2.0
+- Catálogo DAILY_ITEMS: 56 ítems
+- Onboarding conversacional: *"¿Cómo es su hogar?"* antes de cualquier número
+- Nota obligatoria en "Otros"
+- DA-11: ingresos dinámicos desde perfil
 
-**Decisiones principales:**
+### 📅 Fase 10 — Etapa E implementada (Junio 2026)
 
-#### Dos niveles de detalle (DA-10)
-El insight más importante de la sesión: no hay tensión entre simplicidad y análisis. Se resuelve con dos niveles:
-- **Presupuesto Base:** ítems agrupados (planear)
-- **Registro diario:** ítems detallados (entender)
+**Lo que se construyó:**
+- `defD()` v2.0 — 10 categorías oficiales
+- `DAILY_ITEMS` — 56 ítems para registro diario, separado de `defD()`
+- `calcPresupuestoBase(item, mes)` — función canónica de frecuencias (DA-8)
+- `buildIncomeFromPerfil(perfil)` — ingresos dinámicos desde perfil (DA-11)
+- Onboarding 5 pantallas + resumen conversacional
+- Sección Presupuesto Base en tab Config
+- Banner miembro 2 "¿Estás de acuerdo?"
+- Nota obligatoria al elegir "Otros" en registro diario
+- Selector de 2 niveles en tab Hoy (categoría → ítem)
 
-Una mamá con poco tiempo configura 3 campos. Al final del mes puede responder *"¿en qué se fue Salud?"* con detalle real.
+**Textos del onboarding ajustados:**
+- P2: *"Así podemos mostrarte lo que más importa para ustedes."*
+- P4: `Servicios (agua, energía, gas, internet)`
+- P4: `Transporte (gasolina, peajes, taxis)`
+- P5: `Mercado y loncheras`
+- Resumen: botón "Cancelar" agregado para salir sin guardar
 
-#### Categorías v2.0 — 10 categorías oficiales
-Las categorías aumentaron de 8 a 10. Se agregaron Vestuario y Regalos y Celebraciones. La categoría Servicio Doméstico se absorbió como ítem dentro de Vivienda.
+**Proceso de integración — aprendizaje importante:**
+La Etapa E se intentó integrar en dos sesiones. En la primera se generaron 4 archivos JS + 1 CSS + instrucciones. En la segunda se intentó hacer "archivos completos" lo que generó confusión y mezcla de versiones. **Aprendizaje: cuando algo funciona, no rehacerlo completo. Solo modificar lo que cambia.**
 
-#### Catálogo de ítems del registro diario
-56 ítems en 10 categorías. Decisiones específicas:
-- Restaurantes → Entretenimiento (era Alimentación en v1) — es una decisión de ocio, no de mercado
-- Servicios estéticos → agrupa manicure, pedicure, depilación, barbería — universal para hombres y mujeres
-- Cuota crédito vehículo → Transporte (no Vivienda) — gasto reversible
-- Medicina prepagada → ítem fijo mensual en Salud y Belleza
-- Matrículas → frecuencia configurable (anual/semestral/mensual)
+### 📅 Fase 11 — Tab Resumen rediseñado (Junio 2026)
 
-#### Onboarding — lenguaje conversacional
-El primer prototipo se veía como cualquier app financiera. Rediseño completo con:
-- Pantalla inicial de contexto: *"¿Cómo es su hogar?"* antes de cualquier número
-- Pantalla de dolor: *"¿Cuál es su mayor reto?"* — personaliza el tono de toda la app
-- Lenguaje conversacional: *"Lo que sí o sí hay que pagar"* en lugar de *"Gastos fijos"*
+**Problema:** El tab Resumen era una copia del editor de presupuesto de v1 — inputs, filas editables, hoja de cálculo. No respondía *"¿cómo vamos?"* de forma rápida.
 
-#### Regla sobre "Otros"
-En v1, "Otros" era un campo libre. En v2:
-- En registro diario: nota **obligatoria** cuando se elige "Otros"
-- En Config: botón "+ Agregar ítem" que crea un ítem personalizado persistente en el hogar
+**Solución — diseño con mockup:**
+- Solo lectura — sin inputs
+- Número grande de disponible como protagonista (verde/rojo)
+- Semáforo por categoría: rojo (pasó límite) / amarillo (>85%) / verde (bien)
+- Rojo y amarillo expandidos por defecto
+- Ahorro siempre expandido con "✓ cumplido" en fondo verde
+- Categorías verdes colapsadas — se abren al tocar
+- Cada tarjeta: gastado X de Y + lo que queda
+- Orden: rojo → amarillo → ahorro cumplido → verde → sin presupuesto
 
-#### Trabajo en equipo — modelo de colaboración
-Problema identificado: si ambos miembros hacen el onboarding por separado, se necesita merge de presupuestos — demasiado complejo.
+**Aprendizaje:** *Una mamá mira colores, no números. Si todo está verde, respira. Si hay rojo, se enfoca ahí.*
 
-Solución simple: onboarding lo llena quien crea el hogar. El miembro 2 ve el presupuesto con banner *"¿Estás de acuerdo?"* y puede dejar un comentario por ítem. Historial, notificaciones y votación para después del piloto.
+**Archivos modificados:** `js/finanzas.js` (nueva `renderResumen()`, `renderExpSecs()` separado), `js/ui.js`, `index.html`
 
-#### Ingresos dinámicos (DA-11)
-Los labels de ingresos salen del perfil del hogar, no del código. Eliminado el antipatrón `label: 'Salario Jaime'` hardcodeado.
+### 📅 Fase 12 — Pantalla de login rediseñada (Junio 2026)
 
-**Documentos actualizados:** `producto_v2_3.md`, `arquitectura_v2_3.md`
+- Logo oficial `logo.png` subido a la raíz del repo
+- Diseño Opción C: logo en fondo crema + 3 beneficios + botón Google con SVG inline
+- Beneficios alineados con propuesta de valor:
+  - ✅ Saben en qué se va el dinero
+  - ✅ Deciden juntos, sin sorpresas
+  - ✅ Paz mental a fin de mes
+
+**Archivos modificados:** `css/login.css`, `index.html`
+
+### 📅 Fase 13 — Bugs post-integración y limpieza Config (Junio 2026)
+
+Ver sección 3 — Registro de Bugs.
+
+**Decisión de Config (DA-16):** El tab Config solo muestra configuración del hogar y presupuesto base. Los gastos reales del mes solo se ven en el Resumen. `renderExpSecs()` eliminado de Config.
+
+### 📅 Fase 14 — Regla de Oro y proyecto Claude (Junio 2026)
+
+- Creado `REGLAS_IA.md` en la raíz del repo
+- Todos los archivos del proyecto subidos al proyecto Claude
+- Regla de Oro establecida: siempre preguntar si el archivo está actualizado antes de modificarlo
 
 ---
 
 ## 3. Registro de Bugs y Soluciones
 
-*(bugs #1 al #13 — ver versión anterior de la bitácora)*
+*(bugs #1 al #13 — ver versiones anteriores)*
+
+**Bug #14 — Tarjetas verdes del Resumen sin contraste**
+- **Síntoma:** Categorías en estado verde tenían fondo igual al fondo de la página
+- **Causa:** `var(--color-bg)` en lugar de `var(--color-surface)`
+- **Fix:** Cambiar en `renderResumen()` los dos casos de `var(--color-bg)` a `var(--color-surface)`
+- **Archivo:** `js/finanzas.js`
+
+**Bug #15 — `calcPresupuestoBase` not defined**
+- **Síntoma:** `Uncaught ReferenceError: calcPresupuestoBase is not defined` en `presupuesto.js`
+- **Causa:** Al rediseñar el Resumen se generó un `finanzas.js` nuevo basado en el archivo original del proyecto de Claude (v1), que no tenía `calcPresupuestoBase`, pisando el archivo correcto
+- **Fix:** Reconstruir `finanzas.js` combinando ambas versiones
+- **Aprendizaje:** Siempre pedir el archivo actual antes de modificarlo → DA-17
+
+**Bug #16 — Config con contenido duplicado (v1 + v2)**
+- **Síntoma:** Config mostraba categorías dos veces — HTML hardcodeado (v1) + `renderExpSecs()` (v2)
+- **Causa:** El `index.html` tenía bloques de v1 (`incRows`, `expSecs`, `ncLbl`, botón "Aplicar fijos") que nunca se eliminaron
+- **Fix:** Eliminar bloques v1 del `index.html` + quitar `renderExpSecs()` de `go('c')` en `ui.js`
+
+**Bug #17 — Nombres de categorías cortados en Resumen**
+- **Síntoma:** `ivienda`, `e Impuestos`, `Doméstico` en lugar de los nombres completos
+- **Causa:** `c.name.replace(/^\S+\s/, '')` cortaba la primera *palabra* en lugar de solo el emoji inicial. Para `🏠 Vivienda` funciona, pero para `Vivienda` (sin emoji) cortaba la `V`
+- **Fix:** Función `displayName(name)` que usa regex Unicode para quitar solo emojis al inicio
+- **Archivo:** `js/finanzas.js`
+
+**Bug #18 — Orden del semáforo incorrecto**
+- **Síntoma:** Las categorías rojas y amarillas no aparecían primero; el ahorro no aparecía destacado
+- **Causa:** Las tarjetas se renderizaban en el orden original de `D.categories` sin ordenar por estado
+- **Fix:** Ordenar antes de renderizar: `[...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud, ...ahorroSinCumplir]`
+- **Archivo:** `js/finanzas.js`
 
 ---
 
 ## 4. Decisiones Arquitecturales
 
-*(DA-0 al DA-9 — ver arquitectura_v2_3.md)*
+*(DA-0 al DA-13 — ver arquitectura_v2_3.md)*
 
-*(DA-10 al DA-13 son nuevas — ver arquitectura_v2_3.md)*
+**DA-14: Tab Resumen es solo lectura**
+El tab Resumen no tiene inputs. Solo muestra el estado del mes. La edición vive en Config.
+
+**DA-15: Login con logo oficial**
+La pantalla de login muestra `logo.png`. El emoji 🏠 era un placeholder temporal.
+
+**DA-16: Config solo muestra configuración, no gastos reales**
+El tab Config muestra: info del hogar + presupuesto base. No muestra los gastos reales del mes. `renderExpSecs()` eliminado de Config. Los gastos reales solo se ven en el Resumen.
+
+**DA-17: Siempre pedir el archivo actual antes de modificarlo**
+Antes de modificar cualquier archivo, preguntar al usuario si está actualizado. Nunca generar desde cero si existe. Nunca asumir que el archivo en el proyecto de Claude es igual al que está en el repo. Ver `REGLAS_IA.md`.
 
 ---
 
-## 5. Deuda Técnica Consolidada
+## 5. Deuda Técnica
 
-### 🔴 Prioridad Alta — Etapa E
-- Presupuesto Base: onboarding 5 pantallas
-- `defD()` v2.0 con 10 categorías oficiales
-- `calcPresupuestoBase()` y actualizar `recalc()`
-- `DAILY_ITEMS` catálogo para registro diario
-- `buildIncomeFromPerfil()` — ingresos dinámicos
-- Script `migracion-anny1130.html` — ✅ ejecutado. Datos en hogares/SNBDPA/pl/2026/. Ítems v2 se verán correctamente al implementar defD() v2.0 en Etapa E.
-- Banner *"¿Estás de acuerdo?"* para miembro 2
-- Nota obligatoria al elegir "Otros" en registro diario
+### 🔴 Prioridad Alta — Antes del piloto
+- Rediseño tab Config con mockup — ingresos, presupuesto, info hogar
+- Tab Análisis — hay cosas pendientes de afinar
+- Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
+- Pantallas dinámicas según `getCapabilidades(perfil)` — hijos activan Educación, vehículo activa Seguros
 
 ### 🟡 Prioridad Media
-- Fix iOS decimal: `type="text"` `inputmode="decimal"`
 - Exportar mes a PDF
 - Exportar año completo a Excel
-- "+ Agregar ítem" en Config (reemplaza "Otros" fijo)
+- Presupuesto Base se aplica automáticamente al crear mes nuevo
 - Sugerencias contextuales DA-9
 
 ### 🟢 Prioridad Baja
 - Modo oscuro
-- Proyección fin de año
 - Comparar mes actual vs mismo mes año anterior
+- Historial de cambios en presupuesto por ítem
 
 ---
 
 ## 6. Aprendizajes Clave
 
-*(aprendizajes anteriores — ver versión anterior de la bitácora)*
+> **Siempre pedir el archivo actual antes de modificarlo.**
+> En esta sesión se pisó el `finanzas.js` bueno porque se generó uno nuevo basado en el archivo del proyecto de Claude, que era la versión original. A partir de ahora: si hay que modificar un archivo existente, pedirlo primero.
 
-> **El onboarding define si el usuario clasifica la app como "otra app financiera" o como "algo diferente".**
-> El primer prototipo del onboarding pedía *"Ingreso del hogar"* — lenguaje de contador. Cuando la primera pantalla dice *"¿Cómo es su hogar?"*, el usuario siente que la app lo entiende antes de pedir un solo número. El lenguaje no es cosmético — es la diferenciación.
+> **No rehacer lo que funciona.**
+> Cuando el usuario pidió "archivos completos", se reescribieron todos desde cero en lugar de hacer cambios necesarios. Eso introdujo regresiones. La regla: cambios quirúrgicos, no rewrites completos.
 
-> **La tensión simplicidad vs análisis se resuelve con dos niveles, no con un término medio.**
-> Intentar que el presupuesto sea simple Y detallado produce un formulario mediocre — ni suficientemente simple para una mamá con poco tiempo, ni suficientemente detallado para un papá que quiere tomar decisiones. La solución es separar los dos momentos: presupuesto agrupado al planear, ítems detallados al registrar.
+> **Mockupear antes de implementar.**
+> El Resumen, el login y el onboarding se diseñaron con mockups interactivos antes de escribir código. Iteraciones en minutos vs horas de commits y redeploys.
 
-> **Antes de escribir código, definir los datos.**
-> La sesión de diseño del Presupuesto Base tomó varias horas pero evitará semanas de refactorización. Tener claros los 56 ítems, el mapa v1→v2, las reglas de "Otros" y el modelo de colaboración antes de escribir una línea de código es la inversión más rentable del proyecto.
+> **Config es configuración, no edición de gastos.**
+> El tab Config debe ser el panel de administración del hogar. Los gastos reales del mes van en el Resumen. Mezclar los dos crea confusión.
+
+> **Una mamá mira colores, no números.**
+> Los porcentajes y cifras exactas son para el análisis. Para la vista rápida, el color comunica más rápido. Rojo = problema. Verde = tranquilidad.
+
+> **El logo en el login comunica identidad. Un emoji no.**
+> El logo oficial con los beneficios específicos convierte el login en el primer momento de comunicación de la propuesta de valor.
 
 ---
 
 ## 7. Historial de Commits
 
-| Hash | Fecha | Descripción |
-|------|-------|-------------|
-| *(ver commits anteriores)* | | |
-| [confirmar hash] | Jun 2026 | feat: Etapa A — Login Google Firebase Auth ✅ |
-| [confirmar hash] | Jun 2026 | feat: Etapa B — Modelo de Hogar, crear/unirse ✅ |
-| [confirmar hash] | Jun 2026 | feat: Etapa C — Migración datos a hogares/ ✅ |
-| [confirmar hash] | Jun 2026 | feat: Etapa D — Finanzas v2 arquitectura modular ✅ |
-| [pendiente] | Jun 2026 | docs: producto v2.3, arquitectura v2.3, bitácora actualizada |
+| Hash | Descripción |
+|------|-------------|
+| *(ver commits anteriores)* | Etapas A-D |
+| 0bf4024 | feat: Etapa E — Presupuesto Base, onboarding 5 pantallas, DAILY_ITEMS |
+| [confirmar] | fix: onboarding — textos y botón cancelar en resumen |
+| [confirmar] | feat: tab Resumen rediseñado — semáforo por categoría, solo lectura |
+| [confirmar] | feat: pantalla de login rediseñada con logo y beneficios |
+| [confirmar] | fix: fondo blanco en tarjetas verdes del Resumen |
+| [confirmar] | fix: calcPresupuestoBase, buildIncomeFromPerfil y renderAll completo |
+| [confirmar] | fix: Config limpio — sin bloques v1, solo hogar y presupuesto base |
+| [confirmar] | fix: nombres categorías, orden semáforo y fondo tarjetas en Resumen |
+| [confirmar] | docs: REGLAS_IA.md — reglas de trabajo para asistentes IA |
+| [confirmar] | docs: bitacora v2.5, arquitectura v2.3, producto v2.3, README actualizados |
 
 ---
 
@@ -181,12 +247,23 @@ Los labels de ingresos salen del perfil del hogar, no del código. Eliminado el 
 |---------|-------|--------|
 | v2.0 | Auditoría · Visión · Documentación | ✅ |
 | v2.1 | Login + Hogar + Finanzas modular (Etapas A-D) | ✅ |
-| v2.2 | Finanzas v2 · Onboarding · Presupuesto Base (Etapa E) | 🔄 Siguiente |
-| v2.3 | Piloto 5-10 familias | 🔲 |
+| v2.2 | Etapa E: Presupuesto Base · Onboarding · Resumen rediseñado · Login nuevo | ✅ |
+| v2.3 | Piloto 5-10 familias — validar con uso real | 🔲 Siguiente |
 | v3.0 | Planeador MVP | 🔲 |
 | v4.0 | Alimentación | 🔲 |
 | v5.0 | Monetización | 🔲 |
 
 ---
 
-*Organiza2 — Bitácora v2.3 | Junio 2026*
+## 9. Próxima Sesión
+
+**Antes del piloto hay que resolver:**
+1. Rediseño de Config — mockup primero
+2. Tab Análisis — afinar lo pendiente
+3. Fix iOS decimal
+
+**Cuando esos tres estén listos → Piloto v2.3 con 5-10 familias**
+
+---
+
+*Organiza2 — Bitácora v2.5 | Junio 2026*

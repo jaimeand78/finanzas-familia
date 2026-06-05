@@ -1,6 +1,6 @@
-# 📋 Organiza2 — Documento de Producto v2.3
+# 📋 Organiza2 — Documento de Producto v2.5
 
-> Junio 2026 — Actualizado tras sesión de diseño del Presupuesto Base y Onboarding
+> Junio 2026 — Actualizado con Etapa E completa y rediseños de UX
 
 ---
 
@@ -14,20 +14,18 @@ Nació como una app financiera. Durante el uso real se descubrió algo más impo
 
 **Organiza2 no es una app financiera. Es una plataforma para organizar la vida en pareja y familia. Las finanzas son uno de sus módulos.**
 
-> **Nota sobre el lema:** *"Organizamos tu vida en pareja"* refleja el propósito central del producto — la colaboración, la transparencia compartida y la toma de decisiones conjuntas. Sin embargo, Organiza2 también es válido para usuarios solteros que quieren organizar sus finanzas personales, construir hábitos y prepararse para futuras etapas de vida. El lema describe la experiencia más completa del producto, no una restricción de acceso.
+> **Nota sobre el lema:** *"Organizamos tu vida en pareja"* refleja la experiencia más completa del producto. Organiza2 también es válido para usuarios solteros — el lema describe la colaboración, no una restricción.
 
 ---
 
 ## 2. El Problema que Resuelve
 
-Las familias modernas viven una fragmentación constante de información y responsabilidades.
-
 | Problema | Descripción |
 |----------|-------------|
 | **Carga mental diaria** | Qué pagar, qué comprar, qué cocinar, qué falta, qué hay que recordar. Decisiones repetitivas que agotan. |
-| **Gastos invisibles** | Regalos, cuotas escolares, materiales, viajes cortos, salidas imprevistas. Individualmente pequeños — en conjunto impactan enormemente el presupuesto. |
+| **Gastos invisibles** | Regalos, cuotas escolares, materiales, viajes cortos, salidas imprevistas. Individualmente pequeños — en conjunto enormes. |
 | **Descoordinación en pareja** | Quién lleva al niño, quién compra el regalo, quién paga qué. Todo depende de memoria humana. |
-| **Información dispersa** | El colegio manda circulares por WhatsApp, los gastos están en una hoja de cálculo, los recordatorios están en el teléfono de uno solo. Nada está conectado. |
+| **Información dispersa** | El colegio manda circulares por WhatsApp, los gastos en una hoja de cálculo, los recordatorios en el teléfono de uno solo. |
 
 ---
 
@@ -37,14 +35,19 @@ Las familias modernas viven una fragmentación constante de información y respo
 
 La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decisiones juntos y sentir que todo está bajo control.
 
+**En el login:**
+- ✅ Saben en qué se va el dinero
+- ✅ Deciden juntos, sin sorpresas
+- ✅ Paz mental a fin de mes
+
 ### Diferencial Competitivo
 
 | # | Diferencial | Descripción |
 |---|-------------|-------------|
-| 1 | **Se adapta a cada hogar** | La app no obliga al usuario a adaptarse al sistema. El sistema se adapta al usuario. Un soltero ve una experiencia diferente a una familia con hijos, vehículos y empleada. |
-| 2 | **Diseñado para Latinoamérica** | Cesantías, prima, colegios privados, cuotas extras, PSE, Nequi, empleada doméstica, SOAT. Realidades que apps globales ignoran. |
-| 3 | **"Nuestro hogar", no "mi presupuesto"** | Construido para parejas. Transparencia compartida, coordinación real, visión conjunta. |
-| 4 | **Todo conectado** | Los eventos originan gastos. El colegio genera recordatorios. La empleada genera prestaciones. Todo fluye hacia las finanzas del hogar. |
+| 1 | **Se adapta a cada hogar** | Un soltero ve una experiencia diferente a una familia con hijos, vehículos y empleada. |
+| 2 | **Diseñado para Latinoamérica** | Cesantías, prima, colegios privados, cuotas extras, SOAT, empleada doméstica. |
+| 3 | **"Nuestro hogar", no "mi presupuesto"** | Transparencia compartida, coordinación real, visión conjunta. |
+| 4 | **Todo conectado** | Los eventos originan gastos. El colegio genera recordatorios. La empleada genera prestaciones. |
 
 ---
 
@@ -52,419 +55,137 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
 
 | Perfil | Descripción |
 |--------|-------------|
-| **Principal** | Parejas entre 28 y 45 años. Ambos trabajan. Tienen 1-3 hijos. Viven en ciudades intermedias o grandes de Colombia o Latinoamérica. Usan smartphone diariamente. Sienten falta de tiempo y organización. |
-| **Secundario** | Parejas jóvenes sin hijos que quieren construir una visión financiera compartida desde el inicio de su vida juntos. |
-| **Terciario** | Personas solteras que quieren organizar sus finanzas personales, construir hábitos sólidos y prepararse para futuras etapas familiares. Organiza2 les ofrece una experiencia simplificada y escalable. |
+| **Principal** | Parejas entre 28 y 45 años. Ambos trabajan. Tienen 1-3 hijos. Viven en ciudades de Colombia o Latinoamérica. |
+| **Secundario** | Parejas jóvenes sin hijos que quieren construir visión financiera compartida. |
+| **Terciario** | Personas solteras que quieren organizar sus finanzas personales. |
 
 ---
 
-## 5. Principios Fundamentales
+## 5. Principios
 
-**Simplicidad.** La aplicación debe ser comprensible sin capacitación previa.
-
-**Colaboración.** La información del hogar se construye entre todos sus integrantes.
-
-**Transparencia.** Las parejas deben tener una visión compartida de ingresos, gastos, compromisos y metas.
-
-**Configurar una vez.** La información estructural del hogar se configura una sola vez y se reutiliza en toda la plataforma.
-
-**Registrar diariamente.** El uso cotidiano debe ser rápido y sin fricción.
-
-**Entender fácilmente.** La app debe responder rápidamente: *¿Cómo vamos?*
+**Simplicidad.** Comprensible sin capacitación.
+**Colaboración.** La información del hogar se construye entre todos.
+**Transparencia.** Visión compartida de ingresos, gastos y metas.
+**Configurar una vez.** La información del hogar se configura una vez y se reutiliza siempre.
+**Registrar diariamente.** Rápido y sin fricción — máximo 10 segundos por gasto.
+**Entender fácilmente.** La app responde *¿cómo vamos?* en 2 segundos.
 
 ---
 
-## 6. El Ecosistema Organiza2
+## 6. El Ecosistema
 
 ```
-┌──────────────────────────────────────────────────┐
-│              🏠 MODELO DE HOGAR                   │
-│  Perfil · Miembros · Vehículos · Hijos            │
-│  Personal de apoyo · Ingresos                     │
-└────┬──────────────┬──────────────┬───────────────┘
-     │              │              │
-     ▼              ▼              ▼
-💰 Finanzas    📋 Planeador    🍽️ Alimentación
+            🏠 MODELO DE HOGAR
+    (la fuente de verdad de toda la plataforma)
+                    │
+       ┌────────────┼────────────┐
+       │            │            │
+       ▼            ▼            ▼
+ 💰 Finanzas   📋 Planeador  🍽️ Alimentación
+ (v2.2 ✅)    (v3.0 🔲)     (v4.0 🔲)
 ```
 
-El Modelo de Hogar es la fuente de verdad que determina qué ve cada usuario y cómo se comporta cada módulo.
+---
+
+## 7. Módulo Finanzas — Estado v2.2
+
+### Tabs
+
+| Tab | Propósito | Tipo |
+|-----|-----------|------|
+| 💰 Hoy | Registrar gastos del día | Escritura |
+| 📊 Resumen | Ver cómo va el mes — semáforo por categoría | Solo lectura |
+| 📈 Análisis | Semáforo histórico, tendencia, gastos hormiga | Solo lectura |
+| ⚙️ Config | Info hogar + Presupuesto Base | Configuración |
+
+### Tab Resumen — Diseño v2.2
+
+El Resumen responde una sola pregunta: **¿cómo vamos?**
+
+- Número grande de disponible (verde = bien, rojo = problema)
+- Semáforo por categoría: rojo (pasó límite) / amarillo (>85%) / verde (bien)
+- Rojo y amarillo expandidos por defecto — el problema se ve de inmediato
+- Ahorro siempre expandido con "✓ cumplido" cuando está al 100%
+- Categorías verdes colapsadas — se abren al tocar
+- Orden: rojo → amarillo → ahorro → verde → sin presupuesto
+
+**Principio de diseño:** Una mamá mira colores, no números. Si todo está verde, respira. Si hay rojo, se enfoca ahí.
+
+### Presupuesto Base — Onboarding 5 pantallas
+
+| Pantalla | Pregunta | Saltable |
+|----------|---------|---------|
+| P1 | ¿Cómo es su hogar? (Soltero/Pareja/Familia/Mixto) | No |
+| P2 | ¿Cuál es su mayor reto? | Sí |
+| P3 | ¿Con cuánto cuentan este mes? | Sí |
+| P4 | Lo que sí o sí hay que pagar | Sí |
+| P5 | Lo que varía según el mes | Sí |
+| Resumen | Ingresan / Se van / Les queda + insight | — |
+
+Lenguaje conversacional, no financiero. *"Lo que sí o sí hay que pagar"* en lugar de *"Gastos fijos"*.
+
+### Categorías Oficiales v2.0
+
+| # | Categoría | Tipo |
+|---|-----------|------|
+| 1 | 🏠 Vivienda | Fijos + variables |
+| 2 | 🍽️ Alimentación | Variables |
+| 3 | 🚗 Transporte | Fijos + variables |
+| 4 | 🎬 Entretenimiento | Fijos + variables |
+| 5 | 👕 Vestuario | Variables |
+| 6 | ❤️ Salud y Belleza | Fijos + variables |
+| 7 | 📚 Educación | Fijos + variables |
+| 8 | 🛡️ Seguros e Impuestos | Anuales / por mes |
+| 9 | 🎁 Regalos y Celebraciones | Variables |
+| 10 | 💰 Ahorro | Fijo mensual |
+
+### Modelo de Colaboración
+
+1. Quien crea el hogar configura el presupuesto base
+2. El miembro 2 ve banner: *"[Nombre] configuró el presupuesto base. ¿Estás de acuerdo?"*
+3. Opciones: *"Se ve bien 👍"* / *"Tengo un ajuste"* (redirige a Config)
 
 ---
 
-## 7. Modelo de Hogar
+## 8. Pantalla de Login
 
-Organiza2 no debe pedir al usuario configurar categorías complejas. Debe pedirle describir su hogar.
-
-### Onboarding progresivo
-
-La configuración es gradual. El usuario comienza con información mínima y la app sugiere completar el perfil según el uso. El objetivo es reducir fricción inicial y evitar formularios largos.
-
-### Tipos de hogar (orientados a experiencia, no a límites)
-
-| Tipo | Experiencia |
-|------|-------------|
-| **Soltero** | Finanzas personales. Sin educación, loncheras ni servicio doméstico por defecto. |
-| **Pareja** | Vista compartida. Sin sección educativa por defecto. |
-| **Familia** | Experiencia completa: educación, hijos, recordatorios escolares, alimentación. |
-| **Mixto** | Hogar con familiares, roomies u otros integrantes. |
-
-> El tipo de hogar personaliza pantallas, categorías y recordatorios visibles. **No impone límites de miembros ni restricciones comerciales.**
-
-### Componentes del perfil
-
-**Miembros:** adultos e hijos del hogar. Cada miembro tiene nombre y rol.
-
-**Vehículos:** por cada vehículo se registran nombre, tipo, placa, y fechas de SOAT, seguro e impuesto. La app genera recordatorios automáticamente.
-
-**Hijos:** por cada hijo se registran nombre, fecha de nacimiento, institución educativa y nivel. Habilita categorías educativas y futuras funciones del Planeador.
-
-**Personal de apoyo:** empleada doméstica, niñera, conductor, mensajero. Por cada persona se registran nombre, tipo, fecha de inicio y salario. La app genera prestaciones de referencia y recordatorios asociados.
-
-**Ingresos:** múltiples fuentes generadas dinámicamente desde `perfil.miembros`. Los labels de ingresos nunca están hardcodeados en el código — reflejan los nombres reales del hogar.
-
-**Mascotas _(extensión futura — no implementar en v2.0)_:** nodo `perfil/mascotas/` reservado.
-
-**Metas _(extensión futura — no implementar en v2.0)_:** nodo `perfil/metas/` reservado.
-
-### Pantallas dinámicas
-
-| Configuración | Se habilita automáticamente |
-|---------------|----------------------------|
-| Tipo: Familia con hijos | Educación · Actividades extracurriculares · Alimentación |
-| Vehículos registrados | SOAT · Seguro · Impuestos · Recordatorios · Cuota crédito/leasing |
-| Personal de apoyo | Servicio doméstico · Prestaciones · Recordatorios |
-| Pareja | Vista compartida · Coordinación · Transparencia financiera |
+- Logo oficial `logo.png` como protagonista
+- Tres beneficios alineados con la propuesta de valor
+- Botón "Entrar con Google" con SVG inline
 
 ---
 
-## 8. Módulos en Detalle
+## 9. ⛔ Regla de Validación
 
-### 8.1 💰 Finanzas — v2.0
-
-**Objetivo:** responder tres preguntas.
-1. ¿Cuánto dinero entra?
-2. ¿En qué se va?
-3. ¿Cómo vamos?
-
-**Estructura de vistas:**
-
-| Vista | Contenido |
-|-------|-----------|
-| **Hoy** | Registro diario de gastos e ingresos. |
-| **Resumen** | Dashboard principal: ingresos, gastos, disponible, alertas, presupuesto vs realidad. |
-| **Análisis** | Tendencias, comparaciones históricas, patrones. La métrica "gasto hormiga" vive aquí. |
-| **Configuración** | Presupuesto Base, ingresos, vehículos, personal de apoyo, categorías, perfil del hogar. |
-
----
-
-## 8.1.1 🧱 Presupuesto Base — El corazón financiero de Organiza2
-
-### Dos niveles de detalle — principio fundamental
-
-> **El Presupuesto Base usa ítems agrupados para planear. El registro diario usa ítems detallados para entender.**
-
-Este principio resuelve la tensión entre simplicidad en el onboarding y utilidad en el análisis:
-
-| Nivel | Dónde | Para qué |
-|-------|-------|---------|
-| **Agrupado** | Presupuesto Base | Planear — simple, pocas líneas, sin fricción |
-| **Detallado** | Registro diario | Entender — ítems específicos para tomar decisiones |
-
-**Ejemplo:** El hogar presupuesta "Salud y Belleza: $600.000". Al registrar el gasto diario elige "Peluquería" o "Droguería". El análisis al final del mes muestra el desglose real y permite responder *"¿en qué se fue Salud este mes?"*
-
----
-
-### Categorías oficiales v2.0 — 10 categorías
-
-| # | Categoría | Aparece en onboarding | Condición |
-|---|-----------|----------------------|-----------|
-| 1 | 🏠 Vivienda | ✓ Siempre | — |
-| 2 | 🍽️ Alimentación | ✓ Siempre | — |
-| 3 | 🚗 Transporte | ✓ Siempre | — |
-| 4 | 🎬 Entretenimiento | ✓ Siempre | — |
-| 5 | ❤️ Salud y Belleza | ✓ Siempre | — |
-| 6 | 💰 Ahorro | ✓ Siempre | — |
-| 7 | 📚 Educación | Solo Config | Si hay hijos en perfil |
-| 8 | 🛡️ Seguros e Impuestos | Solo Config | Si hay vehículo o vivienda propia |
-| 9 | 👕 Vestuario | Solo Config | Disponible, no en onboarding |
-| 10 | 🎁 Regalos y Celebraciones | Solo Config | Disponible, no en onboarding |
-
----
-
-### Catálogo de ítems — registro diario
-
-El catálogo detallado para el registro diario. Estos ítems permiten tomar decisiones reales al final del mes.
-
-**🏠 Vivienda**
-| Ítem | Tipo |
-|------|------|
-| Arriendo / Hipoteca | Fijo |
-| Administración | Fijo |
-| Agua y Energía | Fijo |
-| Gas | Fijo |
-| Internet | Fijo |
-| Telefonía | Fijo |
-| Servicio doméstico | Fijo |
-| Mantenimiento hogar | Variable |
-
-**🍽️ Alimentación**
-| Ítem | Tipo | Nota |
-|------|------|------|
-| Frutas y verduras | Variable | Se agrupa como "Mercado" en presupuesto |
-| Aseo y víveres | Variable | Se agrupa como "Mercado" en presupuesto |
-| Loncheras | Variable | |
-| Otros* | Variable | Nota obligatoria |
-
-**🚗 Transporte**
-| Ítem | Tipo | Nota |
-|------|------|------|
-| Cuota crédito / leasing | Fijo | En Transporte, no Vivienda — gasto reversible |
-| Combustible | Variable | |
-| Transporte público | Variable | |
-| Peajes | Variable | |
-| Parqueadero | Variable | |
-| Mantenimiento vehículo | Variable | |
-| Otros* | Variable | Nota obligatoria |
-
-**🎬 Entretenimiento**
-| Ítem | Tipo | Nota |
-|------|------|------|
-| Streaming | Fijo | |
-| Restaurantes | Variable | Viene de Alimentación v1 — decisión de ocio, no de mercado |
-| Cine | Variable | |
-| Salidas | Variable | |
-| Viajes | Variable | |
-| Vacaciones | Variable | |
-| Otros* | Variable | Nota obligatoria |
-
-**👕 Vestuario**
-| Ítem | Tipo |
-|------|------|
-| Ropa | Variable |
-| Zapatos | Variable |
-| Uniforme | Variable |
-| Otros* | Variable |
-
-**❤️ Salud y Belleza**
-| Ítem | Tipo | Presupuesto agrupado en |
-|------|------|------------------------|
-| Medicina prepagada | Fijo | Salud |
-| Gimnasio | Fijo | Salud |
-| Droguería | Variable | Salud |
-| Cita médica | Variable | Salud |
-| Cita pediátrica | Variable | Salud |
-| Peluquería | Variable | Belleza |
-| Servicios estéticos | Variable | Belleza |
-| Otros* | Variable | — |
-
-> "Servicios estéticos" agrupa manicure, pedicure, depilación, barbería. Universal — aplica para hombres y mujeres. El campo **nota** del registro especifica el detalle.
-
-**📚 Educación**
-| Ítem | Tipo | Nota |
-|------|------|------|
-| Universidad | Fijo | |
-| Colegio | Fijo | |
-| Jardín | Fijo | |
-| Matrícula | Variable | Frecuencia configurable: anual/semestral/mensual |
-| Actividades extracurriculares | Variable | |
-| Otros* | Variable | Nota obligatoria |
-
-**🛡️ Seguros e Impuestos**
-| Ítem | Tipo | Frecuencia |
-|------|------|------------|
-| Seguro de vida | Fijo | Anual |
-| Seguro de hogar | Fijo | Anual |
-| Seguro vehículo | Fijo | Anual |
-| SOAT | Fijo | Anual (agosto) |
-| Impuestos vehículo | Fijo | Anual (abril) |
-| Impuesto predial | Fijo | Anual (marzo) |
-
-**🎁 Regalos y Celebraciones**
-| Ítem | Tipo |
-|------|------|
-| Regalos | Variable |
-| Celebraciones | Variable |
-| Otros* | Variable |
-
-**💰 Ahorro**
-| Ítem | Tipo |
-|------|------|
-| Ahorro programado | Fijo |
-| Fondo emergencia | Fijo |
-| Otros* | Variable |
-
----
-
-### Regla sobre el ítem "Otros"
-
-**Dos comportamientos distintos:**
-
-- **"Otros" en registro diario** → el campo **nota se vuelve obligatorio**. El dato queda como *"Otros — suscripción revista"*, no como un número huérfano sin contexto.
-- **En Config (categorías)** → en lugar de "Otros" hay un botón **"+ Agregar ítem"**. El ítem nuevo queda guardado en el hogar y aparece en futuras sesiones. El catálogo crece con el uso real de cada familia (DA-9).
-
----
-
-### Ítems agrupados en el Presupuesto Base
-
-| Categoría | Ítem en presupuesto | Ítems diarios que lo alimentan |
-|-----------|--------------------|---------------------------------|
-| Alimentación | Mercado | Frutas y verduras + Aseo y víveres |
-| Salud y Belleza | Salud | Droguería + Cita médica + Cita pediátrica + Medicina prepagada + Gimnasio |
-| Salud y Belleza | Belleza | Peluquería + Servicios estéticos |
-| Vivienda | Servicios del hogar | Agua y Energía + Gas + Internet (agrupados en onboarding) |
-
----
-
-## 8.1.2 🚀 Onboarding del Presupuesto Base
-
-### Principio de diseño
-
-> El onboarding pide lo mínimo para que la app tenga valor inmediato. El detalle se agrega después, cuando el usuario quiera.
-
-**Organiza2 no es una app financiera** — el onboarding no debe sentirse como configurar un presupuesto contable. Debe sentirse como *"cuéntanos cómo es tu hogar"*.
-
-### Flujo definitivo — 5 pantallas + resumen
-
-| # | Pantalla | Contenido | Saltable |
-|---|----------|-----------|---------|
-| 1 | ¿Cómo es su hogar? | Soltero / Pareja / Familia / Mixto | No — define personalización |
-| 2 | ¿Cuál es su mayor reto? | 4 opciones de dolor principal | Sí — "Prefiero no decir" |
-| 3 | ¿Con cuánto cuentan? | Ingreso fijo + Ingreso adicional opcional | Sí |
-| 4 | Lo que sí o sí pagan | Arriendo · Servicios del hogar · Transporte | Sí |
-| 5 | Lo que varía | Mercado · Entretenimiento · Ahorro | Sí |
-| 6 | Así queda el mes | Resumen: ingresos − gastos = disponible + insight | — |
-
-### Lenguaje del onboarding
-
-El lenguaje es conversacional, nunca contable:
-
-| ❌ Lenguaje financiero | ✅ Lenguaje Organiza2 |
-|----------------------|----------------------|
-| Ingreso del hogar | ¿Con cuánto cuentan este mes? |
-| Gastos fijos | Lo que sí o sí hay que pagar |
-| Gastos variables | Lo que varía según el mes |
-| Ahorro mensual | ¿Cuánto quieren guardar? |
-| Disponible | Les queda libre |
-
-### Reglas del onboarding
-
-- Máximo 3 campos por pantalla
-- Pantallas 1 y 2 requieren selección — personalizan todo lo que sigue
-- "Saltar por ahora" disponible en pantallas 3, 4 y 5
-- El resumen final muestra números reales ingresados + insight contextual
-- Vestuario, Regalos, Seguros, Educación, frecuencias → solo en Config
-
-### Pantallas condicionales dentro del onboarding
-
-- Cuota crédito/leasing → aparece en pantalla 4 solo si perfil tiene vehículo financiado
-- Educación → no aparece en onboarding, solo en Config si hay hijos
-
-### Opciones de la pantalla 2 — "¿Cuál es su mayor reto?"
-
-| Opción | Subtítulo |
-|--------|-----------|
-| No sé en qué se va el dinero | El mes acaba y no queda nada |
-| No nos ponemos de acuerdo | Cada uno ve el dinero diferente |
-| Llego muy justo a fin de mes | Siempre falta un poco |
-| Quiero ahorrar pero no logro | La plata siempre se gasta primero |
-
-> Esta respuesta personaliza el tono de los mensajes y los insights del análisis. No afecta funcionalidad.
-
----
-
-## 8.1.3 🤝 Trabajo en Equipo — modelo de colaboración
-
-### Principio
-
-> La app facilita la conversación en pareja. No la reemplaza ni la arbitra.
-
-El presupuesto lo decide la pareja conversando. La app provee los datos para que esa conversación sea honesta y basada en información real.
-
-### Flujo de incorporación del segundo miembro
-
-1. Al final del onboarding aparece: *"¿Quieres invitar a tu pareja para que revise esto juntos?"* → `[Enviar invitación]` / `[Lo hago después]`
-2. Cuando el miembro 2 entra por primera vez, ve el presupuesto configurado con un banner: *"[Nombre] configuró el presupuesto base. ¿Estás de acuerdo con estos números?"* → `[Se ve bien]` / `[Tengo un ajuste]`
-3. Si elige "Tengo un ajuste" → campo de comentario simple por ítem — una línea, visible para ambos miembros
-
-### Para después del piloto (v2.3+)
-
-Historial de cambios por ítem, notificaciones push, votación de ítems en disputa.
-
----
-
-### 8.2 📋 Planeador
-
-**Estado:** planificado para v3.0. No desarrollar hasta validar Finanzas v2.0 con familias reales.
-
----
-
-### 8.3 🍽️ Alimentación
-
-**Estado:** planificado para v4.0. No desarrollar todavía.
-
----
-
-## 9. Transparencia Financiera como Objetivo Estratégico
-
-> *De "mi presupuesto" a "nuestro hogar".*
-
-| Objetivo | Descripción |
-|----------|-------------|
-| **Visión compartida** | Ambos integrantes ven los mismos datos, en tiempo real, desde sus dispositivos. |
-| **Transparencia financiera** | Ingresos, gastos, presupuesto y disponible son información del hogar — no de una persona. |
-| **Comunicación basada en datos** | Las conversaciones sobre dinero parten de información real, no de suposiciones. |
-| **Planeación conjunta** | El presupuesto base, los eventos y las metas se construyen juntos. |
-
-**La transparencia no es una función. Es el producto.**
-
----
-
-## 10. Filosofía de Producto
-
-**Organiza2 simplifica. No complica.**
-
-> El filtro de cada decisión: *"¿Esto reduce estrés o agrega complejidad innecesaria?"*
-
-**El sistema se adapta al usuario. No al revés.**
-
-**De "mi presupuesto" a "nuestro hogar".**
-
----
-
-## 11. Identidad Visual
-
-**Valores visuales:** Tranquilidad · Cercanía · Orden
-
-- Color principal: `#1D9E75` (verde tranquilidad)
-- Tipografía: DM Sans (texto) + DM Mono (números)
-- Estilo: moderno, móvil primero, sin estética corporativa
-- Lenguaje visual: humano, cotidiano, no técnico
-
----
-
-## 12. ⛔ Regla de Validación — No construir sin validar
-
-**No se desarrollará el Planeador ni el módulo de Alimentación hasta que Finanzas v2.0 haya sido validado con familias reales.**
+**No se desarrollará el Planeador ni la Alimentación hasta que Finanzas v2.0 haya sido validado con familias reales.**
 
 El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de hogar correcto, presupuesto base con valor real, transparencia en pareja funcional, registro diario suficientemente rápido.
 
 ---
 
-## 13. Hoja de Ruta Estratégica — v2.0
+## 10. Hoja de Ruta
 
-| Versión | Hitos clave | Estado |
-|---------|-------------|--------|
-| **v2.0** | Auditoría estratégica · Redefinición de visión · Nuevo modelo de hogar · Categorías oficiales · Diseño onboarding | ✅ Completado |
-| **v2.1** *(Etapas A-D)* | Login Google · Creación de hogares · Invitación de pareja · Migración Anny1130 · Finanzas modular · Reglas Firebase | ✅ Completado |
-| **v2.2** *(Etapa E)* | Presupuesto Base · Onboarding 5 pantallas · defD() v2.0 · Registro diario detallado · Pantallas dinámicas | 🔄 Siguiente |
-| **v2.3** | Piloto con 10 familias · Feedback real · Comentarios en presupuesto | 🔲 Pendiente |
-| **v3.0** | Planeador MVP | 🔲 Pendiente |
-| **v4.0** | Alimentación | 🔲 Pendiente |
-| **v5.0** | Monetización · PSE/Nequi · Planes freemium | 🔲 Pendiente |
+| Versión | Hitos | Estado |
+|---------|-------|--------|
+| **v2.0** | Auditoría · Redefinición de visión · Documentación | ✅ |
+| **v2.1** | Login Google · Hogar · Invitación · Migración Anny1130 · Finanzas modular | ✅ |
+| **v2.2** | Presupuesto Base · Onboarding · Resumen rediseñado · Login con logo | ✅ |
+| **v2.3** | Piloto 5-10 familias · Feedback real | 🔲 Siguiente |
+| **v3.0** | Planeador MVP | 🔲 |
+| **v4.0** | Alimentación | 🔲 |
+| **v5.0** | Monetización · PSE/Nequi · Planes freemium | 🔲 |
 
 ---
 
-## 14. Modelo de Negocio
+## 11. Antes del Piloto — Pendientes
+
+1. Rediseño tab Config — mockup primero
+2. Tab Análisis — afinar
+3. Fix iOS decimal (`type="text"` `inputmode="decimal"`)
+
+---
+
+## 12. Modelo de Negocio
 
 | Plan | Precio | Incluye |
 |------|--------|---------| 
@@ -474,17 +195,13 @@ El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de 
 
 ---
 
-## 15. Stack Técnico
+## 13. Identidad Visual
 
-| Componente | Tecnología |
-|------------|------------|
-| Frontend | HTML + CSS + JS Vanilla |
-| Base de datos | Firebase Realtime Database |
-| Autenticación | Firebase Auth (Google) |
-| Hosting | GitHub Pages |
-| PWA | Service Worker + manifest.json |
-| Offline | LocalStorage Queue + navigator.onLine |
+- Color principal: `#1D9E75` (verde tranquilidad)
+- Tipografía: DM Sans (texto) + DM Mono (números)
+- Estilo: moderno, móvil primero, sin estética corporativa
+- Logo: `logo.png` (estilo 3D suave, crema, fondo redondeado)
 
 ---
 
-*Organiza2 — Documento de Producto v2.3 | Junio 2026*
+*Organiza2 — Documento de Producto v2.5 | Junio 2026*
