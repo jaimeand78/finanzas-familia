@@ -27,6 +27,8 @@
 | Bloque 2: onboarding presupuesto.js ✅ | |
 | Bloque 3: rediseño tab Config ✅ | |
 | fix: Vestuario y Regalos en defD() y migrateCategories() ✅ | Ítems faltantes en Vivienda, Salud, Entretenimiento, Ahorro — revisar antes del piloto |
+| fix: onboarding P4 — servicios/transporte va a ítem principal, no dividido ✅ | |
+| fix: Config modal — selector de mes para ítems de fecha fija (SOAT, predial, cesantías) ✅ | |
 
 ---
 
@@ -181,6 +183,30 @@ Ver sección 3 — Registro de Bugs.
 - Estilos modales: `cfg-modal-inner`, `cfg-modal-hdr`, `cfg-modal-body`, `cfg-modal-row`, `cfg-freq-sel`, `cfg-modal-foot`
 - Estilos Cerrar sesión: `cfg-signout-btn`
 
+### 📅 Fase 18 — Revisión técnica pre-piloto y fixes onboarding/Config (Junio 2026)
+
+**Contexto:** Sesión de análisis antes del piloto v2.3. Se identificaron 4 problemas en onboarding y Config, se hizo mockup y se implementaron 3 fixes en `presupuesto.js`.
+
+**Problemas identificados:**
+
+| # | Problema | Impacto | Decisión |
+|---|----------|---------|----------|
+| C1 | Servicios del hogar se dividía en 3 partes iguales entre Agua/Gas/Internet | Alto — valores incorrectos en Firebase | Fix inmediato |
+| C2 | Modal Config mostraba select "anual/mensual" para ítems de fecha fija (SOAT, predial, cesantías) — no permitía cambiar el mes | Alto — hogares con vehículo o empleada | Fix inmediato |
+| C3 | Onboarding P1 no usa tipoHogar para activar/desactivar categorías | Bajo | Post-piloto |
+| C4 | Labels de servicios y transporte en P4 no aclaraban que era un estimado total | Bajo | Fix inmediato |
+
+**Fixes implementados en `presupuesto.js`:**
+
+**C1 — `_aplicarOnbDataAD()`:** El valor de servicios va completo a `Agua y Energía`. Gas e Internet arrancan en $0. El usuario desglosa en Config.
+
+**C2 — `abrirModalCategoria()`:** Detecta si el ítem tiene `months[]`. Si sí → muestra selector de mes (Ene–Dic) con estilo verde, el usuario puede cambiar el mes. Si no → select de frecuencia normal sin cambios. Nueva función `updMes(ci, ri, val)` guarda `item.months = [mes]` y llama `recalc()` + `save()`. `calcPresupuestoBase()` no se toca — ya funciona correctamente con `months[]`.
+
+**C4 — `_tpl4()`:** Badges de servicios y transporte cambian de lista de ítems a *"total estimado — lo desglosás en Config"*.
+
+**Aprendizaje clave de esta sesión:**
+> El onboarding recoge estimados agrupados. Config recoge el detalle real. No forzar mapeo 1:1 entre ellos.
+
 ---
 
 ## 3. Registro de Bugs y Soluciones
@@ -240,10 +266,10 @@ Ver sección 3 — Registro de Bugs.
 ### 🔴 Prioridad Alta — Antes del piloto
 - Tab Análisis — Semáforo histórico y Tendencia pendientes de afinar
 - Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
-- Pantallas dinámicas según `getCapabilidades(perfil)` — hijos activan Educación, vehículo activa Seguros
 - Ítems faltantes en hogares v1: `migrateCategories()` sin `ensure` para Vivienda, Salud y Belleza, Entretenimiento, Ahorro — revisar impacto UX antes del piloto
 
-### 🟡 Prioridad Media
+### 🟡 Prioridad Media — Post-piloto
+- Onboarding P1: usar `tipoHogar` para activar/desactivar categorías vía `getCapabilidades(perfil)` — Familia activa Educación y Servicio Doméstico, Solo las oculta
 - Exportar mes a PDF
 - Exportar año completo a Excel
 - Presupuesto Base se aplica automáticamente al crear mes nuevo
@@ -294,6 +320,7 @@ Ver sección 3 — Registro de Bugs.
 | [confirmar] | refactor: onboarding — _tx(), íconos, textos singular/plural, sin Mixto |
 | 60182e9 | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
 | [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
+| [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal; Config modal mes fijo vs frecuencia |
 
 ---
 
@@ -314,8 +341,9 @@ Ver sección 3 — Registro de Bugs.
 ## 9. Próxima Sesión
 
 **Antes del piloto hay que resolver:**
-1. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
-2. Probar en producción y validar que no hay más bugs
+1. Tab Análisis — afinar Semáforo histórico y Tendencia
+2. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
+3. Probar en producción con hogar SNBDPA y validar fixes de esta sesión
 
 **Cuando esos estén listos → Piloto v2.3 con 5-10 familias**
 
