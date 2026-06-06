@@ -227,6 +227,46 @@ Ver sección 3 — Registro de Bugs.
 
 **Archivo modificado:** `js/analisis.js`
 
+### 📅 Fase 20 — Revisión pre-piloto producción + parche budgets SNBDPA (Junio 2026)
+
+**Contexto:** Sesión de validación en producción y resolución de problemas específicos del hogar SNBDPA (migrado de v1).
+
+**Validaciones en producción:**
+- ✅ Tendencia — barras dobles, promedio, insight funcionando correctamente
+- ✅ Onboarding P4 — texto aclaratorio "total estimado — lo desglosás en Config"
+- ✅ Config modal — selector de mes para SOAT, predial, cesantías
+- ✅ Resumen — comportamiento correcto: solo muestra categorías con presupuesto o gasto (Opción A confirmada)
+
+**Problema identificado — Config solo mostraba mes actual para ítems de fecha fija:**
+- `renderConfigPresupuesto()` usaba `calcPresupuestoBase(r, curM)` para mostrar valores — devuelve $0 para ítems fuera de su mes
+- **Fix:** Config ignora el mes actual para ítems con `months[]` — siempre muestra `r.budget` real con badge verde del mes (Ene/Feb/.../Dic)
+- Los ítems mensuales normales no cambian
+- **Archivo:** `js/presupuesto.js` — `renderConfigPresupuesto()`
+
+**DA-18:** Config es una vista de configuración anual — nunca filtrar ítems de fecha fija por el mes actual.
+
+**Parche budgets 2026 SNBDPA:**
+- Problema: `migrateCategories()` creaba ítems de cesantías/primas/seguros con `budget: 0` — los valores reales estaban en nodo `empleadas` dentro de cada mes
+- Solución: script one-shot ejecutado desde consola del navegador
+- Fuente de datos: `hogares/SNBDPA/pl/2026/7/empleadas` (presente en todos los meses)
+- Fuente adicional: valores hardcodeados leídos directamente de Firebase (predial mes 3, impuesto vehículo mes 4, seguro vehículo mensual)
+
+| Ítem | Mes | Valor |
+|------|-----|-------|
+| Intereses Cesantías Empleada + Niñera | Enero (0) | $240.000 c/u |
+| Cesantías Empleada + Niñera | Febrero (1) | $2.000.000 c/u |
+| Prima Junio Empleada + Niñera | Junio (5) | $1.000.000 c/u |
+| Prima Diciembre Empleada + Niñera | Diciembre (11) | $1.000.000 c/u |
+| Impuesto predial | Abril (3) | $4.250.000 |
+| Impuestos vehículo | Mayo (4) | $2.670.600 |
+| Seguro vehículo | Todos los meses | $327.555 |
+
+- **22 budgets escritos** en Firebase — 0 errores
+- **SOAT vehículo:** no estaba en v1 para ningún mes — ingresar manualmente en Config → Seguros e Impuestos → badge Ago
+
+**Archivos modificados:** `js/presupuesto.js`
+**Script ejecutado:** `parche_budgets_2026.js` (one-shot, no commitear)
+
 ---
 
 ## 3. Registro de Bugs y Soluciones
@@ -278,14 +318,15 @@ Ver sección 3 — Registro de Bugs.
 **DA-15:** Login con logo oficial `logo.png`.
 **DA-16:** Config solo muestra configuración — no gastos reales del mes.
 **DA-17:** Siempre pedir el archivo actual antes de modificarlo — ver `REGLAS_IA.md`.
+**DA-18:** Config es una vista de configuración anual — nunca filtrar ítems de fecha fija por el mes actual.
 
 ---
 
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- Ítems faltantes en hogares v1: `migrateCategories()` sin `ensure` para Vivienda, Salud y Belleza, Entretenimiento, Ahorro — revisar impacto UX antes del piloto
-- Probar en producción con hogar SNBDPA — validar Tendencia, fixes C1/C2/C4
+- SOAT vehículo SNBDPA: ingresar manualmente en Config → Seguros e Impuestos → badge Ago
+- Ítems faltantes en hogares nuevos del piloto: verificar que `defD()` incluye todos los ítems correctos al crear el primer mes
 
 ### 🟡 Prioridad Media — Post-piloto
 - Onboarding P1: usar `tipoHogar` para activar/desactivar categorías vía `getCapabilidades(perfil)` — Familia activa Educación y Servicio Doméstico, Solo las oculta
@@ -315,7 +356,11 @@ Ver sección 3 — Registro de Bugs.
 
 > **El logo en el login comunica identidad. Un emoji no.**
 
-> **Documentar los textos aprobados en la bitácora.** En la sesión anterior se aprobaron los textos singular/plural del onboarding pero no quedaron registrados en la documentación, lo que obligó a reconstruirlos desde el código en la sesión siguiente.
+> **Documentar los textos aprobados en la bitácora.**
+
+> **Config es configuración anual, no vista mensual.** Los ítems de fecha fija deben mostrar siempre su budget real independiente del mes en que estés — DA-18.
+
+> **Los scripts one-shot de parche son la herramienta correcta para migrar datos puntuales.** No tocar la app, no tocar Firebase a mano — un script reproducible con log detallado. En la sesión anterior se aprobaron los textos singular/plural del onboarding pero no quedaron registrados en la documentación, lo que obligó a reconstruirlos desde el código en la sesión siguiente.
 
 ---
 
@@ -341,6 +386,7 @@ Ver sección 3 — Registro de Bugs.
 | [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
 | [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal; Config modal mes fijo vs frecuencia |
 | [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
+| [confirmar] | fix: Config muestra budget real de ítems fecha fija — badge de mes, DA-18 |
 
 ---
 
@@ -360,11 +406,10 @@ Ver sección 3 — Registro de Bugs.
 
 ## 9. Próxima Sesión
 
-**Antes del piloto hay que resolver:**
-1. Probar en producción con hogar SNBDPA — Tendencia, onboarding P4, modal mes fijo
-2. Revisar `migrateCategories()` — ítems faltantes en hogares v1 (Vivienda, Salud, Entretenimiento, Ahorro)
+**Último pendiente antes del piloto:**
+1. Ingresar SOAT vehículo manualmente en Config → Seguros e Impuestos → Ago
 
-**Cuando esos estén listos → Piloto v2.3 con 5-10 familias**
+**→ Piloto v2.3 listo para lanzar con 5-10 familias**
 
 ---
 

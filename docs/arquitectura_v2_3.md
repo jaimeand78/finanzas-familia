@@ -218,6 +218,7 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-15 | Login con logo oficial `logo.png` | ✅ Implementado |
 | DA-16 | Config solo muestra configuración — no gastos reales del mes | ✅ Implementado |
 | DA-17 | Siempre pedir archivo actual antes de modificarlo — ver REGLAS_IA.md | ✅ Regla activa |
+| DA-18 | Config es vista de configuración anual — nunca filtrar ítems de fecha fija (`months[]`) por el mes actual. Siempre mostrar `budget` real con badge del mes | ✅ Implementado |
 
 ---
 
