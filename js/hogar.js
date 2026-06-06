@@ -26,8 +26,10 @@ async function getCodigoHogar(uid) {
 async function crearHogar(uid, nombre, tipo) {
   const codigoHogar = generarCodigo();
   const updates = {};
-  updates[`hogares/${codigoHogar}/meta`]            = { nombre: nombre.trim(), tipo, creadoPor: uid, creadoEn: Date.now() };
-  updates[`hogares/${codigoHogar}/miembros/${uid}`] = { rol: 'propietario' };
+  const nombreCreador = (window.CURRENT_USER && window.CURRENT_USER.nombre) || 'Propietario';
+  const emailCreador  = (window.CURRENT_USER && window.CURRENT_USER.email)  || '';
+  updates[`hogares/${codigoHogar}/meta`]            = { nombre: nombre.trim(), tipo, creadoPor: uid, nombreCreador, creadoEn: Date.now() };
+  updates[`hogares/${codigoHogar}/miembros/${uid}`] = { rol: 'propietario', nombre: nombreCreador, email: emailCreador };
   updates[`hogares/${codigoHogar}/perfil`]          = { _init: true };
   updates[`usuarios/${uid}/codigoHogar`]            = codigoHogar;
   await db.ref().update(updates);
@@ -44,7 +46,9 @@ async function unirseHogar(uid, codigoHogar) {
     return { ok: true, meta: snap.val(), yaEraMiembro: true };
   }
   // Escrituras separadas — evita evaluación de reglas en path raíz
-  await db.ref(`hogares/${codigo}/miembros/${uid}`).set({ rol: 'miembro' });
+  const nombreMiembro = (window.CURRENT_USER && window.CURRENT_USER.nombre) || 'Miembro';
+  const emailMiembro  = (window.CURRENT_USER && window.CURRENT_USER.email)  || '';
+  await db.ref(`hogares/${codigo}/miembros/${uid}`).set({ rol: 'miembro', nombre: nombreMiembro, email: emailMiembro });
   await db.ref(`usuarios/${uid}/codigoHogar`).set(codigo);
   return { ok: true, meta: snap.val() };
 }

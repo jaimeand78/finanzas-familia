@@ -111,12 +111,14 @@ function renderConfigHogar() {
   if (!el || !window.HOGAR) return;
   const { nombre, tipo } = window.HOGAR.meta;
   const codigo   = window.HOGAR.codigoHogar;
-  const miembros = Object.values(window.HOGAR.miembros || {});
-  const chips = miembros.map(m => {
-    const initials = (m.nombre || '?').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+  const miembros = Object.entries(window.HOGAR.miembros || {});
+  const chips = miembros.map(([uid, m]) => {
+    const esCurrent = uid === window.UID;
+    const nombre = m.nombre || (esCurrent && window.CURRENT_USER && window.CURRENT_USER.nombre) || '?';
+    const initials = nombre.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
     return `<div class="cfg-member-chip">
       <div class="cfg-avatar">${initials}</div>
-      <span>${m.nombre || '—'}</span>
+      <span>${nombre}</span>
     </div>`;
   }).join('');
   el.innerHTML = `
