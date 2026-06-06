@@ -214,27 +214,85 @@
     <div id="pc" class="pg">
       <div class="pg-inner">
 
-        <!-- Info hogar -->
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">🏠 Mi Hogar</span></div>
-          <div id="hogarInfo" class="hogar-info"></div>
+        <!-- Mi Hogar -->
+        <div class="cfg-sec" id="cfg-sec-hogar">
+          <div class="cfg-sec-hdr" onclick="cfgToggle('hogar')">
+            <span class="cfg-sec-title">🏠 Mi hogar</span>
+            <span class="cfg-chev" id="cfg-chev-hogar">▾</span>
+          </div>
+          <div class="cfg-sec-body" id="cfg-body-hogar">
+            <div id="hogarInfo"></div>
+          </div>
+        </div>
+
+        <!-- Ingresos -->
+        <div class="cfg-sec" id="cfg-sec-ing">
+          <div class="cfg-sec-hdr" onclick="cfgToggle('ing')">
+            <span class="cfg-sec-title">💵 Ingresos</span>
+            <span class="cfg-chev" id="cfg-chev-ing">▾</span>
+          </div>
+          <div class="cfg-sec-body" id="cfg-body-ing">
+            <div id="ingresosConfig"></div>
+          </div>
         </div>
 
         <!-- Presupuesto Base -->
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">📊 Presupuesto Base</span></div>
-          <div id="budgetConfig"></div>
+        <div class="cfg-sec" id="cfg-sec-bud">
+          <div class="cfg-sec-hdr" onclick="cfgToggle('bud')">
+            <span class="cfg-sec-title">📊 Presupuesto base</span>
+            <span class="cfg-chev" id="cfg-chev-bud">▾</span>
+          </div>
+          <div class="cfg-sec-body" id="cfg-body-bud">
+            <div id="budgetConfig"></div>
+          </div>
         </div>
 
-        <div class="sec danger-sec" style="margin-top:.5rem;">
-          <button class="btn-secondary" onclick="signOutUser()">Cerrar sesión</button>
-          <button class="btn-danger" onclick="cleanDuplicates()">🧹 Limpiar duplicados</button>
+        <!-- Cerrar sesión -->
+        <div class="cfg-sec cfg-sec-plain">
+          <button class="cfg-signout-btn" onclick="signOutUser()">Cerrar sesión</button>
         </div>
 
       </div>
     </div>
 
   </div><!-- /appShell -->
+
+  <!-- Modal editar categoría -->
+  <div id="cfgCatModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+    <div class="cfg-modal-inner">
+      <div class="cfg-modal-hdr">
+        <span id="cfgCatModalTitle" class="cfg-modal-title"></span>
+        <button class="cfg-modal-close" onclick="cerrarModalCategoria()">✕</button>
+      </div>
+      <div id="cfgCatModalBody" class="cfg-modal-body"></div>
+      <div class="cfg-modal-foot">
+        <button class="btn-primary" onclick="cerrarModalCategoria()">Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal editar ingreso -->
+  <div id="cfgIngModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+    <div class="cfg-modal-inner">
+      <div class="cfg-modal-hdr">
+        <span id="cfgIngModalTitle" class="cfg-modal-title"></span>
+        <button class="cfg-modal-close" onclick="cerrarModalIngreso()">✕</button>
+      </div>
+      <div class="cfg-modal-body">
+        <input type="hidden" id="cfgIngIndex" />
+        <div class="cfg-modal-row">
+          <label class="cfg-modal-lbl">Monto mensual</label>
+          <div class="onb-iw"><span class="onb-pre">$</span>
+            <input type="text" inputmode="decimal" id="cfgIngInput" placeholder="0" />
+          </div>
+        </div>
+      </div>
+      <div class="cfg-modal-foot">
+        <button class="onb-skip" onclick="cerrarModalIngreso()">Cancelar</button>
+        <button class="btn-primary" onclick="guardarModalIngreso()">Guardar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div id="toast"></div>

@@ -9,6 +9,13 @@
 let _onbStep = 1;
 let _onbData = {};
 
+// ── HELPER SINGULAR / PLURAL ──────────────────────────────────────────────────
+// Devuelve singular si tipoHogar === 'soltero', plural en cualquier otro caso.
+
+function _tx(singular, plural) {
+  return _onbData.tipoHogar === 'soltero' ? singular : plural;
+}
+
 // ── PUNTOS DE ENTRADA ─────────────────────────────────────────────────────────
 
 function iniciarOnboarding() {
@@ -63,8 +70,8 @@ function _tpl1() {
   ${_prog(1)}
   <div class="onb-body">
     <div class="onb-emoji">🏠</div>
-    <h2 class="onb-title">¿Cómo es su hogar?</h2>
-    <p class="onb-sub">Queremos entender cómo están organizados para mostrarte lo que tiene sentido para ustedes.</p>
+    <h2 class="onb-title">¿Cómo es tu hogar?</h2>
+    <p class="onb-sub">Queremos entender cómo están organizados para mostrarte lo que tiene sentido para ti.</p>
     <div class="onb-opts">
       <button class="onb-opt${sel('soltero')}" onclick="onbTipo('soltero')">
         <span class="oi">🧍</span><span class="ol">Solo</span><span class="os">Manejo mis finanzas</span>
@@ -74,9 +81,6 @@ function _tpl1() {
       </button>
       <button class="onb-opt${sel('familia')}" onclick="onbTipo('familia')">
         <span class="oi">👨‍👩‍👧</span><span class="ol">Familia</span><span class="os">Con hijos</span>
-      </button>
-      <button class="onb-opt${sel('mixto')}" onclick="onbTipo('mixto')">
-        <span class="oi">🏡</span><span class="ol">Mixto</span><span class="os">Comparto gastos</span>
       </button>
     </div>
   </div>
@@ -91,19 +95,21 @@ window.onbTipo = function(t) { _onbData.tipoHogar = t; _renderStep(); };
 // ── PANTALLA 2 — ¿Cuál es su mayor reto? ─────────────────────────────────────
 
 function _tpl2() {
+  const esSolo = _onbData.tipoHogar === 'soltero';
   const opts = [
-    { id:'invisible', icon:'🌫️', label:'No sé en qué se va el dinero', sub:'El mes acaba y no queda nada' },
-    { id:'acuerdo',   icon:'🤝', label:'No nos ponemos de acuerdo',    sub:'Cada uno ve el dinero diferente' },
-    { id:'justo',     icon:'😓', label:'Siempre llego muy justo',      sub:'Siempre falta un poco' },
-    { id:'ahorro',    icon:'🏦', label:'Quiero ahorrar pero no logro', sub:'La plata siempre se gasta primero' },
+    { id:'invisible', icon:'💸', label:'No sé en qué se va el dinero', sub:'El mes acaba y no queda nada' },
+    ...(!esSolo ? [{ id:'acuerdo', icon:'🤝', label:'No nos ponemos de acuerdo', sub:'Cada uno ve el dinero diferente' }] : []),
+    ...(esSolo  ? [{ id:'acuerdo', icon:'😰', label:'Gasto más de lo que gano', sub:'Siempre falta antes de que acabe el mes' }] : []),
+    { id:'justo',     icon:'😓', label:_tx('Siempre llego muy justo','Siempre llegamos muy justos'), sub:'Siempre falta un poco' },
+    { id:'ahorro',    icon:'🏦', label:_tx('Quiero ahorrar pero no logro','Queremos ahorrar pero no logramos'), sub:'La plata siempre se gasta primero' },
   ];
   return `
 <div class="onb-page">
   ${_prog(2)}
   <div class="onb-body">
-    <div class="onb-emoji">💭</div>
-    <h2 class="onb-title">¿Cuál es su mayor reto?</h2>
-    <p class="onb-sub">Así podemos mostrarte lo que más importa para ustedes.</p>
+    <div class="onb-emoji">🤔</div>
+    <h2 class="onb-title">${_tx('¿Cuál es tu mayor reto?','¿Cuál es su mayor reto?')}</h2>
+    <p class="onb-sub">${_tx('Así podemos mostrarte lo que más importa para ti.','Así podemos mostrarte lo que más importa para ustedes.')}</p>
     <div class="onb-opts">
       ${opts.map(o => `
       <button class="onb-opt${_onbData.reto === o.id ? ' sel' : ''}" onclick="onbReto('${o.id}')">
@@ -132,8 +138,8 @@ function _tpl3() {
   ${_prog(3)}
   <div class="onb-body">
     <div class="onb-emoji">💵</div>
-    <h2 class="onb-title">¿Con cuánto cuentan este mes?</h2>
-    <p class="onb-sub">Solo el total que llega al hogar. Los detalles los ajustan después.</p>
+    <h2 class="onb-title">${_tx('¿Con cuánto cuentas este mes?','¿Con cuánto cuentan este mes?')}</h2>
+    <p class="onb-sub">${_tx('Solo el total que recibes. Los detalles los ajustas después.','Solo el total que llega al hogar. Los detalles los ajustan después.')}</p>
     <div class="onb-fields">
       <div class="onb-field">
         <label>${lbl1}</label>
@@ -169,7 +175,7 @@ function _tpl4() {
 <div class="onb-page">
   ${_prog(4)}
   <div class="onb-body">
-    <div class="onb-emoji">🏠</div>
+    <div class="onb-emoji">📌</div>
     <h2 class="onb-title">Lo que sí o sí hay que pagar</h2>
     <p class="onb-sub">Estos gastos son fijos — aparecen todos los meses sin falta.</p>
     <div class="onb-fields">
@@ -199,7 +205,7 @@ function _tpl4() {
       </div>
       ${hasVeh ? `
       <div class="onb-field">
-        <label>🚗 Cuota crédito del vehículo</label>
+        <label>💳 Cuota del vehículo</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oVeh"
             value="${_onbData.cuotaVeh || ''}" placeholder="0"
@@ -222,12 +228,12 @@ function _tpl5() {
 <div class="onb-page">
   ${_prog(5)}
   <div class="onb-body">
-    <div class="onb-emoji">🛒</div>
+    <div class="onb-emoji">🎢</div>
     <h2 class="onb-title">Lo que varía según el mes</h2>
-    <p class="onb-sub">Un estimado está bien. Lo ajustan con el tiempo.</p>
+    <p class="onb-sub">${_tx('Un estimado está bien. Lo ajustas con el tiempo.','Un estimado está bien. Lo ajustan con el tiempo.')}</p>
     <div class="onb-fields">
       <div class="onb-field">
-        <label>🍽️ Mercado y loncheras</label>
+        <label>🧺 Mercado y loncheras</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oMrc"
             value="${_onbData.mercado || ''}" placeholder="0"
@@ -235,7 +241,7 @@ function _tpl5() {
         </div>
       </div>
       <div class="onb-field">
-        <label>🎬 Entretenimiento y salidas</label>
+        <label>🍿 Entretenimiento y salidas</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oEnt"
             value="${_onbData.entrete || ''}" placeholder="0"
@@ -243,7 +249,7 @@ function _tpl5() {
         </div>
       </div>
       <div class="onb-field">
-        <label>💰 ¿Cuánto quieren guardar?</label>
+        <label>🐷 ¿Cuánto ${_tx('quieres','quieren')} guardar?</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oAho"
             value="${_onbData.ahorro || ''}" placeholder="0"
@@ -272,11 +278,11 @@ function _tplResumen() {
 
   let insight = '';
   if (inc > 0) {
-    if (pct > 100) insight = '⚠️ Los gastos planeados superan los ingresos. Ajusta algún valor antes de guardar.';
-    else if (pct > 90) insight = '📊 Están muy ajustados. Cualquier gasto extra puede desequilibrar el mes.';
-    else if (_onbData.reto === 'ahorro' && !_onbData.ahorro) insight = '💡 Pusieron ahorro en cero — configúrenlo aunque sea con poco para crear el hábito.';
-    else if (libre > inc * 0.2) insight = '🎉 Buen margen disponible. Regístren los gastos diarios para ver la foto completa.';
-    else insight = '📋 Presupuesto base listo. Registren los gastos diarios para entender en qué se va el dinero.';
+    if (pct > 100) insight = `⚠️ Los gastos planeados superan los ingresos. ${_tx('Ajusta algún valor antes de guardar.','Ajusten algún valor antes de guardar.')}`;
+    else if (pct > 90) insight = `📊 ${_tx('Estás muy ajustado.','Están muy ajustados.')} Cualquier gasto extra puede desequilibrar el mes.`;
+    else if (_onbData.reto === 'ahorro' && !_onbData.ahorro) insight = `💡 ${_tx('Pusiste ahorro en cero — configúralo aunque sea con poco para crear el hábito.','Pusieron ahorro en cero — configúrenlo aunque sea con poco para crear el hábito.')}`;
+    else if (libre > inc * 0.2) insight = `🎉 Buen margen disponible. ${_tx('Registra los gastos diarios para ver la foto completa.','Regístren los gastos diarios para ver la foto completa.')}`;
+    else insight = `📋 Presupuesto base listo. ${_tx('Registra los gastos diarios para entender en qué se va el dinero.','Registren los gastos diarios para entender en qué se va el dinero.')}`;
   }
 
   // Mostrar invitación solo si hay un miembro
@@ -297,9 +303,9 @@ function _tplResumen() {
     <h2 class="onb-title">Así queda el mes</h2>
     ${inc > 0 ? `
     <div class="onb-res-row">
-      <div class="onb-res-card"><span class="onb-rl">Ingresan</span><span class="onb-rv g">${fmt(inc)}</span></div>
+      <div class="onb-res-card"><span class="onb-rl">${_tx('Ingresa','Ingresan')}</span><span class="onb-rv g">${fmt(inc)}</span></div>
       <div class="onb-res-card"><span class="onb-rl">Se van</span><span class="onb-rv">${fmt(gastos)}</span></div>
-      <div class="onb-res-card"><span class="onb-rl">Les queda</span><span class="onb-rv ${libre >= 0 ? 'g' : 'r'}">${fmt(libre)}</span></div>
+      <div class="onb-res-card"><span class="onb-rl">${_tx('Te queda','Les queda')}</span><span class="onb-rv ${libre >= 0 ? 'g' : 'r'}">${fmt(libre)}</span></div>
     </div>
     ${pct > 0 ? `<div class="onb-bar-wrap">
       <div class="onb-bar-fill" style="width:${Math.min(pct,100)}%;background:${pct>100?'#D85A30':pct>85?'#BA7517':'#1D9E75'};"></div>
@@ -465,44 +471,140 @@ function renderConfigPresupuesto() {
   if (!el) return;
   if (!D || !D.categories || !D.categories.length) {
     el.innerHTML = `
-    <p style="font-size:.85rem;color:var(--color-muted);margin:.5rem 0;">
-      No hay presupuesto configurado todavía.
-    </p>
+    <p class="cfg-empty">No hay presupuesto configurado todavía.</p>
     <button class="btn-primary" style="margin-top:.5rem;" onclick="iniciarOnboarding()">
       Configurar presupuesto base
     </button>`;
     return;
   }
-  el.innerHTML = `
-  <div style="margin-bottom:.75rem;">
-    <button class="btn-secondary" onclick="abrirConfigPresupuesto()">✏️ Reconfigurar</button>
-  </div>
-  ${D.categories.map((cat, ci) => {
+
+  const totalGlobal = D.categories.reduce((s, cat) => {
+    return s + planItems(cat).reduce((cs, r) => cs + (r.budget || 0), 0);
+  }, 0);
+
+  const cats = D.categories.map((cat, ci) => {
     const items = planItems(cat);
     const total = items.reduce((s, r) => s + (r.budget || 0), 0);
+    const sinDef = total === 0;
+    const itemRows = items.map((r, ri) => {
+      const prov = calcPresupuestoBase(r, curM);
+      const freqBadge = r.frecuencia && r.frecuencia !== 'mensual'
+        ? `<span class="cfg-freq-badge">${r.frecuencia}</span>` : '';
+      const provHint = prov > 0 && r.frecuencia && r.frecuencia !== 'mensual'
+        ? `<span class="cfg-prov-hint">≈${fmt(prov)}/mes</span>` : '';
+      return `
+      <div class="cfg-item-row">
+        <span class="cfg-item-lbl">${r.label}${freqBadge}</span>
+        <span class="cfg-item-right">${provHint}<span class="cfg-item-val">${r.budget ? fmt(r.budget) : '—'}</span></span>
+      </div>`;
+    }).join('');
+
     return `
-    <div class="cfg-cat">
-      <div class="cfg-cat-hdr">
-        <span>${cat.name}</span>
-        <span class="cfg-cat-tot">${total > 0 ? fmt(total) : 'Sin definir'}</span>
+    <div class="cfg-cat-item${sinDef ? ' cfg-cat-undef' : ''}">
+      <div class="cfg-cat-hdr" onclick="cfgCatToggle(${ci})">
+        <span class="cfg-cat-name">${cat.name}</span>
+        <span class="cfg-cat-right">
+          <span class="cfg-cat-tot">${sinDef ? 'Sin definir' : fmt(total)}</span>
+          <span class="cfg-cat-chev" id="cfg-cat-chev-${ci}">▾</span>
+        </span>
       </div>
-      ${items.map((r, ri) => {
-        const prov = calcPresupuestoBase(r, curM);
-        return `
-        <div class="cfg-item-row">
-          <span class="cfg-item-lbl">${r.label}${r.frecuencia && r.frecuencia !== 'mensual' ? `<span class="mbadge">${r.frecuencia}</span>` : ''}</span>
-          <div class="cfg-inp-wrap">
-            <span class="onb-pre">$</span>
-            <input type="text" inputmode="decimal"
-              value="${r.budget || ''}" placeholder="0"
-              oninput="updBudget(${ci},${ri},this.value)"/>
-          </div>
-          ${prov > 0 && r.frecuencia && r.frecuencia !== 'mensual' ? `<span class="cfg-prov">≈${fmt(prov)}/mes</span>` : ''}
-        </div>`;
-      }).join('')}
+      <div class="cfg-cat-body cfg-collapsed" id="cfg-cat-body-${ci}">
+        ${itemRows}
+        <div style="display:flex;justify-content:flex-end;padding-top:6px;">
+          <button class="cfg-edit-cat-btn" onclick="abrirModalCategoria(${ci})">✏️ Editar categoría</button>
+        </div>
+      </div>
     </div>`;
-  }).join('')}`;
+  }).join('');
+
+  el.innerHTML = cats + `
+  <div class="cfg-bud-footer">
+    <span class="cfg-bud-total">Total: <span class="cfg-mono">${fmt(totalGlobal)}</span></span>
+    <button class="cfg-reconf-btn" onclick="abrirConfigPresupuesto()">Reconfigurar 🧹</button>
+  </div>`;
 }
+
+window.cfgCatToggle = function(ci) {
+  const body = document.getElementById('cfg-cat-body-' + ci);
+  const chev = document.getElementById('cfg-cat-chev-' + ci);
+  if (!body) return;
+  body.classList.toggle('cfg-collapsed');
+  if (chev) chev.classList.toggle('cfg-chev-closed');
+};
+
+// ── MODAL EDITAR CATEGORÍA ────────────────────────────────────────────────────
+
+window.abrirModalCategoria = function(ci) {
+  const cat = D && D.categories && D.categories[ci];
+  if (!cat) return;
+  const items = planItems(cat);
+  const freqs = ['mensual','bimestral','trimestral','semestral','anual'];
+
+  const rows = items.map((r, ri) => `
+    <div class="cfg-modal-row">
+      <label class="cfg-modal-lbl">${r.label}</label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div class="onb-iw" style="flex:1;"><span class="onb-pre">$</span>
+          <input type="text" inputmode="decimal"
+            value="${r.budget || ''}" placeholder="0"
+            oninput="updBudget(${ci},${ri},this.value)" />
+        </div>
+        <select class="cfg-freq-sel" onchange="updFrecuencia(${ci},${ri},this.value)">
+          ${freqs.map(f => `<option value="${f}"${(r.frecuencia||'mensual')===f?' selected':''}>${f}</option>`).join('')}
+        </select>
+      </div>
+    </div>`).join('');
+
+  const modal = document.getElementById('cfgCatModal');
+  if (!modal) return;
+  document.getElementById('cfgCatModalTitle').textContent = cat.name;
+  document.getElementById('cfgCatModalBody').innerHTML = rows;
+  modal.style.display = 'flex';
+};
+
+window.cerrarModalCategoria = function() {
+  const modal = document.getElementById('cfgCatModal');
+  if (modal) modal.style.display = 'none';
+  renderConfigPresupuesto();
+  if (typeof renderIngresosConfig === 'function') renderIngresosConfig();
+};
+
+window.updFrecuencia = function(ci, ri, val) {
+  if (D.categories && D.categories[ci] && D.categories[ci].items[ri]) {
+    D.categories[ci].items[ri].frecuencia = val;
+    recalc(); save();
+  }
+};
+
+// ── MODAL EDITAR INGRESO ──────────────────────────────────────────────────────
+
+window.abrirModalIngreso = function(i) {
+  if (!D || !D.income || !D.income[i]) return;
+  const inc  = D.income[i];
+  const modal = document.getElementById('cfgIngModal');
+  if (!modal) return;
+  document.getElementById('cfgIngModalTitle').textContent = inc.label;
+  document.getElementById('cfgIngInput').value = inc.value || '';
+  document.getElementById('cfgIngIndex').value = i;
+  modal.style.display = 'flex';
+};
+
+window.cerrarModalIngreso = function() {
+  const modal = document.getElementById('cfgIngModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.guardarModalIngreso = function() {
+  const i   = parseInt(document.getElementById('cfgIngIndex').value);
+  const val = parseFloat((document.getElementById('cfgIngInput').value || '').replace(/[^0-9.]/g,'')) || 0;
+  if (D.income && D.income[i] !== undefined) {
+    D.income[i].value = val;
+    recalc(); save();
+    toast('✅ Ingreso actualizado');
+  }
+  cerrarModalIngreso();
+  if (typeof renderIngresosConfig === 'function') renderIngresosConfig();
+};
 
 window.updBudget = function(ci, ri, v) {
   const val = parseFloat((v || '').replace(/[^0-9.]/g, '')) || 0;

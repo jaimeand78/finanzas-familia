@@ -32,6 +32,7 @@ function go(tab) {
   }
   if (tab === 'c') {
     renderConfigHogar();
+    if (typeof renderIngresosConfig  === 'function') renderIngresosConfig();
     if (typeof renderConfigPresupuesto === 'function') renderConfigPresupuesto();
   }
 }
@@ -96,16 +97,62 @@ function updateDayLabel() {
 
 // ── CONFIG TAB ────────────────────────────────────────────────────────────────
 
+function cfgToggle(id) {
+  const body = document.getElementById('cfg-body-' + id);
+  const chev = document.getElementById('cfg-chev-' + id);
+  if (!body) return;
+  const open = !body.classList.contains('cfg-collapsed');
+  body.classList.toggle('cfg-collapsed', open);
+  if (chev) chev.classList.toggle('cfg-chev-closed', open);
+}
+
 function renderConfigHogar() {
   const el = document.getElementById('hogarInfo');
   if (!el || !window.HOGAR) return;
   const { nombre, tipo } = window.HOGAR.meta;
-  const miembros = Object.keys(window.HOGAR.miembros || {}).length;
+  const codigo   = window.HOGAR.codigoHogar;
+  const miembros = Object.values(window.HOGAR.miembros || {});
+  const chips = miembros.map(m => {
+    const initials = (m.nombre || '?').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="cfg-member-chip">
+      <div class="cfg-avatar">${initials}</div>
+      <span>${m.nombre || '—'}</span>
+    </div>`;
+  }).join('');
   el.innerHTML = `
-    <strong>${nombre}</strong><br>
-    Tipo: ${tipo || '—'} · ${miembros} miembro${miembros !== 1 ? 's' : ''}<br>
-    Código: <span style="font-family:monospace;font-weight:700;letter-spacing:.1em;color:var(--color-primary);">${window.HOGAR.codigoHogar}</span>
-  `;
+    <div class="cfg-info-row">
+      <span class="cfg-info-lbl">Nombre</span>
+      <span class="cfg-info-val">${nombre || '—'}</span>
+    </div>
+    <div class="cfg-info-row">
+      <span class="cfg-info-lbl">Código</span>
+      <span class="cfg-info-val cfg-code">${codigo}</span>
+    </div>
+    ${miembros.length ? `
+    <div class="cfg-info-row" style="align-items:flex-start;">
+      <span class="cfg-info-lbl">Miembros</span>
+      <div class="cfg-members-row">${chips}</div>
+    </div>` : ''}`;
+}
+
+function renderIngresosConfig() {
+  const el = document.getElementById('ingresosConfig');
+  if (!el) return;
+  if (!D || !D.income || !D.income.length) {
+    el.innerHTML = `<p class="cfg-empty">Sin ingresos configurados.</p>`;
+    return;
+  }
+  const rows = D.income.map((inc, i) => `
+    <div class="cfg-income-row">
+      <span class="cfg-income-lbl">${inc.label}</span>
+      <span class="cfg-income-right">
+        <span class="cfg-income-val">${fmt(inc.value || 0)}</span>
+        <button class="cfg-edit-btn" onclick="abrirModalIngreso(${i})" title="Editar">✏️</button>
+      </span>
+    </div>`).join('');
+  const total = D.income.reduce((s, r) => s + (r.value || 0), 0);
+  el.innerHTML = rows + `
+    <div class="cfg-income-total">Total: <span class="cfg-mono">${fmt(total)}</span></div>`;
 }
 
 // ── PWA iOS ───────────────────────────────────────────────────────────────────

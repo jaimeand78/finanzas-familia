@@ -9,19 +9,23 @@
 
 | ✅ Logros | 🔲 Pendientes |
 |-----------|--------------|
-| App PWA en producción | Rediseño tab Config (mockup pendiente) |
-| Login Google + Firebase Auth (Etapa A) | Pantallas dinámicas según perfil (getCapabilidades) |
-| Modelo de Hogar + código invitación (Etapa B) | Fix iOS decimal `type="text"` |
-| Migración datos a hogares/ (Etapa C) | Exportar mes a PDF |
-| Finanzas v2 arquitectura modular (Etapa D) | Exportar año a Excel |
-| Migración Anny1130 → hogares/SNBDPA/ ✅ | Piloto 5-10 familias |
-| Etapa E completa ✅ | Tab Análisis — afinar pendiente |
+| App PWA en producción | Tab Análisis — Semáforo y Tendencia pendientes de afinar |
+| Login Google + Firebase Auth (Etapa A) | Fix iOS decimal `type="text"` |
+| Modelo de Hogar + código invitación (Etapa B) | Exportar mes a PDF |
+| Migración datos a hogares/ (Etapa C) | Exportar año a Excel |
+| Finanzas v2 arquitectura modular (Etapa D) | Piloto 5-10 familias |
+| Migración Anny1130 → hogares/SNBDPA/ ✅ | |
+| Etapa E completa ✅ | |
 | Tab Resumen rediseñado — solo lectura ✅ | |
 | Semáforo por categoría ✅ | |
 | Pantalla login con logo ✅ | |
 | Config limpio — sin residuos v1 ✅ | |
 | REGLAS_IA.md creado ✅ | |
 | Proyecto Claude con todos los archivos ✅ | |
+| Bloque 1: íconos globales utils.js + index.html ✅ | |
+| Bloque 4: renderHormiga() real ✅ | |
+| Bloque 2: onboarding presupuesto.js ✅ | |
+| Bloque 3: rediseño tab Config ✅ | |
 
 ---
 
@@ -74,42 +78,21 @@ Sesión de diseño antes de implementar Etapa E. Decisiones principales:
 - Nota obligatoria al elegir "Otros" en registro diario
 - Selector de 2 niveles en tab Hoy (categoría → ítem)
 
-**Textos del onboarding ajustados:**
-- P2: *"Así podemos mostrarte lo que más importa para ustedes."*
-- P4: `Servicios (agua, energía, gas, internet)`
-- P4: `Transporte (gasolina, peajes, taxis)`
-- P5: `Mercado y loncheras`
-- Resumen: botón "Cancelar" agregado para salir sin guardar
-
-**Proceso de integración — aprendizaje importante:**
-La Etapa E se intentó integrar en dos sesiones. En la primera se generaron 4 archivos JS + 1 CSS + instrucciones. En la segunda se intentó hacer "archivos completos" lo que generó confusión y mezcla de versiones. **Aprendizaje: cuando algo funciona, no rehacerlo completo. Solo modificar lo que cambia.**
-
 ### 📅 Fase 11 — Tab Resumen rediseñado (Junio 2026)
 
-**Problema:** El tab Resumen era una copia del editor de presupuesto de v1 — inputs, filas editables, hoja de cálculo. No respondía *"¿cómo vamos?"* de forma rápida.
-
-**Solución — diseño con mockup:**
+**Solución:**
 - Solo lectura — sin inputs
 - Número grande de disponible como protagonista (verde/rojo)
-- Semáforo por categoría: rojo (pasó límite) / amarillo (>85%) / verde (bien)
-- Rojo y amarillo expandidos por defecto
-- Ahorro siempre expandido con "✓ cumplido" en fondo verde
-- Categorías verdes colapsadas — se abren al tocar
-- Cada tarjeta: gastado X de Y + lo que queda
+- Semáforo por categoría: rojo / amarillo (>85%) / verde
+- Ahorro siempre expandido con "✓ cumplido"
 - Orden: rojo → amarillo → ahorro cumplido → verde → sin presupuesto
 
-**Aprendizaje:** *Una mamá mira colores, no números. Si todo está verde, respira. Si hay rojo, se enfoca ahí.*
-
-**Archivos modificados:** `js/finanzas.js` (nueva `renderResumen()`, `renderExpSecs()` separado), `js/ui.js`, `index.html`
+**Archivos modificados:** `js/finanzas.js`, `js/ui.js`, `index.html`
 
 ### 📅 Fase 12 — Pantalla de login rediseñada (Junio 2026)
 
-- Logo oficial `logo.png` subido a la raíz del repo
-- Diseño Opción C: logo en fondo crema + 3 beneficios + botón Google con SVG inline
-- Beneficios alineados con propuesta de valor:
-  - ✅ Saben en qué se va el dinero
-  - ✅ Deciden juntos, sin sorpresas
-  - ✅ Paz mental a fin de mes
+- Logo oficial `logo.png`
+- Beneficios: ✅ Saben en qué se va el dinero / ✅ Deciden juntos, sin sorpresas / ✅ Paz mental a fin de mes
 
 **Archivos modificados:** `css/login.css`, `index.html`
 
@@ -117,33 +100,85 @@ La Etapa E se intentó integrar en dos sesiones. En la primera se generaron 4 ar
 
 Ver sección 3 — Registro de Bugs.
 
-**Decisión de Config (DA-16):** El tab Config solo muestra configuración del hogar y presupuesto base. Los gastos reales del mes solo se ven en el Resumen. `renderExpSecs()` eliminado de Config.
-
-### 📅 Fase 15 — Sesión de diseño y refactoring íconos (Junio 2026)
-
-**Sesión de diseño completa antes de implementar:**
-- Mockup tab Config aprobado — secciones colapsables, modal por categoría, Reconfigurar 🧹
-- Mockup Hormiga real aprobado — filtro por umbral, insight dinámico, categorías con conteo
-- Revisión completa de íconos — 7 cambios globales aprobados + 10 cambios onboarding pendientes
-- Revisión completa de textos onboarding — corrección singular/plural, función `_tx()`
-- Eliminación opción Mixto P1, opción P2 dinámica según tipoHogar
-
-**Implementado:**
-- `utils.js` — 5 íconos ICONS + 5 claves DAILY_ITEMS
-- `index.html` — tab Hoy 💰→✏️, sub-tab Tendencia 📈→📉
-- `analisis.js` — `renderHormiga()` reescrita con lógica real (umbral $20.000)
-
-**Pendiente próxima sesión:**
-- Bloque 2: onboarding `presupuesto.js` — 16 cambios textos + íconos + `_tx()`
-- Bloque 3: rediseño tab Config — `presupuesto.js`, `ui.js`, `index.html`
-
----
+**Decisión de Config (DA-16):** El tab Config solo muestra configuración del hogar y presupuesto base.
 
 ### 📅 Fase 14 — Regla de Oro y proyecto Claude (Junio 2026)
 
 - Creado `REGLAS_IA.md` en la raíz del repo
 - Todos los archivos del proyecto subidos al proyecto Claude
 - Regla de Oro establecida: siempre preguntar si el archivo está actualizado antes de modificarlo
+
+### 📅 Fase 15 — Sesión de diseño y refactoring íconos (Junio 2026)
+
+**Sesión de diseño completa antes de implementar:**
+- Mockup tab Config aprobado — secciones colapsables, modal por categoría, Reconfigurar 🧹
+- Mockup Hormiga real aprobado — filtro por umbral, insight dinámico, categorías con conteo
+- Revisión completa de íconos — 7 cambios globales aprobados + 10 cambios onboarding
+- Revisión completa de textos onboarding — corrección singular/plural, función `_tx()`
+- Eliminación opción Mixto P1, opción P2 dinámica según tipoHogar
+
+**Implementado (Bloque 1 y 4):**
+- `utils.js` — 5 íconos ICONS + 5 claves DAILY_ITEMS
+- `index.html` — tab Hoy 💰→✏️, sub-tab Tendencia 📈→📉
+- `analisis.js` — `renderHormiga()` reescrita con lógica real (umbral $20.000)
+
+### 📅 Fase 16 — Bloque 2: onboarding presupuesto.js (Junio 2026)
+
+**Cambios implementados en `presupuesto.js`:**
+
+| # | Cambio |
+|---|--------|
+| 1 | `_tx(singular, plural)` — función nueva, devuelve singular si `tipoHogar === 'soltero'` |
+| 2 | P1: eliminado botón Mixto |
+| 3 | P1: textos fijos en singular ("tu hogar", "para ti") — P1 aún no conoce tipoHogar |
+| 4 | P2: emoji `💭→🤔` |
+| 5 | P2: ícono opción `invisible` `🌫️→💸` |
+| 6 | P2: opción `acuerdo` dinámica — soltero ve `😰 Gasto más de lo que gano` |
+| 7 | P2: opciones `justo` y `ahorro` con `_tx()` |
+| 8 | P2: título y subtítulo con `_tx()` |
+| 9 | P3: título y subtítulo con `_tx()` |
+| 10 | P4: emoji `🏠→📌` |
+| 11 | P4: cuota vehículo `🚗 Cuota crédito del vehículo` → `💳 Cuota del vehículo` |
+| 12 | P5: emoji `🛒→🎢` |
+| 13 | P5: subtítulo con `_tx()` |
+| 14 | P5: `🍽️→🧺` mercado, `🎬→🍿` entretenimiento, `💰→🐷` ahorro |
+| 15 | P5: `¿Cuánto quieres/quieren guardar?` con `_tx()` |
+| 16 | Resumen: `Ingresa/Ingresan`, `Te queda/Les queda`, insights con `_tx()` |
+
+### 📅 Fase 17 — Bloque 3: rediseño tab Config (Junio 2026)
+
+**Diseño:** mockup aprobado antes de implementar — secciones colapsables, acordeón por categoría, modales de edición.
+
+**Cambios en `index.html`:**
+- Tab Config reemplazado — 4 secciones colapsables (`cfg-sec`): Mi hogar, Ingresos, Presupuesto base, Cerrar sesión
+- Nuevos contenedores: `#hogarInfo`, `#ingresosConfig`, `#budgetConfig`
+- Modal editar categoría (`#cfgCatModal`) con título dinámico y body generado por JS
+- Modal editar ingreso (`#cfgIngModal`) con input de monto
+- Eliminado: `danger-sec`, `btn-danger`, `cleanDuplicates` del HTML
+
+**Cambios en `ui.js`:**
+- `renderConfigHogar()` reescrita — chips de miembros con avatar de iniciales
+- `cfgToggle(id)` nueva — colapsa/expande secciones Config
+- `renderIngresosConfig()` nueva — lista de ingresos con ✏️ por fila
+- `go('c')` actualizado — llama `renderIngresosConfig()` además de las existentes
+
+**Cambios en `presupuesto.js`:**
+- `renderConfigPresupuesto()` reescrita — acordeón por categoría, categorías sin definir atenuadas, footer con total + Reconfigurar
+- `cfgCatToggle(ci)` nueva — abre/cierra acordeón de categoría
+- `abrirModalCategoria(ci)` nueva — modal con inputs de budget + selector de frecuencia por ítem
+- `cerrarModalCategoria()` nueva — cierra modal y refresca Config
+- `updFrecuencia(ci, ri, val)` nueva — actualiza frecuencia de ítem y guarda
+- `abrirModalIngreso(i)` nueva — modal para editar monto de ingreso
+- `cerrarModalIngreso()` / `guardarModalIngreso()` nuevas
+
+**Cambios en `presupuesto.css`:**
+- Estilos viejos de Config reemplazados completamente
+- Nuevas clases: `cfg-sec`, `cfg-sec-hdr`, `cfg-sec-body`, `cfg-collapsed`, `cfg-chev`
+- Estilos Mi hogar: `cfg-info-row`, `cfg-code`, `cfg-member-chip`, `cfg-avatar`
+- Estilos Ingresos: `cfg-income-row`, `cfg-income-val`, `cfg-edit-btn`
+- Estilos Presupuesto: `cfg-cat-item`, `cfg-cat-hdr`, `cfg-cat-body`, `cfg-freq-badge`, `cfg-prov-hint`, `cfg-bud-footer`, `cfg-reconf-btn`
+- Estilos modales: `cfg-modal-inner`, `cfg-modal-hdr`, `cfg-modal-body`, `cfg-modal-row`, `cfg-freq-sel`, `cfg-modal-foot`
+- Estilos Cerrar sesión: `cfg-signout-btn`
 
 ---
 
@@ -152,33 +187,20 @@ Ver sección 3 — Registro de Bugs.
 *(bugs #1 al #13 — ver versiones anteriores)*
 
 **Bug #14 — Tarjetas verdes del Resumen sin contraste**
-- **Síntoma:** Categorías en estado verde tenían fondo igual al fondo de la página
-- **Causa:** `var(--color-bg)` en lugar de `var(--color-surface)`
-- **Fix:** Cambiar en `renderResumen()` los dos casos de `var(--color-bg)` a `var(--color-surface)`
-- **Archivo:** `js/finanzas.js`
+- **Fix:** `var(--color-bg)` → `var(--color-surface)` en `renderResumen()`
 
 **Bug #15 — `calcPresupuestoBase` not defined**
-- **Síntoma:** `Uncaught ReferenceError: calcPresupuestoBase is not defined` en `presupuesto.js`
-- **Causa:** Al rediseñar el Resumen se generó un `finanzas.js` nuevo basado en el archivo original del proyecto de Claude (v1), que no tenía `calcPresupuestoBase`, pisando el archivo correcto
 - **Fix:** Reconstruir `finanzas.js` combinando ambas versiones
 - **Aprendizaje:** Siempre pedir el archivo actual antes de modificarlo → DA-17
 
 **Bug #16 — Config con contenido duplicado (v1 + v2)**
-- **Síntoma:** Config mostraba categorías dos veces — HTML hardcodeado (v1) + `renderExpSecs()` (v2)
-- **Causa:** El `index.html` tenía bloques de v1 (`incRows`, `expSecs`, `ncLbl`, botón "Aplicar fijos") que nunca se eliminaron
-- **Fix:** Eliminar bloques v1 del `index.html` + quitar `renderExpSecs()` de `go('c')` en `ui.js`
+- **Fix:** Eliminar bloques v1 del `index.html` + quitar `renderExpSecs()` de `go('c')`
 
 **Bug #17 — Nombres de categorías cortados en Resumen**
-- **Síntoma:** `ivienda`, `e Impuestos`, `Doméstico` en lugar de los nombres completos
-- **Causa:** `c.name.replace(/^\S+\s/, '')` cortaba la primera *palabra* en lugar de solo el emoji inicial. Para `🏠 Vivienda` funciona, pero para `Vivienda` (sin emoji) cortaba la `V`
-- **Fix:** Función `displayName(name)` que usa regex Unicode para quitar solo emojis al inicio
-- **Archivo:** `js/finanzas.js`
+- **Fix:** Función `displayName(name)` con regex Unicode en `finanzas.js`
 
 **Bug #18 — Orden del semáforo incorrecto**
-- **Síntoma:** Las categorías rojas y amarillas no aparecían primero; el ahorro no aparecía destacado
-- **Causa:** Las tarjetas se renderizaban en el orden original de `D.categories` sin ordenar por estado
-- **Fix:** Ordenar antes de renderizar: `[...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud, ...ahorroSinCumplir]`
-- **Archivo:** `js/finanzas.js`
+- **Fix:** Ordenar antes de renderizar: `[...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud]`
 
 ---
 
@@ -186,25 +208,17 @@ Ver sección 3 — Registro de Bugs.
 
 *(DA-0 al DA-13 — ver arquitectura_v2_3.md)*
 
-**DA-14: Tab Resumen es solo lectura**
-El tab Resumen no tiene inputs. Solo muestra el estado del mes. La edición vive en Config.
-
-**DA-15: Login con logo oficial**
-La pantalla de login muestra `logo.png`. El emoji 🏠 era un placeholder temporal.
-
-**DA-16: Config solo muestra configuración, no gastos reales**
-El tab Config muestra: info del hogar + presupuesto base. No muestra los gastos reales del mes. `renderExpSecs()` eliminado de Config. Los gastos reales solo se ven en el Resumen.
-
-**DA-17: Siempre pedir el archivo actual antes de modificarlo**
-Antes de modificar cualquier archivo, preguntar al usuario si está actualizado. Nunca generar desde cero si existe. Nunca asumir que el archivo en el proyecto de Claude es igual al que está en el repo. Ver `REGLAS_IA.md`.
+**DA-14:** Tab Resumen es solo lectura — sin inputs.
+**DA-15:** Login con logo oficial `logo.png`.
+**DA-16:** Config solo muestra configuración — no gastos reales del mes.
+**DA-17:** Siempre pedir el archivo actual antes de modificarlo — ver `REGLAS_IA.md`.
 
 ---
 
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- Rediseño tab Config con mockup — mockup aprobado, implementación pendiente
-- Tab Análisis — Hormiga reescrita ✅, Semáforo y Tendencia pendientes de afinar
+- Tab Análisis — Semáforo histórico y Tendencia pendientes de afinar
 - Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
 - Pantallas dinámicas según `getCapabilidades(perfil)` — hijos activan Educación, vehículo activa Seguros
 
@@ -224,22 +238,18 @@ Antes de modificar cualquier archivo, preguntar al usuario si está actualizado.
 ## 6. Aprendizajes Clave
 
 > **Siempre pedir el archivo actual antes de modificarlo.**
-> En esta sesión se pisó el `finanzas.js` bueno porque se generó uno nuevo basado en el archivo del proyecto de Claude, que era la versión original. A partir de ahora: si hay que modificar un archivo existente, pedirlo primero.
 
-> **No rehacer lo que funciona.**
-> Cuando el usuario pidió "archivos completos", se reescribieron todos desde cero en lugar de hacer cambios necesarios. Eso introdujo regresiones. La regla: cambios quirúrgicos, no rewrites completos.
+> **No rehacer lo que funciona.** Cambios quirúrgicos, no rewrites completos.
 
-> **Mockupear antes de implementar.**
-> El Resumen, el login y el onboarding se diseñaron con mockups interactivos antes de escribir código. Iteraciones en minutos vs horas de commits y redeploys.
+> **Mockupear antes de implementar.** Iteraciones en minutos vs horas de commits.
 
 > **Config es configuración, no edición de gastos.**
-> El tab Config debe ser el panel de administración del hogar. Los gastos reales del mes van en el Resumen. Mezclar los dos crea confusión.
 
 > **Una mamá mira colores, no números.**
-> Los porcentajes y cifras exactas son para el análisis. Para la vista rápida, el color comunica más rápido. Rojo = problema. Verde = tranquilidad.
 
 > **El logo en el login comunica identidad. Un emoji no.**
-> El logo oficial con los beneficios específicos convierte el login en el primer momento de comunicación de la propuesta de valor.
+
+> **Documentar los textos aprobados en la bitácora.** En la sesión anterior se aprobaron los textos singular/plural del onboarding pero no quedaron registrados en la documentación, lo que obligó a reconstruirlos desde el código en la sesión siguiente.
 
 ---
 
@@ -258,8 +268,10 @@ Antes de modificar cualquier archivo, preguntar al usuario si está actualizado.
 | [confirmar] | fix: nombres categorías, orden semáforo y fondo tarjetas en Resumen |
 | [confirmar] | docs: REGLAS_IA.md — reglas de trabajo para asistentes IA |
 | [confirmar] | docs: bitacora v2.5, arquitectura v2.3, producto v2.3, README actualizados |
-| [confirmar] | refactor: íconos globales — utils.js (ICONS + DAILY_ITEMS) + index.html (tab Hoy + Tendencia) |
-| [confirmar] | feat: renderHormiga() reescrita — lógica real gastos hormiga, umbral $20k, insight dinámico |
+| [confirmar] | refactor: íconos globales — utils.js (ICONS + DAILY_ITEMS) + index.html |
+| [confirmar] | feat: renderHormiga() reescrita — lógica real gastos hormiga, umbral $20k |
+| [confirmar] | refactor: onboarding — _tx(), íconos, textos singular/plural, sin Mixto |
+| [confirmar] | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
 
 ---
 
@@ -280,11 +292,11 @@ Antes de modificar cualquier archivo, preguntar al usuario si está actualizado.
 ## 9. Próxima Sesión
 
 **Antes del piloto hay que resolver:**
-1. Rediseño de Config — mockup primero
-2. Tab Análisis — afinar lo pendiente
-3. Fix iOS decimal
+1. Tab Análisis — afinar Semáforo histórico y Tendencia
+2. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
+3. Probar en producción los cambios de esta sesión (Bloques 2 y 3)
 
-**Cuando esos tres estén listos → Piloto v2.3 con 5-10 familias**
+**Cuando esos estén listos → Piloto v2.3 con 5-10 familias**
 
 ---
 
