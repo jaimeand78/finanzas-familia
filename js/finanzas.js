@@ -318,7 +318,7 @@ function renderAll() {
 }
 
 // ── RENDER RESUMEN — tab 📊 ───────────────────────────────────────────────────
-// Solo lectura. Semáforo por categoría. Ahorro siempre expandido.
+// Solo lectura. Ahorro fijo arriba. Semáforo por categoría. Quién pagó abajo.
 
 function renderResumen() {
   if (!D.income) return;
@@ -331,11 +331,10 @@ function renderResumen() {
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
 
-  // Cabecera
-  const estado = avail >= 0 ? 'Van bien 🟢' : 'Ojo con el gasto 🔴';
+  const estado    = avail >= 0 ? 'Van bien 🟢' : 'Ojo con el gasto 🔴';
   const dispColor = avail >= 0 ? '#0F6E56' : '#993C1D';
 
-  // Categorías con datos
+  // Todas las categorías con datos (incluyendo Ahorro)
   const cats = D.categories.map(c => {
     const items = planItems(c);
     const act   = items.reduce((s, r) => s + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
@@ -344,22 +343,48 @@ function renderResumen() {
     return { name: c.name, act, bud, pct };
   }).filter(c => c.act > 0 || c.bud > 0);
 
-  // Icono de categoría — extrae nombre sin emoji
+  // Icono de categoría
   const icon = name => {
     const clean = name.replace(/^\S+\s/, '');
     return ICONS[clean] || ICONS[name] || '💸';
   };
 
-  // Quitar solo el emoji inicial, no palabras del nombre
   const displayName = name => name.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\uFE0F\u20E3\u200D🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸]+\s*/u, '').trim() || name;
 
+  // ── BLOQUE AHORRO FIJO ────────────────────────────────────────────────────────
+  const ahorroData = cats.find(c => c.name.includes('Ahorro'));
+  const ahorroEl   = document.getElementById('rAhorro');
+  if (ahorroEl) {
+    if (ahorroData && ahorroData.bud > 0) {
+      const cumplido = ahorroData.act >= ahorroData.bud;
+      const pctBar   = Math.min(Math.round((ahorroData.act / ahorroData.bud) * 100), 100);
+      const badge    = cumplido
+        ? `<span style="font-size:11px;background:#1D9E75;color:#E1F5EE;padding:2px 8px;border-radius:20px;">✓ cumplido</span>`
+        : `<span style="font-size:11px;background:#F0997B;color:#4A1B0C;padding:2px 8px;border-radius:20px;">faltan ${fmt(ahorroData.bud - ahorroData.act)}</span>`;
+      ahorroEl.style.display = 'block';
+      ahorroEl.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;">
+          <span style="font-size:18px;">🐷</span>
+          <span style="font-size:14px;font-weight:600;color:#085041;flex:1;">Ahorro del mes</span>
+          ${badge}
+          <div style="text-align:right;margin-left:4px;">
+            <div style="font-size:14px;font-weight:600;color:#0F6E56;">${fmt(ahorroData.act)}</div>
+            <div style="font-size:11px;color:#085041;">de ${fmt(ahorroData.bud)}</div>
+          </div>
+        </div>
+        <div style="height:4px;background:#9FE1CB;margin:0 14px 12px;border-radius:99px;overflow:hidden;">
+          <div style="width:${pctBar}%;height:100%;background:#1D9E75;border-radius:99px;"></div>
+        </div>`;
+    } else {
+      ahorroEl.style.display = 'none';
+    }
+  }
 
-  // Render de una tarjeta de categoría
-  const tarjeta = (c, expandida) => {
-    const esAhorro  = c.name.includes('Ahorro');
-    const rojo      = c.pct > 100;
-    const amarillo  = c.pct > 85 && c.pct <= 100;
-    const verde     = c.pct >= 0 && c.pct <= 85;
+  // ── SEMÁFORO CATEGORÍAS (sin Ahorro) ─────────────────────────────────────────
+  const tarjeta = (c) => {
+    const rojo     = c.pct > 100;
+    const amarillo = c.pct > 85 && c.pct <= 100;
+    const verde    = c.pct >= 0 && c.pct <= 85;
 
     let bg, textColor, barColor, barBg, badge, detailText;
 
@@ -371,26 +396,19 @@ function renderResumen() {
       bg = '#FAEEDA'; textColor = '#854F0B'; barColor = '#BA7517'; barBg = '#FAC775';
       badge = 'quedan ' + fmt(c.bud - c.act);
       detailText = `<p style="font-size:12px;color:${textColor};margin:0;">Gastado ${fmt(c.act)} de ${fmt(c.bud)}</p>`;
-    } else if (esAhorro && c.bud > 0 && c.act >= c.bud) {
-      bg = '#E1F5EE'; textColor = '#085041'; barColor = '#1D9E75'; barBg = '#9FE1CB';
-      badge = '✓ cumplido';
-      detailText = `<p style="font-size:12px;color:${textColor};margin:0;">Guardado ${fmt(c.act)} de ${fmt(c.bud)}</p>`;
     } else if (verde && c.bud > 0) {
       bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)} de ${fmt(c.bud)} · quedan ${fmt(c.bud - c.act)}</p>`;
     } else {
-      // Sin presupuesto definido
       bg = 'var(--color-surface)'; textColor = 'var(--color-text)'; barColor = '#1D9E75'; barBg = 'var(--color-border)';
       badge = '';
       detailText = `<p style="font-size:12px;color:var(--color-muted);margin:0;">Gastado ${fmt(c.act)}</p>`;
     }
 
     const pctBar  = c.bud > 0 ? Math.min(c.pct, 100) : 0;
-    const abierto = expandida || rojo || amarillo || (esAhorro && c.bud > 0 && c.act >= c.bud);
+    const abierto = rojo || amarillo;
     const chevron = abierto ? '▲' : '▼';
-
-    // Mini barra para colapsado
     const miniBar = !abierto ? `
       <div style="width:60px;height:4px;background:${barBg};border-radius:99px;overflow:hidden;">
         <div style="width:${pctBar}%;height:100%;background:${barColor};border-radius:99px;"></div>
@@ -419,17 +437,18 @@ function renderResumen() {
     </div>`;
   };
 
-  // Ordenar: rojo → amarillo → ahorro cumplido → verde → sin presupuesto
-  const rojos    = cats.filter(c => c.pct > 100);
-  const amarillos= cats.filter(c => c.pct > 85 && c.pct <= 100);
-  const ahorroCumplido = cats.filter(c => c.name.includes('Ahorro') && c.bud > 0 && c.act >= c.bud);
-  const verdes   = cats.filter(c => c.pct >= 0 && c.pct <= 85 && !c.name.includes('Ahorro'));
-  const sinBud   = cats.filter(c => c.pct === -1 && !c.name.includes('Ahorro'));
-  const ahorroSinCumplir = cats.filter(c => c.name.includes('Ahorro') && !(c.bud > 0 && c.act >= c.bud));
-  const ordenadas = [...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud, ...ahorroSinCumplir];
+  const catsNoAhorro = cats.filter(c => !c.name.includes('Ahorro'));
+  const rojos        = catsNoAhorro.filter(c => c.pct > 100);
+  const amarillos    = catsNoAhorro.filter(c => c.pct > 85 && c.pct <= 100);
+  const verdes       = catsNoAhorro.filter(c => c.pct >= 0 && c.pct <= 85);
+  const sinBud       = catsNoAhorro.filter(c => c.pct === -1);
+  const ordenadas    = [...rojos, ...amarillos, ...verdes, ...sinBud];
 
   const el = document.getElementById('resumenCats');
-  if (el) el.innerHTML = ordenadas.map(c => tarjeta(c, false)).join('');
+  if (el) el.innerHTML = ordenadas.map(c => tarjeta(c)).join('');
+
+  // ── QUIÉN HA PAGADO ───────────────────────────────────────────────────────────
+  renderQuienPago();
 
   // Actualizar cabecera
   const dEl = document.getElementById('rDisp');
@@ -440,6 +459,74 @@ function renderResumen() {
   if (iEl) iEl.textContent = fmt(tInc);
   const xEl = document.getElementById('rExp');
   if (xEl) xEl.textContent = fmt(tExp);
+}
+
+// ── QUIÉN HA PAGADO — carga desde daily/ del mes actual ──────────────────────
+
+async function renderQuienPago() {
+  const el = document.getElementById('rQuienPago');
+  if (!el) return;
+
+  try {
+    const mm   = String(curM + 1).padStart(2, '0');
+    const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curY}/${mm}`).once('value');
+
+    // Acumular por miembro
+    const totales = {};
+    snap.forEach(daySnap => daySnap.forEach(itemSnap => {
+      const v = itemSnap.val();
+      if (!v.who || !v.amount) return;
+      totales[v.who] = (totales[v.who] || 0) + v.amount;
+    }));
+
+    const miembros = Object.entries(totales).sort((a, b) => b[1] - a[1]);
+    const total    = miembros.reduce((s, [, v]) => s + v, 0);
+
+    if (!miembros.length || !total) {
+      el.style.display = 'none';
+      return;
+    }
+
+    // Colores por posición
+    const colores = [
+      { bg: '#E6F1FB', text: '#185FA5', bar: '#378ADD' },
+      { bg: '#FBEAF0', text: '#993556', bar: '#D4537E' },
+      { bg: '#E1F5EE', text: '#085041', bar: '#1D9E75' },
+      { bg: '#FAEEDA', text: '#854F0B', bar: '#BA7517' }
+    ];
+
+    const filas = miembros.map(([nombre, monto], i) => {
+      const pct = Math.round((monto / total) * 100);
+      const col = colores[i % colores.length];
+      const ini = nombre.substring(0, 2).toUpperCase();
+      return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:${col.bg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:${col.text};flex-shrink:0;">${ini}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text);margin-bottom:4px;">${nombre}</div>
+          <div style="height:6px;background:var(--color-border);border-radius:3px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${col.bar};border-radius:3px;"></div>
+          </div>
+        </div>
+        <div style="text-align:right;min-width:72px;">
+          <div style="font-size:14px;font-weight:500;color:var(--color-text);">${fmt(monto)}</div>
+          <div style="font-size:11px;color:var(--color-muted);">${pct}%</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    el.style.display = 'block';
+    el.innerHTML = `
+      <p style="font-size:12px;font-weight:500;color:var(--color-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .75rem;">¿Quién ha pagado?</p>
+      ${filas}
+      <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:0.5px solid var(--color-border);margin-top:.25rem;">
+        <span style="font-size:12px;color:var(--color-muted);">Total registrado</span>
+        <span style="font-size:13px;font-weight:500;color:var(--color-text);">${fmt(total)}</span>
+      </div>`;
+  } catch(e) {
+    console.error('renderQuienPago:', e);
+    el.style.display = 'none';
+  }
 }
 
 // Toggle expand/colapsar tarjeta de categoría en Resumen

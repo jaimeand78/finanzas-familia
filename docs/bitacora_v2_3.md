@@ -9,11 +9,11 @@
 
 | ✅ Logros | 🔲 Pendientes |
 |-----------|--------------|
-| App PWA en producción | Tab Análisis — Semáforo y Tendencia pendientes de afinar |
-| Login Google + Firebase Auth (Etapa A) | Fix iOS decimal `type="text"` |
-| Modelo de Hogar + código invitación (Etapa B) | Exportar mes a PDF |
-| Migración datos a hogares/ (Etapa C) | Exportar año a Excel |
-| Finanzas v2 arquitectura modular (Etapa D) | Piloto 5-10 familias |
+| App PWA en producción | Ingresos adicionales / bonos — próxima sesión |
+| Login Google + Firebase Auth (Etapa A) | Onboarding: activar/desactivar categorías por tipoHogar (C3) |
+| Modelo de Hogar + código invitación (Etapa B) | Piloto 5-10 familias |
+| Migración datos a hogares/ (Etapa C) | Exportar mes a PDF |
+| Finanzas v2 arquitectura modular (Etapa D) | Exportar año a Excel |
 | Migración Anny1130 → hogares/SNBDPA/ ✅ | |
 | Etapa E completa ✅ | |
 | Tab Resumen rediseñado — solo lectura ✅ | |
@@ -26,11 +26,15 @@
 | Bloque 4: renderHormiga() real ✅ | |
 | Bloque 2: onboarding presupuesto.js ✅ | |
 | Bloque 3: rediseño tab Config ✅ | |
-| fix: Vestuario y Regalos en defD() y migrateCategories() ✅ | Ítems faltantes en Vivienda, Salud, Entretenimiento, Ahorro — revisar antes del piloto |
-| fix: onboarding P4 — servicios/transporte va a ítem principal, no dividido ✅ | |
-| fix: Config modal — selector de mes para ítems de fecha fija (SOAT, predial, cesantías) ✅ | |
-| feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight ✅ | |
-| fix: iOS decimal — todos los inputs ya correctos, sin cambios necesarios ✅ | |
+| fix: Vestuario y Regalos en defD() y migrateCategories() ✅ | |
+| fix: onboarding P4 — servicios/transporte va a ítem principal ✅ | |
+| fix: Config modal — selector de mes para ítems de fecha fija ✅ | |
+| feat: Tendencia rediseñada — daily incluido, barras dobles, promedio ✅ | |
+| fix: iOS decimal — todos los inputs ya correctos ✅ | |
+| fix: Servicio Doméstico en Tab Hoy (DAILY_ITEMS) ✅ | |
+| feat: Ahorro fijo arriba en Resumen — después de Ingresan/Gastado ✅ | |
+| feat: ¿Quién ha pagado? — sección nueva al final del Resumen ✅ | |
+| fix: dailyTotals normaliza catKey sin emoji — Resumen correcto ✅ | |
 
 ---
 
@@ -179,109 +183,82 @@ Ver sección 3 — Registro de Bugs.
 **Cambios en `presupuesto.css`:**
 - Estilos viejos de Config reemplazados completamente
 - Nuevas clases: `cfg-sec`, `cfg-sec-hdr`, `cfg-sec-body`, `cfg-collapsed`, `cfg-chev`
-- Estilos Mi hogar: `cfg-info-row`, `cfg-code`, `cfg-member-chip`, `cfg-avatar`
-- Estilos Ingresos: `cfg-income-row`, `cfg-income-val`, `cfg-edit-btn`
-- Estilos Presupuesto: `cfg-cat-item`, `cfg-cat-hdr`, `cfg-cat-body`, `cfg-freq-badge`, `cfg-prov-hint`, `cfg-bud-footer`, `cfg-reconf-btn`
-- Estilos modales: `cfg-modal-inner`, `cfg-modal-hdr`, `cfg-modal-body`, `cfg-modal-row`, `cfg-freq-sel`, `cfg-modal-foot`
-- Estilos Cerrar sesión: `cfg-signout-btn`
 
 ### 📅 Fase 18 — Revisión técnica pre-piloto y fixes onboarding/Config (Junio 2026)
 
-**Contexto:** Sesión de análisis antes del piloto v2.3. Se identificaron 4 problemas en onboarding y Config, se hizo mockup y se implementaron 3 fixes en `presupuesto.js`.
+**Problemas identificados y resueltos:**
 
-**Problemas identificados:**
+| # | Problema | Fix |
+|---|----------|-----|
+| C1 | Servicios del hogar se dividía en 3 partes iguales | Valor completo a `Agua y Energía`, Gas e Internet en $0 |
+| C2 | Modal Config no permitía cambiar mes en ítems de fecha fija | Selector de mes (Ene–Dic) cuando ítem tiene `months[]` |
+| C4 | Labels de servicios/transporte en P4 no aclaraban que era estimado | Badge "total estimado — lo desglosás en Config" |
 
-| # | Problema | Impacto | Decisión |
-|---|----------|---------|----------|
-| C1 | Servicios del hogar se dividía en 3 partes iguales entre Agua/Gas/Internet | Alto — valores incorrectos en Firebase | Fix inmediato |
-| C2 | Modal Config mostraba select "anual/mensual" para ítems de fecha fija (SOAT, predial, cesantías) — no permitía cambiar el mes | Alto — hogares con vehículo o empleada | Fix inmediato |
-| C3 | Onboarding P1 no usa tipoHogar para activar/desactivar categorías | Bajo | Post-piloto |
-| C4 | Labels de servicios y transporte en P4 no aclaraban que era un estimado total | Bajo | Fix inmediato |
-
-**Fixes implementados en `presupuesto.js`:**
-
-**C1 — `_aplicarOnbDataAD()`:** El valor de servicios va completo a `Agua y Energía`. Gas e Internet arrancan en $0. El usuario desglosa en Config.
-
-**C2 — `abrirModalCategoria()`:** Detecta si el ítem tiene `months[]`. Si sí → muestra selector de mes (Ene–Dic) con estilo verde, el usuario puede cambiar el mes. Si no → select de frecuencia normal sin cambios. Nueva función `updMes(ci, ri, val)` guarda `item.months = [mes]` y llama `recalc()` + `save()`. `calcPresupuestoBase()` no se toca — ya funciona correctamente con `months[]`.
-
-**C4 — `_tpl4()`:** Badges de servicios y transporte cambian de lista de ítems a *"total estimado — lo desglosás en Config"*.
-
-**Aprendizaje clave de esta sesión:**
-> El onboarding recoge estimados agrupados. Config recoge el detalle real. No forzar mapeo 1:1 entre ellos.
+**Aprendizaje clave:** El onboarding recoge estimados agrupados. Config recoge el detalle real.
 
 ### 📅 Fase 19 — Tendencia rediseñada + confirmación fix iOS (Junio 2026)
 
-**Fix iOS decimal:** Revisión de todos los inputs de monto en la app — todos ya tenían `type="text" inputmode="decimal"` correctamente aplicado. No requirió cambios.
+**Fix iOS decimal:** Todos los inputs ya tenían `type="text" inputmode="decimal"` — sin cambios.
 
 **`renderTendencia()` reescrita en `analisis.js`:**
-
-| Cambio | Detalle |
-|--------|---------|
-| Incluye gastos `daily/` | Carga `daily/[y]/[mm]` en paralelo con el nodo mensual — suma ambos para el total real |
-| Tarjetas resumen | Promedio 5 meses anteriores vs mes actual + delta % (verde si bajó, rojo si subió) |
-| Barras dobles | Barra sólida = gastos · Barra con borde = ingresos |
-| Color semáforo | Mes actual verde · Meses donde gastos > ingresos en rojo coral · Resto morado |
-| Leyenda | Gastos / Mes actual / Ingresos |
-| Insight dinámico | Una frase al final: bien si ▼10%+, ojo si ▲10%+, neutral si dentro del rango |
-| Estado de carga | Muestra "Cargando..." mientras resuelven las promesas de Firebase |
-
-**Archivo modificado:** `js/analisis.js`
+- Incluye gastos `daily/` — carga en paralelo con nodo mensual
+- Tarjetas resumen: promedio 5 meses anteriores vs mes actual + delta %
+- Barras dobles: sólida = gastos · con borde = ingresos
+- Color semáforo, leyenda, insight dinámico al final
 
 ### 📅 Fase 20 — Revisión pre-piloto producción + parche budgets SNBDPA (Junio 2026)
 
-**Contexto:** Sesión de validación en producción y resolución de problemas específicos del hogar SNBDPA (migrado de v1).
-
-**Validaciones en producción:**
-- ✅ Tendencia — barras dobles, promedio, insight funcionando correctamente
-- ✅ Onboarding P4 — texto aclaratorio "total estimado — lo desglosás en Config"
-- ✅ Config modal — selector de mes para SOAT, predial, cesantías
-- ✅ Resumen — comportamiento correcto: solo muestra categorías con presupuesto o gasto (Opción A confirmada)
-
-**Problema identificado — Config solo mostraba mes actual para ítems de fecha fija:**
-- `renderConfigPresupuesto()` usaba `calcPresupuestoBase(r, curM)` para mostrar valores — devuelve $0 para ítems fuera de su mes
-- **Fix:** Config ignora el mes actual para ítems con `months[]` — siempre muestra `r.budget` real con badge verde del mes (Ene/Feb/.../Dic)
-- Los ítems mensuales normales no cambian
-- **Archivo:** `js/presupuesto.js` — `renderConfigPresupuesto()`
-
-**DA-18:** Config es una vista de configuración anual — nunca filtrar ítems de fecha fija por el mes actual.
-
-**Parche budgets 2026 SNBDPA:**
-- Problema: `migrateCategories()` creaba ítems de cesantías/primas/seguros con `budget: 0` — los valores reales estaban en nodo `empleadas` dentro de cada mes
-- Solución: script one-shot ejecutado desde consola del navegador
-- Fuente de datos: `hogares/SNBDPA/pl/2026/7/empleadas` (presente en todos los meses)
-- Fuente adicional: valores hardcodeados leídos directamente de Firebase (predial mes 3, impuesto vehículo mes 4, seguro vehículo mensual)
-
-| Ítem | Mes | Valor |
-|------|-----|-------|
-| Intereses Cesantías Empleada + Niñera | Enero (0) | $240.000 c/u |
-| Cesantías Empleada + Niñera | Febrero (1) | $2.000.000 c/u |
-| Prima Junio Empleada + Niñera | Junio (5) | $1.000.000 c/u |
-| Prima Diciembre Empleada + Niñera | Diciembre (11) | $1.000.000 c/u |
-| Impuesto predial | Abril (3) | $4.250.000 |
-| Impuestos vehículo | Mayo (4) | $2.670.600 |
-| Seguro vehículo | Todos los meses | $327.555 |
-
-- **22 budgets escritos** en Firebase — 0 errores
-- **SOAT vehículo:** no estaba en v1 para ningún mes — ingresar manualmente en Config → Seguros e Impuestos → badge Ago
-
-**Archivos modificados:** `js/presupuesto.js`
-**Script ejecutado:** `parche_budgets_2026.js` (one-shot, no commitear)
+Sesión de validación en producción y resolución de problemas específicos del hogar SNBDPA.
 
 ### 📅 Fase 21 — Fix definitivo Config budget anual (Junio 2026)
 
-**Problema raíz confirmado en producción:**
-El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `renderConfigPresupuesto()` seguía leyendo de `D` (mes actual en memoria). Los ítems de fecha fija tienen `budget > 0` solo en su mes específico en Firebase — en cualquier otro mes llegan con `budget: 0`.
-
 **Fix definitivo — `renderConfigPresupuesto()` convertida a `async`:**
 - Carga los 12 meses del año en paralelo con `Promise.all`
-- Construye `budgetAnual = { 'CatName|ItemLabel': maxBudget }` con el valor máximo de cada ítem en cualquier mes
+- Construye `budgetAnual = { 'CatName|ItemLabel': maxBudget }` con el valor máximo de cualquier mes
 - `getBudget(catName, itemLabel, fallback)` reemplaza el acceso directo a `r.budget`
-- Aplica para todos los hogares — no solo SNBDPA
 
-**Alcance:** universal. Cualquier familia con SOAT, predial, cesantías o primas experimenta el mismo problema. El fix aplica a todos los hogares del piloto y futuros.
-
-**Archivo:** `js/presupuesto.js` — `renderConfigPresupuesto()`
+**Archivo:** `js/presupuesto.js`
 **Commit:** `fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18)`
+
+### 📅 Fase 22 — Pre-piloto: Resumen mejorado + Servicio Doméstico en Tab Hoy (Junio 2026)
+
+**Contexto:** Sesión de revisión pre-piloto a partir de nota de voz con hallazgos del usuario. Se identificaron bugs reales y se aprobaron mejoras de UX mediante mockups antes de implementar.
+
+**Hallazgos identificados:**
+
+| # | Hallazgo | Tipo | Decisión |
+|---|----------|------|----------|
+| H1 | Servicio Doméstico no aparece en Tab Hoy | Bug | Fix inmediato |
+| H2 | dailyTotals acumulaba con clave con emoji — no coincidía con c.name | Bug | Fix inmediato |
+| H3 | Ahorro enterrado en semáforo, sin prominencia | UX | Fix inmediato — sube a posición fija |
+| H4 | Sin visibilidad de quién está pagando | Feature | Implementado — sección nueva al final del Resumen |
+| H5 | Ingresos adicionales / bonos no existen en v2.2 | Feature | Pendiente — próxima sesión |
+| H6 | Onboarding no activa/desactiva categorías por tipoHogar | Feature | Pendiente — pre-piloto |
+
+**Mockups aprobados antes de implementar:**
+- Tab Resumen completo: disponible → Ingresan/Gastado → Ahorro fijo → semáforo → ¿Quién ha pagado?
+- Tres iteraciones hasta aprobación final
+
+**Cambios implementados:**
+
+`js/utils.js`:
+- Agregada clave `'🤝 Servicio Doméstico'` a `DAILY_ITEMS` con ítems: Salario empleada, Salario niñera, Prestaciones, Otros
+
+`js/daily.js` — `syncDailyMonth()`:
+- `catKey` ahora normaliza quitando emoji inicial con `.replace(/^\S+\s/, '')` antes de acumular en `dailyTotals`
+- Garantiza que `dailyTotals['Servicio Doméstico']` coincida con `c.name` en `renderResumen()`
+
+`js/finanzas.js`:
+- `renderResumen()` refactorizada: Ahorro sale del orden de categorías, se renderiza en bloque fijo `#rAhorro` entre mini cards y semáforo
+- Semáforo ahora excluye Ahorro — orden: rojo → amarillo → verde → sin presupuesto
+- Nueva función `renderQuienPago()` — lee `daily/[año]/[mm]` completo, acumula por `v.who`, renderiza en `#rQuienPago` con barra proporcional, monto y % por miembro. Se oculta si no hay registros.
+
+`index.html`:
+- Agregado `<div id="rAhorro">` entre mini cards y `#resumenCats`
+- Agregado `<div id="rQuienPago">` después de `#resumenCats`
+
+**Archivos modificados:** `js/utils.js`, `js/daily.js`, `js/finanzas.js`, `index.html`
+**Commit sugerido:** `feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy`
 
 ---
 
@@ -306,23 +283,19 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 - **Fix:** Ordenar antes de renderizar: `[...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud]`
 
 **Bug #19 — Nombres de miembros no aparecen en tab Config**
-- **Síntoma:** Los chips de miembros en "Mi hogar" mostraban `?` en lugar de los nombres
-- **Causa:** `crearHogar()` y `unirseHogar()` en `hogar.js` solo guardaban `{ rol }` en el nodo miembro — nunca persistían `nombre` ni `email`. El `displayName` de Google solo vive en el objeto `firebaseUser` en memoria.
-- **Fix:**
-  - `app.js`: guarda `{ nombre, email }` en `window.CURRENT_USER` al autenticarse
-  - `hogar.js`: escribe `nombre` y `email` al crear hogar y al unirse
-  - `ui.js`: fallback en `renderConfigHogar()` — si `m.nombre` vacío, usa `window.CURRENT_USER.nombre` para el usuario actual
-  - `app.js`: parche en `onHogarReady()` — si el miembro no tiene `nombre` en Firebase, lo escribe automáticamente la próxima vez que entre (resuelve hogares existentes sin necesidad de migración)
-- **Archivos:** `js/app.js`, `js/hogar.js`, `js/ui.js`
+- **Causa:** `crearHogar()` y `unirseHogar()` nunca persistían `nombre` ni `email`
+- **Fix:** `app.js` guarda `{ nombre, email }` en `window.CURRENT_USER`; `hogar.js` escribe al crear/unirse; parche en `onHogarReady()` para hogares existentes
 
 **Bug #20 — Vestuario y Regalos y Celebraciones ausentes en hogares migrados de v1**
-- **Síntoma:** Config, Resumen y Tendencia no mostraban `Vestuario` ni `Regalos y Celebraciones` en el hogar SNBDPA (migrado de v1)
-- **Causa:** `migrateCategories()` solo migra categorías que ya existen en Firebase — nunca agrega categorías nuevas. `defD()` tampoco las incluía. Ambas categorías son nuevas en v2.0 y nunca existieron en v1.
-- **Fix:**
-  - `utils.js`: bloque `newCats` en `migrateCategories()` — agrega categorías ausentes con ítems base, idempotente (guarda solo si `changed = true`)
-  - `finanzas.js`: `Vestuario` y `Regalos y Celebraciones` agregadas en `defD()` para meses nuevos y hogares nuevos del piloto
-- **Archivos:** `js/utils.js`, `js/finanzas.js`
-- **Pendiente:** `migrateCategories()` no tiene `ensure` para ítems de Vivienda, Salud y Belleza, Entretenimiento y Ahorro — esos ítems pueden estar desactualizados en hogares v1. Revisar en sesión de UX antes del piloto.
+- **Fix:** bloque `newCats` en `migrateCategories()` + ambas categorías en `defD()`
+
+**Bug #21 — Servicio Doméstico ausente en Tab Hoy**
+- **Causa:** `DAILY_ITEMS` en `utils.js` no incluía la clave `'🤝 Servicio Doméstico'`
+- **Fix:** Agregada la clave con ítems: Salario empleada, Salario niñera, Prestaciones, Otros
+
+**Bug #22 — dailyTotals no coincidía con c.name en Resumen**
+- **Causa:** `syncDailyMonth()` acumulaba usando `v.category` con emoji (ej. `'🤝 Servicio Doméstico'`) pero `renderResumen()` busca por `c.name` sin emoji (ej. `'Servicio Doméstico'`)
+- **Fix:** Normalizar `catKey` con `.replace(/^\S+\s/, '')` antes de acumular
 
 ---
 
@@ -335,21 +308,22 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 **DA-16:** Config solo muestra configuración — no gastos reales del mes.
 **DA-17:** Siempre pedir el archivo actual antes de modificarlo — ver `REGLAS_IA.md`.
 **DA-18:** Config es una vista de configuración anual — nunca filtrar ítems de fecha fija por el mes actual.
+**DA-19:** Ahorro es un indicador de primer nivel en el Resumen — siempre visible en posición fija, no mezclado con el semáforo de categorías.
 
 ---
 
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- SOAT vehículo SNBDPA: ingresar manualmente en Config → Seguros e Impuestos → badge Ago
-- Ítems faltantes en hogares nuevos del piloto: verificar que `defD()` incluye todos los ítems correctos al crear el primer mes
+- **Ingresos adicionales / bonos:** Agregar campo para bonificaciones e ingresos variables en Config → Ingresos. Aplica empleados y independientes. Mockup pendiente — próxima sesión.
+- **Onboarding tipoHogar:** Activar/desactivar categorías según tipo de hogar (C3). Hogares sin empleada no deben ver Servicio Doméstico con $0 sin contexto.
 
 ### 🟡 Prioridad Media — Post-piloto
-- Onboarding P1: usar `tipoHogar` para activar/desactivar categorías vía `getCapabilidades(perfil)` — Familia activa Educación y Servicio Doméstico, Solo las oculta
 - Exportar mes a PDF
 - Exportar año completo a Excel
 - Presupuesto Base se aplica automáticamente al crear mes nuevo
-- Sugerencias contextuales DA-9
+- Feedback in-app conectado a canal Discord (post-piloto, WhatsApp resuelve durante el piloto)
+- Onboarding dinámico completo por tipo de hogar (hijos, empleados, vehículo)
 
 ### 🟢 Prioridad Baja
 - Modo oscuro
@@ -374,9 +348,13 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 
 > **Documentar los textos aprobados en la bitácora.**
 
-> **Config es configuración anual, no vista mensual.** Los ítems de fecha fija deben mostrar siempre su budget real independiente del mes en que estés — DA-18.
+> **Config es configuración anual, no vista mensual.** Los ítems de fecha fija deben mostrar siempre su budget real — DA-18.
 
-> **Los scripts one-shot de parche son la herramienta correcta para migrar datos puntuales.** No tocar la app, no tocar Firebase a mano — un script reproducible con log detallado. En la sesión anterior se aprobaron los textos singular/plural del onboarding pero no quedaron registrados en la documentación, lo que obligó a reconstruirlos desde el código en la sesión siguiente.
+> **Los scripts one-shot de parche son la herramienta correcta para migrar datos puntuales.**
+
+> **El ahorro no es una categoría más — es el primer indicador de disciplina financiera.** Siempre en posición prominente, antes del semáforo de gastos — DA-19.
+
+> **Las notas de voz del usuario son auditorías de producto.** Procesarlas sistemáticamente antes de cada piloto para convertirlas en bugs y features priorizados.
 
 ---
 
@@ -400,11 +378,11 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 | [confirmar] | refactor: onboarding — _tx(), íconos, textos singular/plural, sin Mixto |
 | 60182e9 | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
 | [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
-| [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal; Config modal mes fijo vs frecuencia |
+| [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal |
 | [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
-| [confirmar] | fix: Config muestra budget real de ítems fecha fija — badge de mes, DA-18 |
 | [confirmar] | fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18) |
 | [confirmar] | fix: onboarding P1 — subtítulo neutro, sin plural prematuro |
+| [pendiente] | feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy |
 
 ---
 
@@ -415,7 +393,7 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 | v2.0 | Auditoría · Visión · Documentación | ✅ |
 | v2.1 | Login + Hogar + Finanzas modular (Etapas A-D) | ✅ |
 | v2.2 | Etapa E: Presupuesto Base · Onboarding · Resumen rediseñado · Login nuevo | ✅ |
-| v2.3 | Piloto 5-10 familias — validar con uso real | 🔲 Siguiente |
+| v2.3 | Piloto 5-10 familias — validar con uso real | 🔲 Próximo |
 | v3.0 | Planeador MVP | 🔲 |
 | v4.0 | Alimentación | 🔲 |
 | v5.0 | Monetización | 🔲 |
@@ -425,9 +403,10 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 ## 9. Próxima Sesión
 
 **Pendiente antes del piloto:**
-1. Ingresar SOAT vehículo manualmente en Config → Seguros e Impuestos → Ago
+1. **Ingresos adicionales / bonos** — mockup primero, luego implementar en Config → Ingresos
+2. **Onboarding tipoHogar** — activar/desactivar categorías según tipo de hogar (C3)
 
-**→ Piloto v2.3 listo para lanzar con 5-10 familias**
+**Con esos dos cambios el piloto v2.3 está listo para lanzar.**
 
 ---
 

@@ -240,8 +240,10 @@ async function syncDailyMonth() {
     snap.forEach(daySnap => daySnap.forEach(itemSnap => {
       const v = itemSnap.val();
       // Compatibilidad v1 (solo category) y v2 (category con emoji)
-      const catKey = v.category || '';
-      if (!catKey) return;
+      // Normalizar: quitar emoji inicial para que coincida con c.name en renderResumen
+      const rawCat = v.category || '';
+      if (!rawCat) return;
+      const catKey = rawCat.replace(/^\S+\s/, '') || rawCat;
       if (!dailyTotals[catKey]) dailyTotals[catKey] = 0;
       dailyTotals[catKey] += v.amount || 0;
     }));

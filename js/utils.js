@@ -63,6 +63,9 @@ const DAILY_ITEMS = {
   ],
   '🐷 Ahorro': [
     'Ahorro programado','Fondo emergencia','Otros'
+  ],
+  '🤝 Servicio Doméstico': [
+    'Salario empleada','Salario niñera','Prestaciones','Otros'
   ]
 };
 
