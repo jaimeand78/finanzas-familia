@@ -138,6 +138,10 @@ async function renderTendencia() {
 }
 
 // ── HORMIGA ───────────────────────────────────────────────────────────────────
+// Gastos pequeños y frecuentes — umbral: menos de $20.000
+// Lógica: filtra daily items por monto, agrupa por categoría, muestra por día
+
+const HORMIGA_UMBRAL = 20000;
 
 async function renderHormiga() {
   const el = document.getElementById('an-hor');
@@ -146,53 +150,127 @@ async function renderHormiga() {
   try {
     const mm   = String(curMx + 1).padStart(2, '0');
     const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curYx}/${mm}`).once('value');
-    const catTotals = {};
-    const diaTotals = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
-    let total = 0, count = 0;
-    const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+    // Acumuladores — solo gastos hormiga (monto < umbral)
+    const catTotals  = {}; // { categoria: { total, count } }
+    const diaTotals  = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
+    let totalHormiga = 0;
+    let countHormiga = 0;
+
+    // Acumulador total de gastos del mes (para el insight)
+    let totalMes = 0;
 
     snap.forEach(daySnap => {
       daySnap.forEach(item => {
         const v   = item.val();
         const amt = v.amount || 0;
-        total += amt; count++;
-        if (!catTotals[v.category]) catTotals[v.category] = 0;
-        catTotals[v.category] += amt;
-        const d = new Date(curY, curM, parseInt(daySnap.key));
-        diaTotals[d.getDay()] += amt;
+        totalMes += amt;
+
+        if (amt > 0 && amt < HORMIGA_UMBRAL) {
+          totalHormiga += amt;
+          countHormiga++;
+          const cat = v.category || 'Otros';
+          if (!catTotals[cat]) catTotals[cat] = { total: 0, count: 0 };
+          catTotals[cat].total += amt;
+          catTotals[cat].count++;
+          const d = new Date(curYx, curMx, parseInt(daySnap.key));
+          diaTotals[d.getDay()] += amt;
+        }
       });
     });
 
-    const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (countHormiga === 0) {
+      el.innerHTML = `<div class="sec" style="padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">🐜</div>
+        <div style="font-size:.9rem;font-weight:500;color:var(--color-text-primary);">Sin gastos hormiga este mes</div>
+        <div style="font-size:.8rem;color:var(--color-muted);margin-top:.25rem;">Son gastos menores a ${fmt(HORMIGA_UMBRAL)}</div>
+      </div>`;
+      return;
+    }
+
+    // Insight dinámico — compara con otros gastos cotidianos del mes
+    const promedio   = Math.round(totalHormiga / countHormiga);
+    const pctDelMes  = totalMes > 0 ? Math.round((totalHormiga / totalMes) * 100) : 0;
+    let insightTexto = '';
+    if (pctDelMes >= 10) {
+      insightTexto = `Representan el <strong>${pctDelMes}%</strong> de tus gastos del mes — más de lo que parece.`;
+    } else if (pctDelMes > 0) {
+      insightTexto = `Representan el <strong>${pctDelMes}%</strong> de tus gastos del mes.`;
+    } else {
+      insightTexto = `Gastos pequeños que suman sin que uno se dé cuenta.`;
+    }
+
+    // Categorías ordenadas por total descendente
+    const sortedCats = Object.entries(catTotals)
+      .sort((a, b) => b[1].total - a[1].total);
+    const maxCat = sortedCats[0][1].total;
+
+    // Días de la semana
+    const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const maxDia = Math.max(...Object.values(diaTotals), 1);
 
     el.innerHTML = `
       <div class="sec">
-        <div class="sec-hdr">
-          <span class="sec-title">Gastos del mes</span>
-          <span class="sec-val">${fmt(total)}</span>
+        <div style="background:#E1F5EE;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary);">
+          <div style="display:flex;align-items:flex-start;gap:.6rem;">
+            <span style="font-size:1.4rem;flex-shrink:0;">🐜</span>
+            <span style="font-size:.85rem;color:#085041;line-height:1.5;">${insightTexto}</span>
+          </div>
         </div>
-        <div style="font-size:.8rem;color:#9b9b97;margin-bottom:.75rem;">${count} gasto${count !== 1 ? 's' : ''} registrado${count !== 1 ? 's' : ''}</div>
-        ${sortedCats.map(([cat, val]) => `
-          <div class="hor-item">
-            <span>${ICONS[cat] || '💸'} ${cat}</span>
-            <span class="hor-val">${fmt(val)}</span>
-          </div>`).join('') || '<div style="font-size:.85rem;color:#9b9b97;">Sin gastos este mes</div>'}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:.5px solid var(--color-border-tertiary);">
+          <div style="padding:.6rem 0;display:flex;flex-direction:column;align-items:center;gap:2px;border-right:.5px solid var(--color-border-tertiary);">
+            <span style="font-size:.95rem;font-weight:500;font-family:'DM Mono',monospace;color:var(--color-text-primary);">${fmt(totalHormiga)}</span>
+            <span style="font-size:.7rem;color:var(--color-muted);">Total hormiga</span>
+          </div>
+          <div style="padding:.6rem 0;display:flex;flex-direction:column;align-items:center;gap:2px;border-right:.5px solid var(--color-border-tertiary);">
+            <span style="font-size:.95rem;font-weight:500;font-family:'DM Mono',monospace;color:var(--color-text-primary);">${countHormiga}</span>
+            <span style="font-size:.7rem;color:var(--color-muted);">Gastos pequeños</span>
+          </div>
+          <div style="padding:.6rem 0;display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <span style="font-size:.95rem;font-weight:500;font-family:'DM Mono',monospace;color:var(--color-text-primary);">${fmt(promedio)}</span>
+            <span style="font-size:.7rem;color:var(--color-muted);">Promedio c/u</span>
+          </div>
+        </div>
+        <div style="padding:.4rem .75rem .25rem;display:flex;justify-content:flex-end;">
+          <span style="font-size:.7rem;color:var(--color-muted);">Umbral: menos de ${fmt(HORMIGA_UMBRAL)}</span>
+        </div>
       </div>
+
       <div class="sec">
-        <div class="sec-hdr"><span class="sec-title">Por día de la semana</span></div>
+        <div class="sec-hdr"><span class="sec-title">Dónde se van</span></div>
+        ${sortedCats.map(([cat, data]) => {
+          const w = Math.round((data.total / maxCat) * 100);
+          return `<div class="hor-item">
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:.88rem;color:var(--color-text-primary);">${ICONS[cat] || '💸'} ${cat}</span>
+                <span style="font-size:.75rem;color:var(--color-muted);">${data.count} vez${data.count !== 1 ? 'es' : ''}</span>
+              </div>
+              <div style="height:5px;background:var(--color-border-tertiary);border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:${w}%;background:#D85A30;border-radius:3px;"></div>
+              </div>
+            </div>
+            <span class="hor-val" style="margin-left:.75rem;">${fmt(data.total)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-title">Cuándo más gastas</span></div>
         ${DIAS.map((dia, i) => {
           const w     = Math.round((diaTotals[i] / maxDia) * 100);
-          const color = (i === 5 || i === 6) ? '#D85A30' : '#534AB7';
+          const esFin = (i === 0 || i === 6);
+          const color = esFin ? '#D85A30' : '#534AB7';
           return `<div class="ten-row">
-            <div class="ten-mes">${dia}</div>
+            <div class="ten-mes" style="${esFin ? 'color:#D85A30;font-weight:500;' : ''}">${dia}</div>
             <div class="ten-bar-wrap"><div class="ten-bar" style="width:${w || 2}%;background:${color};"></div></div>
             <div class="ten-val">${fmt(diaTotals[i])}</div>
           </div>`;
         }).join('')}
       </div>`;
+
   } catch(e) {
     console.error('renderHormiga:', e);
-    el.innerHTML = '<div class="sec" style="font-size:.85rem;color:#9b9b97;">Sin datos disponibles</div>';
+    el.innerHTML = '<div class="sec" style="font-size:.85rem;color:var(--color-muted);padding:1rem;">Sin datos disponibles</div>';
   }
 }

@@ -119,6 +119,26 @@ Ver sección 3 — Registro de Bugs.
 
 **Decisión de Config (DA-16):** El tab Config solo muestra configuración del hogar y presupuesto base. Los gastos reales del mes solo se ven en el Resumen. `renderExpSecs()` eliminado de Config.
 
+### 📅 Fase 15 — Sesión de diseño y refactoring íconos (Junio 2026)
+
+**Sesión de diseño completa antes de implementar:**
+- Mockup tab Config aprobado — secciones colapsables, modal por categoría, Reconfigurar 🧹
+- Mockup Hormiga real aprobado — filtro por umbral, insight dinámico, categorías con conteo
+- Revisión completa de íconos — 7 cambios globales aprobados + 10 cambios onboarding pendientes
+- Revisión completa de textos onboarding — corrección singular/plural, función `_tx()`
+- Eliminación opción Mixto P1, opción P2 dinámica según tipoHogar
+
+**Implementado:**
+- `utils.js` — 5 íconos ICONS + 5 claves DAILY_ITEMS
+- `index.html` — tab Hoy 💰→✏️, sub-tab Tendencia 📈→📉
+- `analisis.js` — `renderHormiga()` reescrita con lógica real (umbral $20.000)
+
+**Pendiente próxima sesión:**
+- Bloque 2: onboarding `presupuesto.js` — 16 cambios textos + íconos + `_tx()`
+- Bloque 3: rediseño tab Config — `presupuesto.js`, `ui.js`, `index.html`
+
+---
+
 ### 📅 Fase 14 — Regla de Oro y proyecto Claude (Junio 2026)
 
 - Creado `REGLAS_IA.md` en la raíz del repo
@@ -183,8 +203,8 @@ Antes de modificar cualquier archivo, preguntar al usuario si está actualizado.
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- Rediseño tab Config con mockup — ingresos, presupuesto, info hogar
-- Tab Análisis — hay cosas pendientes de afinar
+- Rediseño tab Config con mockup — mockup aprobado, implementación pendiente
+- Tab Análisis — Hormiga reescrita ✅, Semáforo y Tendencia pendientes de afinar
 - Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
 - Pantallas dinámicas según `getCapabilidades(perfil)` — hijos activan Educación, vehículo activa Seguros
 
@@ -238,6 +258,8 @@ Antes de modificar cualquier archivo, preguntar al usuario si está actualizado.
 | [confirmar] | fix: nombres categorías, orden semáforo y fondo tarjetas en Resumen |
 | [confirmar] | docs: REGLAS_IA.md — reglas de trabajo para asistentes IA |
 | [confirmar] | docs: bitacora v2.5, arquitectura v2.3, producto v2.3, README actualizados |
+| [confirmar] | refactor: íconos globales — utils.js (ICONS + DAILY_ITEMS) + index.html (tab Hoy + Tendencia) |
+| [confirmar] | feat: renderHormiga() reescrita — lógica real gastos hormiga, umbral $20k, insight dinámico |
 
 ---
 

@@ -12,16 +12,16 @@ const COLORS  = ['#1D9E75','#378ADD','#D85A30','#BA7517','#D4537E','#534AB7','#6
 // Categorías oficiales v2.0 — íconos por nombre (sin emoji en la clave)
 const ICONS = {
   'Vivienda':               '🏠',
-  'Alimentación':           '🍽️',
+  'Alimentación':           '🧺',
   'Transporte':             '🚗',
-  'Entretenimiento':        '🎬',
+  'Entretenimiento':        '🍿',
   'Vestuario':              '👕',
-  'Salud y Belleza':        '❤️',
+  'Salud y Belleza':        '💅',
   'Educación':              '📚',
   'Seguros e Impuestos':    '🛡️',
   'Regalos y Celebraciones':'🎁',
-  'Ahorro':                 '💰',
-  'Servicio Doméstico':     '🏡',
+  'Ahorro':                 '🐷',
+  'Servicio Doméstico':     '🤝',
   'Otros':                  '💸'
 };
 
@@ -34,20 +34,20 @@ const DAILY_ITEMS = {
     'Arriendo / Hipoteca','Administración','Agua y Energía',
     'Gas','Internet','Telefonía','Servicio doméstico','Mantenimiento hogar','Otros'
   ],
-  '🍽️ Alimentación': [
+  '🧺 Alimentación': [
     'Frutas y verduras','Aseo y víveres','Loncheras','Otros'
   ],
   '🚗 Transporte': [
     'Cuota crédito / leasing','Combustible','Transporte público',
     'Peajes','Parqueadero','Mantenimiento vehículo','Otros'
   ],
-  '🎬 Entretenimiento': [
+  '🍿 Entretenimiento': [
     'Streaming','Restaurantes','Cine','Salidas','Viajes','Vacaciones','Otros'
   ],
   '👕 Vestuario': [
     'Ropa','Zapatos','Uniforme','Otros'
   ],
-  '❤️ Salud y Belleza': [
+  '💅 Salud y Belleza': [
     'Medicina prepagada','Gimnasio','Droguería',
     'Cita médica','Cita pediátrica','Peluquería','Servicios estéticos','Otros'
   ],
@@ -61,7 +61,7 @@ const DAILY_ITEMS = {
   '🎁 Regalos y Celebraciones': [
     'Regalos','Celebraciones','Otros'
   ],
-  '💰 Ahorro': [
+  '🐷 Ahorro': [
     'Ahorro programado','Fondo emergencia','Otros'
   ]
 };
