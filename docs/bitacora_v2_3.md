@@ -29,6 +29,8 @@
 | fix: Vestuario y Regalos en defD() y migrateCategories() ✅ | Ítems faltantes en Vivienda, Salud, Entretenimiento, Ahorro — revisar antes del piloto |
 | fix: onboarding P4 — servicios/transporte va a ítem principal, no dividido ✅ | |
 | fix: Config modal — selector de mes para ítems de fecha fija (SOAT, predial, cesantías) ✅ | |
+| feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight ✅ | |
+| fix: iOS decimal — todos los inputs ya correctos, sin cambios necesarios ✅ | |
 
 ---
 
@@ -207,6 +209,24 @@ Ver sección 3 — Registro de Bugs.
 **Aprendizaje clave de esta sesión:**
 > El onboarding recoge estimados agrupados. Config recoge el detalle real. No forzar mapeo 1:1 entre ellos.
 
+### 📅 Fase 19 — Tendencia rediseñada + confirmación fix iOS (Junio 2026)
+
+**Fix iOS decimal:** Revisión de todos los inputs de monto en la app — todos ya tenían `type="text" inputmode="decimal"` correctamente aplicado. No requirió cambios.
+
+**`renderTendencia()` reescrita en `analisis.js`:**
+
+| Cambio | Detalle |
+|--------|---------|
+| Incluye gastos `daily/` | Carga `daily/[y]/[mm]` en paralelo con el nodo mensual — suma ambos para el total real |
+| Tarjetas resumen | Promedio 5 meses anteriores vs mes actual + delta % (verde si bajó, rojo si subió) |
+| Barras dobles | Barra sólida = gastos · Barra con borde = ingresos |
+| Color semáforo | Mes actual verde · Meses donde gastos > ingresos en rojo coral · Resto morado |
+| Leyenda | Gastos / Mes actual / Ingresos |
+| Insight dinámico | Una frase al final: bien si ▼10%+, ojo si ▲10%+, neutral si dentro del rango |
+| Estado de carga | Muestra "Cargando..." mientras resuelven las promesas de Firebase |
+
+**Archivo modificado:** `js/analisis.js`
+
 ---
 
 ## 3. Registro de Bugs y Soluciones
@@ -264,9 +284,8 @@ Ver sección 3 — Registro de Bugs.
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- Tab Análisis — Semáforo histórico y Tendencia pendientes de afinar
-- Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
 - Ítems faltantes en hogares v1: `migrateCategories()` sin `ensure` para Vivienda, Salud y Belleza, Entretenimiento, Ahorro — revisar impacto UX antes del piloto
+- Probar en producción con hogar SNBDPA — validar Tendencia, fixes C1/C2/C4
 
 ### 🟡 Prioridad Media — Post-piloto
 - Onboarding P1: usar `tipoHogar` para activar/desactivar categorías vía `getCapabilidades(perfil)` — Familia activa Educación y Servicio Doméstico, Solo las oculta
@@ -321,6 +340,7 @@ Ver sección 3 — Registro de Bugs.
 | 60182e9 | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
 | [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
 | [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal; Config modal mes fijo vs frecuencia |
+| [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
 
 ---
 
@@ -341,9 +361,8 @@ Ver sección 3 — Registro de Bugs.
 ## 9. Próxima Sesión
 
 **Antes del piloto hay que resolver:**
-1. Tab Análisis — afinar Semáforo histórico y Tendencia
-2. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
-3. Probar en producción con hogar SNBDPA y validar fixes de esta sesión
+1. Probar en producción con hogar SNBDPA — Tendencia, onboarding P4, modal mes fijo
+2. Revisar `migrateCategories()` — ítems faltantes en hogares v1 (Vivienda, Salud, Entretenimiento, Ahorro)
 
 **Cuando esos estén listos → Piloto v2.3 con 5-10 familias**
 

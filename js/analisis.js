@@ -97,6 +97,9 @@ async function renderTendencia() {
   const el = document.getElementById('an-ten');
   if (!el) return;
 
+  el.innerHTML = `<div style="padding:1rem 0;text-align:center;font-size:.85rem;color:var(--color-muted);">Cargando...</div>`;
+
+  // Construir lista de 6 meses hacia atrás desde curMx
   const meses = [];
   for (let i = 5; i >= 0; i--) {
     let m = curMx - i, y = curYx;
@@ -104,37 +107,122 @@ async function renderTendencia() {
     meses.push({ m, y, lbl: MSHORT[m] });
   }
 
+  // Cargar datos mensuales + daily para cada mes
   const datos = await Promise.all(meses.map(async ({ m, y, lbl }) => {
     try {
-      const snap = await db.ref(dKey(y, m)).once('value');
-      const d = snap.val();
-      if (!d) return { lbl, exp: 0, inc: 0 };
-      const exp = d.categories ? d.categories.reduce((s, c) =>
-        s + (c.items || []).filter(it => !it.auto).reduce((ss, r) => ss + (r.value || 0), 0), 0) : 0;
-      const inc = d.income ? d.income.reduce((s, r) => s + (r.value || 0), 0) : 0;
-      return { lbl, exp, inc };
+      const mm = String(m + 1).padStart(2, '0');
+      const [snapMes, snapDaily] = await Promise.all([
+        db.ref(dKey(y, m)).once('value'),
+        db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${y}/${mm}`).once('value')
+      ]);
+
+      const d = snapMes.val();
+      const expMes = d && d.categories
+        ? d.categories.reduce((s, c) =>
+            s + (c.items || []).filter(it => !it.auto).reduce((ss, r) => ss + (r.value || 0), 0), 0)
+        : 0;
+      const inc = d && d.income
+        ? d.income.reduce((s, r) => s + (r.value || 0), 0)
+        : 0;
+
+      // Sumar gastos daily del mes
+      let expDaily = 0;
+      snapDaily.forEach(daySnap => {
+        daySnap.forEach(item => { expDaily += (item.val().amount || 0); });
+      });
+
+      return { lbl, exp: expMes + expDaily, inc };
     } catch(e) { return { lbl, exp: 0, inc: 0 }; }
   }));
 
+  // Calcular promedio de los 5 meses anteriores (excluye el actual)
+  const anteriores = datos.slice(0, 5).filter(d => d.exp > 0);
+  const promedio   = anteriores.length
+    ? Math.round(anteriores.reduce((s, d) => s + d.exp, 0) / anteriores.length)
+    : 0;
+  const actual     = datos[datos.length - 1];
+  const delta      = promedio > 0 ? Math.round(((actual.exp - promedio) / promedio) * 100) : 0;
+
   const maxVal = Math.max(...datos.map(d => Math.max(d.exp, d.inc)), 1);
 
-  el.innerHTML = `
-    <div class="sec">
-      <div class="sec-hdr"><span class="sec-title">Gastos últimos 6 meses</span></div>
-      ${datos.map((d, i) => {
-        const wExp = Math.round((d.exp / maxVal) * 100);
-        const wInc = Math.round((d.inc / maxVal) * 100);
-        const isNow = i === datos.length - 1;
-        return `<div class="ten-row">
-          <div class="ten-mes">${d.lbl}</div>
-          <div style="flex:1;">
-            <div class="ten-bar-wrap"><div class="ten-bar" style="width:${wExp}%;background:${isNow ? '#1D9E75' : '#534AB7'};"></div></div>
-            ${d.inc > 0 ? `<div class="ten-bar-wrap" style="margin-top:2px;"><div class="ten-bar" style="width:${wInc}%;background:#E1F5EE;border:1px solid #1D9E75;"></div></div>` : ''}
-          </div>
-          <div class="ten-val">${fmt(d.exp)}</div>
-        </div>`;
-      }).join('')}
+  // Tarjetas resumen
+  const deltaHtml = promedio > 0
+    ? `<div style="font-size:11px;margin-top:2px;color:${delta <= 0 ? '#0F6E56' : '#993C1D'};">
+        ${delta <= 0 ? '▼' : '▲'} ${Math.abs(delta)}% vs promedio
+       </div>`
+    : '';
+
+  const tarjetas = `
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:.75rem;">
+    <div style="background:var(--color-bg);border-radius:10px;padding:.6rem .75rem;border:0.5px solid var(--color-border);">
+      <div style="font-size:11px;color:var(--color-muted);margin-bottom:2px;">Promedio 5 meses</div>
+      <div style="font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:var(--color-text);">${promedio > 0 ? fmt(promedio) : '—'}</div>
+    </div>
+    <div style="background:var(--color-bg);border-radius:10px;padding:.6rem .75rem;border:0.5px solid var(--color-border);">
+      <div style="font-size:11px;color:var(--color-muted);margin-bottom:2px;">Este mes</div>
+      <div style="font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:${delta <= 0 ? '#0F6E56' : '#993C1D'};">${actual.exp > 0 ? fmt(actual.exp) : '—'}</div>
+      ${deltaHtml}
+    </div>
+  </div>`;
+
+  // Leyenda
+  const leyenda = `
+  <div style="display:flex;gap:12px;margin-bottom:.65rem;">
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-muted);">
+      <div style="width:10px;height:10px;border-radius:2px;background:#534AB7;flex-shrink:0;"></div>Gastos
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-muted);">
+      <div style="width:10px;height:10px;border-radius:2px;background:#1D9E75;flex-shrink:0;"></div>Mes actual
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-muted);">
+      <div style="width:10px;height:10px;border-radius:2px;border:1.5px solid #1D9E75;background:transparent;flex-shrink:0;"></div>Ingresos
+    </div>
+  </div>`;
+
+  // Barras
+  const barras = datos.map((d, i) => {
+    const isNow  = i === datos.length - 1;
+    const wExp   = Math.round((d.exp / maxVal) * 100);
+    const wInc   = Math.round((d.inc / maxVal) * 100);
+    const sobreIngresos = d.inc > 0 && d.exp > d.inc;
+    const barColor = isNow ? '#1D9E75' : sobreIngresos ? '#D85A30' : '#534AB7';
+    const valColor = sobreIngresos ? '#993C1D' : isNow ? '#0F6E56' : 'var(--color-text)';
+    return `
+    <div class="ten-row" style="${isNow ? 'font-weight:600;' : ''}">
+      <div class="ten-mes" style="${isNow ? 'color:var(--color-text);' : ''}">${d.lbl}</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
+        <div class="ten-bar-wrap"><div class="ten-bar" style="width:${wExp || 1}%;background:${barColor};"></div></div>
+        ${d.inc > 0 ? `<div class="ten-bar-wrap" style="background:transparent;border:0.5px solid #1D9E75;"><div style="width:${wInc}%;height:100%;"></div></div>` : ''}
+      </div>
+      <div class="ten-val" style="color:${valColor};">${d.exp > 0 ? fmt(d.exp) : '—'}</div>
     </div>`;
+  }).join('');
+
+  // Insight
+  let insightTxt = '';
+  if (promedio > 0 && actual.exp > 0) {
+    const diff = Math.abs(actual.exp - promedio);
+    if (delta <= -10) insightTxt = `Están <strong>${fmt(diff)} por debajo</strong> del promedio. Buen mes 👍`;
+    else if (delta >= 10) insightTxt = `Están <strong>${fmt(diff)} por encima</strong> del promedio. Ojo con el gasto ⚠️`;
+    else insightTxt = `Gasto similar al promedio histórico.`;
+  } else if (actual.exp === 0) {
+    insightTxt = `Sin gastos registrados este mes todavía.`;
+  }
+
+  const insightHtml = insightTxt ? `
+  <div style="background:#E1F5EE;border-radius:10px;padding:.55rem .75rem;display:flex;gap:.5rem;align-items:flex-start;margin-top:.75rem;">
+    <span style="font-size:1rem;flex-shrink:0;">📉</span>
+    <span style="font-size:.82rem;color:#085041;line-height:1.5;">${insightTxt}</span>
+  </div>` : '';
+
+  el.innerHTML = `
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Gastos vs ingresos — últimos 6 meses</span></div>
+    ${tarjetas}
+    ${leyenda}
+    ${barras}
+    ${insightHtml}
+  </div>`;
 }
 
 // ── HORMIGA ───────────────────────────────────────────────────────────────────
