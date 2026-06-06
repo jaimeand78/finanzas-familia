@@ -481,16 +481,19 @@ function renderConfigPresupuesto() {
     const items = planItems(cat);
     const total = items.reduce((s, r) => s + (r.budget || 0), 0);
     const sinDef = total === 0;
+    const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const itemRows = items.map((r, ri) => {
-      const prov = calcPresupuestoBase(r, curM);
-      const freqBadge = r.frecuencia && r.frecuencia !== 'mensual'
+      const tieneMes = r.months && r.months.length;
+      const mesBadge = tieneMes
+        ? `<span class="cfg-freq-badge" style="border-color:var(--color-primary);color:var(--color-primary);">${MESES_CORTO[r.months[0]]}</span>`
+        : '';
+      const freqBadge = !tieneMes && r.frecuencia && r.frecuencia !== 'mensual'
         ? `<span class="cfg-freq-badge">${r.frecuencia}</span>` : '';
-      const provHint = prov > 0 && r.frecuencia && r.frecuencia !== 'mensual'
-        ? `<span class="cfg-prov-hint">≈${fmt(prov)}/mes</span>` : '';
+      const badge = mesBadge || freqBadge;
       return `
       <div class="cfg-item-row">
-        <span class="cfg-item-lbl">${r.label}${freqBadge}</span>
-        <span class="cfg-item-right">${provHint}<span class="cfg-item-val">${r.budget ? fmt(r.budget) : '—'}</span></span>
+        <span class="cfg-item-lbl">${r.label}${badge}</span>
+        <span class="cfg-item-right"><span class="cfg-item-val">${r.budget ? fmt(r.budget) : '—'}</span></span>
       </div>`;
     }).join('');
 
