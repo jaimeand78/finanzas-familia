@@ -461,7 +461,7 @@ window.bannerAjuste = function() {
 
 // ── CONFIG — SECCIÓN PRESUPUESTO BASE ─────────────────────────────────────────
 
-function renderConfigPresupuesto() {
+async function renderConfigPresupuesto() {
   const el = document.getElementById('budgetConfig');
   if (!el) return;
   if (!D || !D.categories || !D.categories.length) {
@@ -473,15 +473,47 @@ function renderConfigPresupuesto() {
     return;
   }
 
+  // DA-18: Config es vista anual — cargar budget máximo de todos los meses
+  // para mostrar el valor real de ítems de fecha fija (SOAT, predial, cesantías, primas)
+  const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const budgetAnual = {}; // { 'CatName|ItemLabel': maxBudget }
+
+  try {
+    const snapsMeses = await Promise.all(
+      Array.from({ length: 12 }, (_, m) =>
+        db.ref(dKey(curY, m)).once('value')
+      )
+    );
+    snapsMeses.forEach(snap => {
+      const d = snap.val();
+      if (!d || !d.categories) return;
+      d.categories.forEach(cat => {
+        (cat.items || []).forEach(item => {
+          const key = `${cat.name}|${item.label}`;
+          const prev = budgetAnual[key] || 0;
+          if ((item.budget || 0) > prev) budgetAnual[key] = item.budget;
+        });
+      });
+    });
+  } catch(e) {
+    console.warn('renderConfigPresupuesto: no se pudieron cargar todos los meses', e);
+  }
+
+  const getBudget = (catName, itemLabel, fallback) => {
+    const key = `${catName}|${itemLabel}`;
+    return budgetAnual[key] || fallback || 0;
+  };
+
   const totalGlobal = D.categories.reduce((s, cat) => {
-    return s + planItems(cat).reduce((cs, r) => cs + (r.budget || 0), 0);
+    return s + planItems(cat).reduce((cs, r) => {
+      return cs + getBudget(cat.name, r.label, r.budget);
+    }, 0);
   }, 0);
 
   const cats = D.categories.map((cat, ci) => {
     const items = planItems(cat);
-    const total = items.reduce((s, r) => s + (r.budget || 0), 0);
+    const total = items.reduce((s, r) => s + getBudget(cat.name, r.label, r.budget), 0);
     const sinDef = total === 0;
-    const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const itemRows = items.map((r, ri) => {
       const tieneMes = r.months && r.months.length;
       const mesBadge = tieneMes
@@ -490,10 +522,11 @@ function renderConfigPresupuesto() {
       const freqBadge = !tieneMes && r.frecuencia && r.frecuencia !== 'mensual'
         ? `<span class="cfg-freq-badge">${r.frecuencia}</span>` : '';
       const badge = mesBadge || freqBadge;
+      const budget = getBudget(cat.name, r.label, r.budget);
       return `
       <div class="cfg-item-row">
         <span class="cfg-item-lbl">${r.label}${badge}</span>
-        <span class="cfg-item-right"><span class="cfg-item-val">${r.budget ? fmt(r.budget) : '—'}</span></span>
+        <span class="cfg-item-right"><span class="cfg-item-val">${budget ? fmt(budget) : '—'}</span></span>
       </div>`;
     }).join('');
 
