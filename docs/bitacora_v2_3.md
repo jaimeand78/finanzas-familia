@@ -202,6 +202,16 @@ Ver sección 3 — Registro de Bugs.
 **Bug #18 — Orden del semáforo incorrecto**
 - **Fix:** Ordenar antes de renderizar: `[...rojos, ...amarillos, ...ahorroCumplido, ...verdes, ...sinBud]`
 
+**Bug #19 — Nombres de miembros no aparecen en tab Config**
+- **Síntoma:** Los chips de miembros en "Mi hogar" mostraban `?` en lugar de los nombres
+- **Causa:** `crearHogar()` y `unirseHogar()` en `hogar.js` solo guardaban `{ rol }` en el nodo miembro — nunca persistían `nombre` ni `email`. El `displayName` de Google solo vive en el objeto `firebaseUser` en memoria.
+- **Fix:**
+  - `app.js`: guarda `{ nombre, email }` en `window.CURRENT_USER` al autenticarse
+  - `hogar.js`: escribe `nombre` y `email` al crear hogar y al unirse
+  - `ui.js`: fallback en `renderConfigHogar()` — si `m.nombre` vacío, usa `window.CURRENT_USER.nombre` para el usuario actual
+  - `app.js`: parche en `onHogarReady()` — si el miembro no tiene `nombre` en Firebase, lo escribe automáticamente la próxima vez que entre (resuelve hogares existentes sin necesidad de migración)
+- **Archivos:** `js/app.js`, `js/hogar.js`, `js/ui.js`
+
 ---
 
 ## 4. Decisiones Arquitecturales
@@ -271,7 +281,8 @@ Ver sección 3 — Registro de Bugs.
 | [confirmar] | refactor: íconos globales — utils.js (ICONS + DAILY_ITEMS) + index.html |
 | [confirmar] | feat: renderHormiga() reescrita — lógica real gastos hormiga, umbral $20k |
 | [confirmar] | refactor: onboarding — _tx(), íconos, textos singular/plural, sin Mixto |
-| [confirmar] | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
+| 60182e9 | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
+| [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
 
 ---
 
@@ -292,9 +303,8 @@ Ver sección 3 — Registro de Bugs.
 ## 9. Próxima Sesión
 
 **Antes del piloto hay que resolver:**
-1. Tab Análisis — afinar Semáforo histórico y Tendencia
-2. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
-3. Probar en producción los cambios de esta sesión (Bloques 2 y 3)
+1. Fix iOS decimal — `type="text"` `inputmode="decimal"` en todos los inputs de monto
+2. Probar en producción y validar que no hay más bugs
 
 **Cuando esos estén listos → Piloto v2.3 con 5-10 familias**
 
