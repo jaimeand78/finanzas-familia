@@ -26,6 +26,7 @@
 | Bloque 4: renderHormiga() real ✅ | |
 | Bloque 2: onboarding presupuesto.js ✅ | |
 | Bloque 3: rediseño tab Config ✅ | |
+| fix: Vestuario y Regalos en defD() y migrateCategories() ✅ | Ítems faltantes en Vivienda, Salud, Entretenimiento, Ahorro — revisar antes del piloto |
 
 ---
 
@@ -212,6 +213,15 @@ Ver sección 3 — Registro de Bugs.
   - `app.js`: parche en `onHogarReady()` — si el miembro no tiene `nombre` en Firebase, lo escribe automáticamente la próxima vez que entre (resuelve hogares existentes sin necesidad de migración)
 - **Archivos:** `js/app.js`, `js/hogar.js`, `js/ui.js`
 
+**Bug #20 — Vestuario y Regalos y Celebraciones ausentes en hogares migrados de v1**
+- **Síntoma:** Config, Resumen y Tendencia no mostraban `Vestuario` ni `Regalos y Celebraciones` en el hogar SNBDPA (migrado de v1)
+- **Causa:** `migrateCategories()` solo migra categorías que ya existen en Firebase — nunca agrega categorías nuevas. `defD()` tampoco las incluía. Ambas categorías son nuevas en v2.0 y nunca existieron en v1.
+- **Fix:**
+  - `utils.js`: bloque `newCats` en `migrateCategories()` — agrega categorías ausentes con ítems base, idempotente (guarda solo si `changed = true`)
+  - `finanzas.js`: `Vestuario` y `Regalos y Celebraciones` agregadas en `defD()` para meses nuevos y hogares nuevos del piloto
+- **Archivos:** `js/utils.js`, `js/finanzas.js`
+- **Pendiente:** `migrateCategories()` no tiene `ensure` para ítems de Vivienda, Salud y Belleza, Entretenimiento y Ahorro — esos ítems pueden estar desactualizados en hogares v1. Revisar en sesión de UX antes del piloto.
+
 ---
 
 ## 4. Decisiones Arquitecturales
@@ -231,6 +241,7 @@ Ver sección 3 — Registro de Bugs.
 - Tab Análisis — Semáforo histórico y Tendencia pendientes de afinar
 - Fix iOS decimal: `type="text"` `inputmode="decimal"` en todos los inputs de monto
 - Pantallas dinámicas según `getCapabilidades(perfil)` — hijos activan Educación, vehículo activa Seguros
+- Ítems faltantes en hogares v1: `migrateCategories()` sin `ensure` para Vivienda, Salud y Belleza, Entretenimiento, Ahorro — revisar impacto UX antes del piloto
 
 ### 🟡 Prioridad Media
 - Exportar mes a PDF

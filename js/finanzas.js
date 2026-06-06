@@ -71,6 +71,14 @@ function defD() {
         { label:'Impuestos vehículo',     value:0, budget:0, fixed:true, months:[4] },
         { label:'SOAT vehículo',          value:0, budget:0, fixed:true, months:[8] }
       ]},
+      { name:'Vestuario', items:[
+        { label:'Ropa',    value:0, budget:0, fixed:false },
+        { label:'Zapatos', value:0, budget:0, fixed:false }
+      ]},
+      { name:'Regalos y Celebraciones', items:[
+        { label:'Regalos',       value:0, budget:0, fixed:false },
+        { label:'Celebraciones', value:0, budget:0, fixed:false }
+      ]},
       { name:'Ahorro', items:[
         { label:'Ahorro mensual', value:0, budget:0, fixed:true }
       ]}

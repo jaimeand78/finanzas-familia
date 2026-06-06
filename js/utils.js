@@ -243,7 +243,27 @@ function migrateCategories(data) {
       ]
     }
   };
+
+  // Categorías nuevas en v2.0 — no existían en v1, se agregan si el hogar no las tiene
+  const newCats = [
+    { name:'Vestuario', items:[
+      { label:'Ropa',  value:0, budget:0, fixed:false },
+      { label:'Zapatos', value:0, budget:0, fixed:false }
+    ]},
+    { name:'Regalos y Celebraciones', items:[
+      { label:'Regalos',       value:0, budget:0, fixed:false },
+      { label:'Celebraciones', value:0, budget:0, fixed:false }
+    ]}
+  ];
+
   let changed = false;
+  newCats.forEach(nc => {
+    if (!data.categories.find(c => c.name === nc.name)) {
+      data.categories.push(nc);
+      changed = true;
+    }
+  });
+
   data.categories = data.categories.map(cat => {
     const mig = plan[cat.name];
     if (!mig) return cat;
