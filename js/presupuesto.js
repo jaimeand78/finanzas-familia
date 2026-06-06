@@ -71,7 +71,7 @@ function _tpl1() {
   <div class="onb-body">
     <div class="onb-emoji">🏠</div>
     <h2 class="onb-title">¿Cómo es tu hogar?</h2>
-    <p class="onb-sub">Queremos entender cómo están organizados para mostrarte lo que tiene sentido para ti.</p>
+    <p class="onb-sub">Cuéntanos cómo está organizado tu hogar para mostrarte lo que tiene sentido para ti.</p>
     <div class="onb-opts">
       <button class="onb-opt${sel('soltero')}" onclick="onbTipo('soltero')">
         <span class="oi">🧍</span><span class="ol">Solo</span><span class="os">Manejo mis finanzas</span>

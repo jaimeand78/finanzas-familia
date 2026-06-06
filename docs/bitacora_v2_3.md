@@ -404,6 +404,7 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 | [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
 | [confirmar] | fix: Config muestra budget real de ítems fecha fija — badge de mes, DA-18 |
 | [confirmar] | fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18) |
+| [confirmar] | fix: onboarding P1 — subtítulo neutro, sin plural prematuro |
 
 ---
 
@@ -423,11 +424,10 @@ El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `rende
 
 ## 9. Próxima Sesión
 
-**Pendientes antes del piloto:**
+**Pendiente antes del piloto:**
 1. Ingresar SOAT vehículo manualmente en Config → Seguros e Impuestos → Ago
-2. Recuperar y validar textos singular/plural del onboarding (aprobados en sesión anterior, no documentados)
 
-**→ Con esos dos resueltos, Piloto v2.3 listo para lanzar con 5-10 familias**
+**→ Piloto v2.3 listo para lanzar con 5-10 familias**
 
 ---
 
