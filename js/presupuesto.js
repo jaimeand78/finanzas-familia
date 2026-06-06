@@ -188,7 +188,7 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>💡 Servicios <span class="onb-badge">agua, energía, gas, internet</span></label>
+        <label>💡 Servicios <span class="onb-badge">total estimado — lo desglosás en Config</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oSvc"
             value="${_onbData.servicios || ''}" placeholder="0"
@@ -196,7 +196,7 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>🚗 Transporte <span class="onb-badge">gasolina, peajes, taxis</span></label>
+        <label>🚗 Transporte <span class="onb-badge">total estimado — lo desglosás en Config</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oTrn"
             value="${_onbData.transporte || ''}" placeholder="0"
@@ -416,12 +416,7 @@ function _aplicarOnbDataAD() {
   };
 
   if (_onbData.arriendo)   setBudget('Vivienda',       'Arriendo / Hipoteca', _onbData.arriendo);
-  if (_onbData.servicios) {
-    const s3 = Math.round(_onbData.servicios / 3);
-    setBudget('Vivienda', 'Agua y Energía', s3);
-    setBudget('Vivienda', 'Gas',            s3);
-    setBudget('Vivienda', 'Internet',       _onbData.servicios - s3 * 2);
-  }
+  if (_onbData.servicios) setBudget('Vivienda', 'Agua y Energía', _onbData.servicios);
   if (_onbData.transporte) setBudget('Transporte',     'Combustible',              _onbData.transporte);
   if (_onbData.cuotaVeh)   setBudget('Transporte',     'Cuota crédito / leasing',  _onbData.cuotaVeh);
   if (_onbData.mercado)    setBudget('Alimentación',   'Mercado',                  _onbData.mercado);
@@ -538,9 +533,21 @@ window.abrirModalCategoria = function(ci) {
   const cat = D && D.categories && D.categories[ci];
   if (!cat) return;
   const items = planItems(cat);
+  const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const freqs = ['mensual','bimestral','trimestral','semestral','anual'];
 
-  const rows = items.map((r, ri) => `
+  const rows = items.map((r, ri) => {
+    const tieneMes = r.months && r.months.length;
+    const mesActual = tieneMes ? r.months[0] : null;
+    const control = tieneMes
+      ? `<select class="cfg-freq-sel" style="border-color:var(--color-primary);background:rgba(29,158,117,.07);color:var(--color-primary);"
+           onchange="updMes(${ci},${ri},this.value)">
+           ${MESES.map((m, idx) => `<option value="${idx}"${idx === mesActual ? ' selected' : ''}>${m}</option>`).join('')}
+         </select>`
+      : `<select class="cfg-freq-sel" onchange="updFrecuencia(${ci},${ri},this.value)">
+           ${freqs.map(f => `<option value="${f}"${(r.frecuencia||'mensual')===f?' selected':''}>${f}</option>`).join('')}
+         </select>`;
+    return `
     <div class="cfg-modal-row">
       <label class="cfg-modal-lbl">${r.label}</label>
       <div style="display:flex;gap:6px;align-items:center;">
@@ -549,11 +556,10 @@ window.abrirModalCategoria = function(ci) {
             value="${r.budget || ''}" placeholder="0"
             oninput="updBudget(${ci},${ri},this.value)" />
         </div>
-        <select class="cfg-freq-sel" onchange="updFrecuencia(${ci},${ri},this.value)">
-          ${freqs.map(f => `<option value="${f}"${(r.frecuencia||'mensual')===f?' selected':''}>${f}</option>`).join('')}
-        </select>
+        ${control}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const modal = document.getElementById('cfgCatModal');
   if (!modal) return;
@@ -572,6 +578,13 @@ window.cerrarModalCategoria = function() {
 window.updFrecuencia = function(ci, ri, val) {
   if (D.categories && D.categories[ci] && D.categories[ci].items[ri]) {
     D.categories[ci].items[ri].frecuencia = val;
+    recalc(); save();
+  }
+};
+
+window.updMes = function(ci, ri, val) {
+  if (D.categories && D.categories[ci] && D.categories[ci].items[ri]) {
+    D.categories[ci].items[ri].months = [parseInt(val)];
     recalc(); save();
   }
 };
