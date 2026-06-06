@@ -267,6 +267,22 @@ Ver sección 3 — Registro de Bugs.
 **Archivos modificados:** `js/presupuesto.js`
 **Script ejecutado:** `parche_budgets_2026.js` (one-shot, no commitear)
 
+### 📅 Fase 21 — Fix definitivo Config budget anual (Junio 2026)
+
+**Problema raíz confirmado en producción:**
+El fix anterior (Fase 20) solo cambiaba el display visual del badge, pero `renderConfigPresupuesto()` seguía leyendo de `D` (mes actual en memoria). Los ítems de fecha fija tienen `budget > 0` solo en su mes específico en Firebase — en cualquier otro mes llegan con `budget: 0`.
+
+**Fix definitivo — `renderConfigPresupuesto()` convertida a `async`:**
+- Carga los 12 meses del año en paralelo con `Promise.all`
+- Construye `budgetAnual = { 'CatName|ItemLabel': maxBudget }` con el valor máximo de cada ítem en cualquier mes
+- `getBudget(catName, itemLabel, fallback)` reemplaza el acceso directo a `r.budget`
+- Aplica para todos los hogares — no solo SNBDPA
+
+**Alcance:** universal. Cualquier familia con SOAT, predial, cesantías o primas experimenta el mismo problema. El fix aplica a todos los hogares del piloto y futuros.
+
+**Archivo:** `js/presupuesto.js` — `renderConfigPresupuesto()`
+**Commit:** `fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18)`
+
 ---
 
 ## 3. Registro de Bugs y Soluciones
@@ -387,6 +403,7 @@ Ver sección 3 — Registro de Bugs.
 | [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal; Config modal mes fijo vs frecuencia |
 | [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
 | [confirmar] | fix: Config muestra budget real de ítems fecha fija — badge de mes, DA-18 |
+| [confirmar] | fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18) |
 
 ---
 
@@ -406,10 +423,11 @@ Ver sección 3 — Registro de Bugs.
 
 ## 9. Próxima Sesión
 
-**Último pendiente antes del piloto:**
+**Pendientes antes del piloto:**
 1. Ingresar SOAT vehículo manualmente en Config → Seguros e Impuestos → Ago
+2. Recuperar y validar textos singular/plural del onboarding (aprobados en sesión anterior, no documentados)
 
-**→ Piloto v2.3 listo para lanzar con 5-10 familias**
+**→ Con esos dos resueltos, Piloto v2.3 listo para lanzar con 5-10 familias**
 
 ---
 
