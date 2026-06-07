@@ -157,7 +157,8 @@ function renderIngresosConfig() {
 
   // Agrupar fijos por miembro
   miembros.forEach((mbr, mi) => {
-    const fijosMbr  = fijos.filter(r => r.label && r.label.includes(mbr.nombre));
+    const primerNombre = mbr.nombre.split(' ')[0];
+    const fijosMbr  = fijos.filter(r => r.label && r.label.includes(primerNombre));
     const extrasMbr = extras.filter(r => r.quien === mbr.nombre);
 
     if (mi > 0) html += `<div class="cfg-member-divider"></div>`;
@@ -197,7 +198,7 @@ function renderIngresosConfig() {
   });
 
   // Ingresos sin miembro asignado (Otros ingresos u otros de v1)
-  const sinMbr = fijos.filter(r => !miembros.some(m => r.label && r.label.includes(m.nombre)));
+  const sinMbr = fijos.filter(r => !miembros.some(m => r.label && r.label.includes(m.nombre.split(' ')[0])));
   if (sinMbr.length) {
     html += `<div class="cfg-member-divider"></div>`;
     sinMbr.forEach(r => {
