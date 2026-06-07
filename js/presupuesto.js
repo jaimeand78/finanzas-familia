@@ -129,8 +129,10 @@ window.onbReto = function(r) { _onbData.reto = r; _renderStep(); };
 // ── PANTALLA 3 — ¿Con cuánto cuentan? ────────────────────────────────────────
 
 function _tpl3() {
-  const perfil   = (window.HOGAR && window.HOGAR.perfil) || {};
-  const miembros = Object.values(perfil.miembros || {}).filter(m => m.rol === 'adulto' && m.nombre);
+  const perfil     = (window.HOGAR && window.HOGAR.perfil) || {};
+  const miembros   = Object.values(perfil.miembros || {}).filter(m => m.rol === 'adulto' && m.nombre);
+  const tipoHogar  = _onbData.tipoHogar || (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.tipoHogar) || '';
+  const esSoltero  = tipoHogar === 'soltero';
   const lbl1 = miembros[0] ? 'Ingreso de ' + miembros[0].nombre : 'Ingreso principal';
   const lbl2 = miembros[1] ? 'Ingreso de ' + miembros[1].nombre : 'Segundo ingreso';
   return `
@@ -149,6 +151,7 @@ function _tpl3() {
             oninput="_onbData.inc1=parseFloat(this.value.replace(/[^0-9.]/g,''))||0"/>
         </div>
       </div>
+      ${!esSoltero ? `
       <div class="onb-field">
         <label>${lbl2} <span class="onb-badge">opcional</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
@@ -156,7 +159,7 @@ function _tpl3() {
             value="${_onbData.inc2 || ''}" placeholder="0"
             oninput="_onbData.inc2=parseFloat(this.value.replace(/[^0-9.]/g,''))||0"/>
         </div>
-      </div>
+      </div>` : ''}
     </div>
   </div>
   <div class="onb-foot">
