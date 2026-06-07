@@ -27,7 +27,8 @@ window.abrirCompletarPerfil = function() {
     tieneVehiculo:  true,
     tieneEmpleada:  true,
     tieneEducacion: true,
-    tieneSeguros:   true
+    tieneSeguros:   true,
+    _soloFlags:     true  // no tocar D.income ni D.categories
   };
   _onbStep = 15;
   _renderStep();
@@ -437,14 +438,18 @@ function _leerCampos(step) {
 // ── GUARDAR ───────────────────────────────────────────────────────────────────
 
 window.guardarPresupuestoBase = async function() {
-  _aplicarOnbDataAD();
+  const soloFlags = _onbData._soloFlags === true;
+  if (!soloFlags) _aplicarOnbDataAD();
   const cH = window.HOGAR && window.HOGAR.codigoHogar;
   if (cH) {
     try {
-      const updates = { 'meta/presupuestoBase': true };
-      if (_onbData.tipoHogar) updates['meta/tipoHogar'] = _onbData.tipoHogar;
-      if (_onbData.reto)      updates['meta/reto']      = _onbData.reto;
-      // Guardar flags de perfil
+      const updates = {};
+      if (!soloFlags) {
+        updates['meta/presupuestoBase'] = true;
+        if (_onbData.tipoHogar) updates['meta/tipoHogar'] = _onbData.tipoHogar;
+        if (_onbData.reto)      updates['meta/reto']      = _onbData.reto;
+      }
+      // Siempre guardar flags de perfil
       updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
       updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
       updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
@@ -459,13 +464,13 @@ window.guardarPresupuestoBase = async function() {
         tieneSeguros:   _onbData.tieneSeguros   !== false,
         perfilCompleto: true
       });
-    } catch(e) { console.error('guardarPresupuestoBase meta:', e); }
+    } catch(e) { console.error('guardarPresupuestoBase:', e); }
   }
-  save();
+  if (!soloFlags) save();
   cerrarOnboarding();
-  toast('✅ Presupuesto base guardado');
+  toast('✅ Perfil del hogar guardado');
   if (typeof renderAll === 'function') renderAll();
-  renderConfigPresupuesto();
+  if (!soloFlags) renderConfigPresupuesto();
 };
 
 function _aplicarOnbDataAD() {
