@@ -18,6 +18,22 @@ function _tx(singular, plural) {
 
 // ── PUNTOS DE ENTRADA ─────────────────────────────────────────────────────────
 
+// Abre el onboarding directo en P1.5 para hogares existentes sin perfilCompleto
+window.abrirCompletarPerfil = function() {
+  document.getElementById('bannerPerfilCompleto').style.display = 'none';
+  // Precargar tipoHogar desde meta del hogar
+  _onbData = {
+    tipoHogar:      (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.tipoHogar) || 'pareja',
+    tieneVehiculo:  true,
+    tieneEmpleada:  false,
+    tieneEducacion: false,
+    tieneSeguros:   true
+  };
+  _onbStep = 15;
+  _renderStep();
+  document.getElementById('presupuestoModal').style.display = 'flex';
+};
+
 function iniciarOnboarding() {
   _onbStep = 1;
   _onbData = {};
@@ -43,11 +59,12 @@ function _renderStep() {
   const inner = document.getElementById('onbInner');
   if (!inner) return;
   switch (_onbStep) {
-    case 1: inner.innerHTML = _tpl1(); break;
-    case 2: inner.innerHTML = _tpl2(); break;
-    case 3: inner.innerHTML = _tpl3(); break;
-    case 4: inner.innerHTML = _tpl4(); break;
-    case 5: inner.innerHTML = _tpl5(); break;
+    case 1:  inner.innerHTML = _tpl1(); break;
+    case 15: inner.innerHTML = _tpl15(); break; // P1.5 — ¿Qué quieren presupuestar?
+    case 2:  inner.innerHTML = _tpl2(); break;
+    case 3:  inner.innerHTML = _tpl3(); break;
+    case 4:  inner.innerHTML = _tpl4(); break;
+    case 5:  inner.innerHTML = _tpl5(); break;
     default: inner.innerHTML = _tplResumen(); break;
   }
 }
@@ -92,7 +109,50 @@ function _tpl1() {
 
 window.onbTipo = function(t) { _onbData.tipoHogar = t; _renderStep(); };
 
-// ── PANTALLA 2 — ¿Cuál es su mayor reto? ─────────────────────────────────────
+// ── PANTALLA 1.5 — ¿Qué quieren presupuestar? ────────────────────────────────
+
+function _tpl15() {
+  const d = _onbData;
+  const tog = (key, icon, name, desc) => {
+    const on = d[key] !== false; // default true
+    return `
+    <div class="onb-toggle-row">
+      <div class="onb-toggle-left">
+        <span class="onb-toggle-icon">${icon}</span>
+        <div>
+          <div class="onb-toggle-name">${name}</div>
+          <div class="onb-toggle-desc">${desc}</div>
+        </div>
+      </div>
+      <button class="onb-toggle-sw${on ? ' on' : ''}" onclick="onbToggle('${key}', this)"></button>
+    </div>`;
+  };
+  const esFamilia = d.tipoHogar === 'familia';
+  return `
+<div class="onb-page">
+  ${_prog(1)}
+  <div class="onb-body">
+    <div class="onb-emoji">🏡</div>
+    <h2 class="onb-title">¿Qué ${_tx('quieres','quieren')} presupuestar?</h2>
+    <p class="onb-sub">Activa solo lo que aplica a ${_tx('tu hogar','su hogar')}. ${_tx('Puedes','Pueden')} cambiarlo después.</p>
+    <div class="onb-toggle-group">
+      ${tog('tieneVehiculo',  '🚗', 'Vehículo',             'Gasolina, seguro, impuestos')}
+      ${tog('tieneEmpleada',  '🤝', 'Servicio Doméstico',   'Empleada, niñera')}
+      ${esFamilia ? tog('tieneEducacion', '📚', 'Educación', 'Colegio, universidad, útiles') : ''}
+      ${tog('tieneSeguros',   '🛡️', 'Seguros e Impuestos',  'SOAT, predial, pólizas')}
+    </div>
+    <p class="onb-toggle-hint">Vivienda, Alimentación y Ahorro siempre activos</p>
+  </div>
+  <div class="onb-foot">
+    <button class="onb-pri" onclick="onbNext()">Continuar →</button>
+  </div>
+</div>`;
+}
+
+window.onbToggle = function(key, btn) {
+  _onbData[key] = !(_onbData[key] !== false);
+  btn.classList.toggle('on', _onbData[key] !== false);
+};
 
 function _tpl2() {
   const esSolo = _onbData.tipoHogar === 'soltero';
@@ -172,8 +232,7 @@ function _tpl3() {
 // ── PANTALLA 4 — Lo que sí o sí hay que pagar ─────────────────────────────────
 
 function _tpl4() {
-  const perfil   = (window.HOGAR && window.HOGAR.perfil) || {};
-  const hasVeh   = (perfil.vehiculos || []).some(v => v.financiado);
+  const tieneVeh = _onbData.tieneVehiculo !== false;
   return `
 <div class="onb-page">
   ${_prog(4)}
@@ -199,14 +258,14 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>🚗 Transporte <span class="onb-badge">total estimado — lo desglosás en Config</span></label>
+        <label>${tieneVeh ? '🚗 Gasolina mensual' : '🚌 Transporte público'} <span class="onb-badge">estimado</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oTrn"
             value="${_onbData.transporte || ''}" placeholder="0"
             oninput="_onbData.transporte=parseFloat(this.value.replace(/[^0-9.]/g,''))||0"/>
         </div>
       </div>
-      ${hasVeh ? `
+      ${tieneVeh ? `
       <div class="onb-field">
         <label>💳 Cuota del vehículo</label>
         <div class="onb-iw"><span class="onb-pre">$</span>
@@ -341,12 +400,15 @@ window.mostrarCodigoInv = function() {
 
 window.onbNext = function() {
   _leerCampos(_onbStep);
+  if (_onbStep === 1)  { _onbStep = 15; _renderStep(); return; } // P1 → P1.5
+  if (_onbStep === 15) { _onbStep = 2;  _renderStep(); return; } // P1.5 → P2
   _onbStep++;
   if (_onbStep > 5) _onbStep = 99; // resumen
   _renderStep();
 };
 
 window.onbSkip = function() {
+  if (_onbStep === 15) { _onbStep = 2; _renderStep(); return; }
   _onbStep++;
   if (_onbStep > 5) _onbStep = 99;
   _renderStep();
@@ -381,7 +443,21 @@ window.guardarPresupuestoBase = async function() {
       const updates = { 'meta/presupuestoBase': true };
       if (_onbData.tipoHogar) updates['meta/tipoHogar'] = _onbData.tipoHogar;
       if (_onbData.reto)      updates['meta/reto']      = _onbData.reto;
+      // Guardar flags de perfil
+      updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
+      updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
+      updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
+      updates['perfil/tieneSeguros']   = _onbData.tieneSeguros   !== false;
+      updates['perfil/perfilCompleto'] = true;
       await db.ref(`hogares/${cH}`).update(updates);
+      // Actualizar window.HOGAR.perfil localmente
+      window.HOGAR.perfil = Object.assign(window.HOGAR.perfil || {}, {
+        tieneVehiculo:  _onbData.tieneVehiculo  !== false,
+        tieneEmpleada:  _onbData.tieneEmpleada  !== false,
+        tieneEducacion: _onbData.tieneEducacion !== false,
+        tieneSeguros:   _onbData.tieneSeguros   !== false,
+        perfilCompleto: true
+      });
     } catch(e) { console.error('guardarPresupuestoBase meta:', e); }
   }
   save();

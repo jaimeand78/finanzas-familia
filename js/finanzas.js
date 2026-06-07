@@ -87,6 +87,50 @@ function defD() {
 }
 
 
+// ── FLAGS DE PERFIL — DA-C3 ───────────────────────────────────────────────────
+// Lee los flags del perfil del hogar para filtrar categorías e ítems.
+// Default true para todos — hogar sin perfil completo ve todo.
+
+function getPerfilFlags() {
+  const p = (window.HOGAR && window.HOGAR.perfil) || {};
+  return {
+    tieneVehiculo:  p.tieneVehiculo  !== false,
+    tieneEmpleada:  p.tieneEmpleada  !== false,
+    tieneEducacion: p.tieneEducacion !== false,
+    tieneSeguros:   p.tieneSeguros   !== false
+  };
+}
+
+// Filtra ítems de una categoría según los flags del perfil
+function filtrarItemsPorPerfil(catName, items) {
+  const f = getPerfilFlags();
+  return items.filter(item => {
+    const l = item.label || '';
+    // Ítems de vehículo — solo si tieneVehiculo
+    if (!f.tieneVehiculo && (
+      l.includes('Gasolina') || l.includes('SOAT') ||
+      l.includes('vehículo') || l.includes('Vehículo') ||
+      l.includes('leasing') || l.includes('Cuota del vehículo')
+    )) return false;
+    return true;
+  });
+}
+
+// Filtra las categorías completas según los flags del perfil
+function filtrarCategoriasPorPerfil(categories) {
+  const f = getPerfilFlags();
+  return categories.filter(c => {
+    const n = c.name || '';
+    if (!f.tieneEmpleada  && n.includes('Servicio Doméstico')) return false;
+    if (!f.tieneEducacion && n.includes('Educación'))          return false;
+    if (!f.tieneSeguros   && n.includes('Seguros'))            return false;
+    return true;
+  }).map(c => ({
+    ...c,
+    items: filtrarItemsPorPerfil(c.name, c.items || [])
+  }));
+}
+
 // ── INGRESOS DINÁMICOS — DA-11 ────────────────────────────────────────────────
 
 function buildIncomeFromPerfil(perfil) {
@@ -310,6 +354,8 @@ function recalc() {
 function renderAll() {
   if (!D.income) return;
   if (D.categories) D.categories = D.categories.map(cat => ({ ...cat, items: normalizeCategoryItems(cat) }));
+  // Aplicar filtro de perfil — oculta categorías/ítems según flags del hogar
+  window._catsFiltradas = filtrarCategoriasPorPerfil(D.categories || []);
   renderMLabel();
   recalc();
   if (curTab === 'd' && typeof populateCatSel === 'function') populateCatSel();

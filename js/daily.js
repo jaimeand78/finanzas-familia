@@ -69,7 +69,16 @@ function populateCatSel() {
   const catSel = document.getElementById('dCat');
   if (!catSel) return;
   const prevCat = catSel.value;
-  const cats    = Object.keys(DAILY_ITEMS);
+
+  // Filtrar categorías según flags del perfil del hogar
+  const flags = (typeof getPerfilFlags === 'function') ? getPerfilFlags() : {};
+  const cats = Object.keys(DAILY_ITEMS).filter(c => {
+    if (!flags.tieneEmpleada  && c.includes('Servicio Doméstico')) return false;
+    if (!flags.tieneEducacion && c.includes('Educación'))          return false;
+    if (!flags.tieneSeguros   && c.includes('Seguros'))            return false;
+    return true;
+  });
+
   catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
   if (prevCat && cats.includes(prevCat)) catSel.value = prevCat;
   populateItemSel();

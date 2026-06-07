@@ -116,6 +116,14 @@
 
     <!-- Banner miembro 2 -->
     <div id="bannerMiembro2" style="display:none;"></div>
+    <div id="bannerPerfilCompleto" style="display:none;background:#E6F1FB;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.75rem;">
+      <div style="font-size:13px;font-weight:600;color:#185FA5;margin-bottom:.25rem;">✨ Nueva función disponible</div>
+      <div style="font-size:13px;color:#185FA5;margin-bottom:.75rem;">Dinos qué quieren presupuestar para ver solo lo que importa a su hogar.</div>
+      <div style="display:flex;gap:.5rem;">
+        <button onclick="abrirCompletarPerfil()" style="flex:2;padding:8px;border:none;border-radius:8px;background:#185FA5;color:white;font-size:13px;font-weight:600;cursor:pointer;">Completar ahora →</button>
+        <button onclick="document.getElementById('bannerPerfilCompleto').style.display='none'" style="flex:1;padding:8px;border:0.5px solid #B8D4F0;border-radius:8px;background:none;color:#185FA5;font-size:13px;cursor:pointer;">Después</button>
+      </div>
+    </div>
 
     <!-- Banner offline -->
     <div id="offlineBanner" class="offline-banner"></div>

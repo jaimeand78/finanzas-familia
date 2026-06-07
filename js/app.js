@@ -41,6 +41,8 @@ async function onHogarReady() {
   if (typeof verificarBannerMiembro2 === 'function') {
     verificarBannerMiembro2().catch(e => console.warn('banner check:', e));
   }
+  // Verificar si el propietario necesita completar el perfil del hogar
+  _verificarPerfilCompleto();
 }
 
 // Llamado por finanzas.js cuando todo está listo para mostrar la app.
@@ -48,4 +50,18 @@ function appLista() {
   updateOfflineUI();
   if (navigator.onLine) { setSS('ok'); syncOfflineQueue(); }
   go('d');
+}
+
+// Muestra "Completa tu perfil" si el propietario no ha configurado los flags
+function _verificarPerfilCompleto() {
+  const hogar   = window.HOGAR;
+  const uid     = window.UID;
+  if (!hogar || !uid) return;
+  const esPropi = hogar.miembros && hogar.miembros[uid] && hogar.miembros[uid].rol === 'propietario';
+  if (!esPropi) return;
+  const perfilCompleto = hogar.perfil && hogar.perfil.perfilCompleto;
+  if (perfilCompleto) return;
+  // Mostrar banner de completar perfil
+  const banner = document.getElementById('bannerPerfilCompleto');
+  if (banner) banner.style.display = 'block';
 }
