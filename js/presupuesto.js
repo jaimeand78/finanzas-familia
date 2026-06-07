@@ -25,8 +25,8 @@ window.abrirCompletarPerfil = function() {
   _onbData = {
     tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
     tieneVehiculo:  true,
-    tieneEmpleada:  false,
-    tieneEducacion: false,
+    tieneEmpleada:  true,
+    tieneEducacion: true,
     tieneSeguros:   true
   };
   _onbStep = 15;
@@ -114,9 +114,9 @@ window.onbTipo = function(t) { _onbData.tipoHogar = t; _renderStep(); };
 function _tpl15() {
   const d = _onbData;
   const tog = (key, icon, name, desc) => {
-    const on = d[key] !== false; // default true
+    const on = _onbData[key] !== false;
     return `
-    <div class="onb-toggle-row">
+    <div class="onb-toggle-row" onclick="onbToggle('${key}')" style="cursor:pointer;">
       <div class="onb-toggle-left">
         <span class="onb-toggle-icon">${icon}</span>
         <div>
@@ -124,7 +124,7 @@ function _tpl15() {
           <div class="onb-toggle-desc">${desc}</div>
         </div>
       </div>
-      <button class="onb-toggle-sw${on ? ' on' : ''}" onclick="onbToggle('${key}', this)"></button>
+      <div class="onb-toggle-sw${on ? ' on' : ''}" id="sw-${key}"></div>
     </div>`;
   };
   const esFamilia = d.tipoHogar === 'familia';
@@ -149,9 +149,10 @@ function _tpl15() {
 </div>`;
 }
 
-window.onbToggle = function(key, btn) {
-  _onbData[key] = !(_onbData[key] !== false);
-  btn.classList.toggle('on', _onbData[key] !== false);
+window.onbToggle = function(key) {
+  _onbData[key] = (_onbData[key] === false) ? true : false;
+  const sw = document.getElementById('sw-' + key);
+  if (sw) sw.classList.toggle('on', _onbData[key] !== false);
 };
 
 function _tpl2() {
