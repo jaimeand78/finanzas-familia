@@ -320,7 +320,24 @@
             <input type="text" inputmode="decimal" id="cfgIngExtraMonto" placeholder="0" />
           </div>
         </div>
-        <p style="font-size:11px;color:var(--color-muted);margin-top:8px;">💡 Solo aplica para este mes</p>
+        <div class="cfg-modal-row" style="margin-top:10px;">
+          <label class="cfg-modal-lbl">¿En qué mes aplica?</label>
+          <select id="cfgIngExtraMes" style="width:100%;border:0.5px solid var(--color-border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--color-bg);color:var(--color-text);box-sizing:border-box;">
+            <option value="0">Enero</option>
+            <option value="1">Febrero</option>
+            <option value="2">Marzo</option>
+            <option value="3">Abril</option>
+            <option value="4">Mayo</option>
+            <option value="5">Junio</option>
+            <option value="6">Julio</option>
+            <option value="7">Agosto</option>
+            <option value="8">Septiembre</option>
+            <option value="9">Octubre</option>
+            <option value="10">Noviembre</option>
+            <option value="11">Diciembre</option>
+          </select>
+        </div>
+        <p style="font-size:11px;color:var(--color-muted);margin-top:8px;">💡 Solo aparece en el mes que selecciones</p>
       </div>
       <div class="cfg-modal-foot">
         <button class="onb-skip" onclick="cerrarModalIngresoExtra()">Cancelar</button>

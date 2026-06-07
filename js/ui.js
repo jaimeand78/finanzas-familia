@@ -197,7 +197,7 @@ function renderIngresosConfig() {
       </div>`;
     });
 
-    html += `<button class="cfg-agregar-btn" onclick="abrirModalIngresoExtra('${mbr.nombre}')">＋ Agregar ingreso — ${nombreDisplay}</button>`;
+    html += `<button class="cfg-agregar-btn" onclick="abrirModalIngresoExtra('${mbr.nombre}')">＋ Agregar ingreso adicional</button>`;
     html += `</div>`;
   });
 

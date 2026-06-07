@@ -633,7 +633,8 @@ window.abrirModalIngresoExtra = function(quien) {
   document.getElementById('cfgIngExtraQuien').value  = quien;
   document.getElementById('cfgIngExtraLabel').value  = '';
   document.getElementById('cfgIngExtraMonto').value  = '';
-  document.getElementById('cfgIngExtraTitulo').textContent = `Ingreso adicional — ${quien}`;
+  document.getElementById('cfgIngExtraMes').value    = String(curM);
+  document.getElementById('cfgIngExtraTitulo').textContent = `Ingreso adicional — ${quien.charAt(0).toUpperCase() + quien.slice(1).toLowerCase()}`;
   modal.style.display = 'flex';
 };
 
@@ -642,18 +643,35 @@ window.cerrarModalIngresoExtra = function() {
   if (modal) modal.style.display = 'none';
 };
 
-window.guardarModalIngresoExtra = function() {
+window.guardarModalIngresoExtra = async function() {
   const quien = document.getElementById('cfgIngExtraQuien').value;
   const label = (document.getElementById('cfgIngExtraLabel').value || '').trim();
   const val   = parseFloat((document.getElementById('cfgIngExtraMonto').value || '').replace(/[^0-9.]/g,'')) || 0;
+  const mes   = parseInt(document.getElementById('cfgIngExtraMes').value);
 
   if (!label) { toast('⚠️ Escribe un nombre para este ingreso'); return; }
   if (!val)   { toast('⚠️ Ingresa un monto'); return; }
 
-  if (!D.income) D.income = [];
-  D.income.push({ label, value: val, extra: true, quien, fixed: false });
-  recalc(); save();
-  toast('✅ Ingreso adicional agregado');
+  // Si el mes seleccionado es el mes actual, agregar a D.income directamente
+  if (mes === curM) {
+    if (!D.income) D.income = [];
+    D.income.push({ label, value: val, extra: true, quien, fixed: false });
+    recalc(); save();
+  } else {
+    // Guardar en el nodo del mes seleccionado
+    try {
+      const snap = await db.ref(dKey(curY, mes)).once('value');
+      const data = snap.val() || defD();
+      if (!data.income) data.income = [];
+      data.income.push({ label, value: val, extra: true, quien, fixed: false });
+      await db.ref(dKey(curY, mes)).set(data);
+    } catch(e) {
+      toast('❌ Error al guardar. Intenta de nuevo.');
+      console.error(e); return;
+    }
+  }
+
+  toast('✅ Ingreso adicional guardado');
   cerrarModalIngresoExtra();
   if (typeof renderIngresosConfig === 'function') renderIngresosConfig();
 };
