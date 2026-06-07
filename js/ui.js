@@ -160,12 +160,13 @@ function renderIngresosConfig() {
 
   // Agrupar fijos por miembro
   miembros.forEach((mbr, mi) => {
-    const primerNombre = mbr.nombre.split(' ')[0];
-    const fijosMbr  = fijos.filter(r => r.label && r.label.includes(primerNombre));
+    const primerNombre = mbr.nombre.split(' ')[0].toLowerCase();
+    const fijosMbr  = fijos.filter(r => r.label && r.label.toLowerCase().includes(primerNombre));
     const extrasMbr = extras.filter(r => r.quien === mbr.nombre);
 
+    const nombreDisplay = mbr.nombre.charAt(0).toUpperCase() + mbr.nombre.slice(1).toLowerCase();
     if (mi > 0) html += `<div class="cfg-member-divider"></div>`;
-    html += `<div class="cfg-member-section"><p class="cfg-member-lbl">${mbr.nombre}</p>`;
+    html += `<div class="cfg-member-section"><p class="cfg-member-lbl">${nombreDisplay}</p>`;
 
     // Ingresos fijos del miembro
     fijosMbr.forEach(r => {
@@ -201,7 +202,7 @@ function renderIngresosConfig() {
   });
 
   // Ingresos sin miembro asignado (Otros ingresos u otros de v1)
-  const sinMbr = fijos.filter(r => !miembros.some(m => r.label && r.label.includes(m.nombre.split(' ')[0])));
+  const sinMbr = fijos.filter(r => !miembros.some(m => r.label && r.label.toLowerCase().includes(m.nombre.split(' ')[0].toLowerCase())));
   if (sinMbr.length) {
     html += `<div class="cfg-member-divider"></div>`;
     sinMbr.forEach(r => {
