@@ -300,6 +300,35 @@
     </div>
   </div>
 
+  <!-- Modal agregar ingreso adicional -->
+  <div id="cfgIngExtraModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+    <div class="cfg-modal-inner">
+      <div class="cfg-modal-hdr">
+        <span id="cfgIngExtraTitulo" class="cfg-modal-title"></span>
+        <button class="cfg-modal-close" onclick="cerrarModalIngresoExtra()">✕</button>
+      </div>
+      <div class="cfg-modal-body">
+        <input type="hidden" id="cfgIngExtraQuien" />
+        <div class="cfg-modal-row">
+          <label class="cfg-modal-lbl">¿Qué es?</label>
+          <input type="text" id="cfgIngExtraLabel" placeholder="Ej: Bono junio, Freelance, Arriendo…"
+            style="width:100%;border:0.5px solid var(--color-border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--color-bg);color:var(--color-text);box-sizing:border-box;" />
+        </div>
+        <div class="cfg-modal-row" style="margin-top:10px;">
+          <label class="cfg-modal-lbl">Monto</label>
+          <div class="onb-iw"><span class="onb-pre">$</span>
+            <input type="text" inputmode="decimal" id="cfgIngExtraMonto" placeholder="0" />
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--color-muted);margin-top:8px;">💡 Solo aplica para este mes</p>
+      </div>
+      <div class="cfg-modal-foot">
+        <button class="onb-skip" onclick="cerrarModalIngresoExtra()">Cancelar</button>
+        <button class="btn-primary" onclick="guardarModalIngresoExtra()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast"></div>
 

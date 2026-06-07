@@ -625,6 +625,47 @@ window.updMes = function(ci, ri, val) {
   }
 };
 
+// ── MODAL INGRESO ADICIONAL (EXTRA) ──────────────────────────────────────────
+
+window.abrirModalIngresoExtra = function(quien) {
+  const modal = document.getElementById('cfgIngExtraModal');
+  if (!modal) return;
+  document.getElementById('cfgIngExtraQuien').value  = quien;
+  document.getElementById('cfgIngExtraLabel').value  = '';
+  document.getElementById('cfgIngExtraMonto').value  = '';
+  document.getElementById('cfgIngExtraTitulo').textContent = `Ingreso adicional — ${quien}`;
+  modal.style.display = 'flex';
+};
+
+window.cerrarModalIngresoExtra = function() {
+  const modal = document.getElementById('cfgIngExtraModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.guardarModalIngresoExtra = function() {
+  const quien = document.getElementById('cfgIngExtraQuien').value;
+  const label = (document.getElementById('cfgIngExtraLabel').value || '').trim();
+  const val   = parseFloat((document.getElementById('cfgIngExtraMonto').value || '').replace(/[^0-9.]/g,'')) || 0;
+
+  if (!label) { toast('⚠️ Escribe un nombre para este ingreso'); return; }
+  if (!val)   { toast('⚠️ Ingresa un monto'); return; }
+
+  if (!D.income) D.income = [];
+  D.income.push({ label, value: val, extra: true, quien, fixed: false });
+  recalc(); save();
+  toast('✅ Ingreso adicional agregado');
+  cerrarModalIngresoExtra();
+  if (typeof renderIngresosConfig === 'function') renderIngresosConfig();
+};
+
+window.eliminarIngresoExtra = function(i) {
+  if (!D.income || !D.income[i]) return;
+  D.income.splice(i, 1);
+  recalc(); save();
+  toast('🗑️ Ingreso eliminado');
+  if (typeof renderIngresosConfig === 'function') renderIngresosConfig();
+};
+
 // ── MODAL EDITAR INGRESO ──────────────────────────────────────────────────────
 
 window.abrirModalIngreso = function(i) {

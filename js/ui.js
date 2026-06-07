@@ -144,17 +144,78 @@ function renderIngresosConfig() {
     el.innerHTML = `<p class="cfg-empty">Sin ingresos configurados.</p>`;
     return;
   }
-  const rows = D.income.map((inc, i) => `
-    <div class="cfg-income-row">
-      <span class="cfg-income-lbl">${inc.label}</span>
-      <span class="cfg-income-right">
-        <span class="cfg-income-val">${fmt(inc.value || 0)}</span>
-        <button class="cfg-edit-btn" onclick="abrirModalIngreso(${i})" title="Editar">✏️</button>
-      </span>
-    </div>`).join('');
+
+  // Separar ingresos fijos (buildIncomeFromPerfil) de adicionales (extra:true)
+  const fijos    = D.income.filter(r => !r.extra);
+  const extras   = D.income.filter(r => r.extra);
+
+  // Obtener nombres de miembros del perfil
+  const perfil   = (window.HOGAR && window.HOGAR.perfil) || {};
+  const miembros = Object.values(perfil.miembros || {}).filter(m => m.rol === 'adulto' && m.nombre);
+
+  let html = '';
+
+  // Agrupar fijos por miembro
+  miembros.forEach((mbr, mi) => {
+    const fijosMbr  = fijos.filter(r => r.label && r.label.includes(mbr.nombre));
+    const extrasMbr = extras.filter(r => r.quien === mbr.nombre);
+
+    if (mi > 0) html += `<div class="cfg-member-divider"></div>`;
+    html += `<div class="cfg-member-section"><p class="cfg-member-lbl">${mbr.nombre}</p>`;
+
+    // Ingresos fijos del miembro
+    fijosMbr.forEach(r => {
+      const i = D.income.indexOf(r);
+      html += `
+      <div class="cfg-income-row">
+        <span class="cfg-income-lbl">${r.label}</span>
+        <span class="cfg-income-right">
+          <span class="cfg-income-badge fijo">fijo</span>
+          <span class="cfg-income-val">${fmt(r.value || 0)}</span>
+          <button class="cfg-edit-btn" onclick="abrirModalIngreso(${i})">✏️</button>
+        </span>
+      </div>`;
+    });
+
+    // Ingresos adicionales del miembro
+    extrasMbr.forEach(r => {
+      const i = D.income.indexOf(r);
+      html += `
+      <div class="cfg-income-row">
+        <span class="cfg-income-lbl cfg-income-extra">${r.label}</span>
+        <span class="cfg-income-right">
+          <span class="cfg-income-badge extra">+ extra</span>
+          <span class="cfg-income-val">${fmt(r.value || 0)}</span>
+          <button class="cfg-edit-btn" onclick="abrirModalIngreso(${i})">✏️</button>
+          <button class="cfg-del-btn"  onclick="eliminarIngresoExtra(${i})">×</button>
+        </span>
+      </div>`;
+    });
+
+    html += `<button class="cfg-agregar-btn" onclick="abrirModalIngresoExtra('${mbr.nombre}')">＋ Agregar ingreso — ${mbr.nombre}</button>`;
+    html += `</div>`;
+  });
+
+  // Ingresos sin miembro asignado (Otros ingresos u otros de v1)
+  const sinMbr = fijos.filter(r => !miembros.some(m => r.label && r.label.includes(m.nombre)));
+  if (sinMbr.length) {
+    html += `<div class="cfg-member-divider"></div>`;
+    sinMbr.forEach(r => {
+      const i = D.income.indexOf(r);
+      html += `
+      <div class="cfg-income-row">
+        <span class="cfg-income-lbl">${r.label}</span>
+        <span class="cfg-income-right">
+          <span class="cfg-income-val">${fmt(r.value || 0)}</span>
+          <button class="cfg-edit-btn" onclick="abrirModalIngreso(${i})">✏️</button>
+        </span>
+      </div>`;
+    });
+  }
+
   const total = D.income.reduce((s, r) => s + (r.value || 0), 0);
-  el.innerHTML = rows + `
-    <div class="cfg-income-total">Total: <span class="cfg-mono">${fmt(total)}</span></div>`;
+  html += `<div class="cfg-income-total">Total: <span class="cfg-mono">${fmt(total)}</span></div>`;
+  el.innerHTML = html;
 }
 
 // ── PWA iOS ───────────────────────────────────────────────────────────────────

@@ -35,6 +35,7 @@
 | feat: Ahorro fijo arriba en Resumen — después de Ingresan/Gastado ✅ | |
 | feat: ¿Quién ha pagado? — sección nueva al final del Resumen ✅ | |
 | fix: dailyTotals normaliza catKey sin emoji — Resumen correcto ✅ | |
+| feat: Ingresos adicionales por miembro en Config ✅ | |
 
 ---
 
@@ -260,9 +261,44 @@ Sesión de validación en producción y resolución de problemas específicos de
 **Archivos modificados:** `js/utils.js`, `js/daily.js`, `js/finanzas.js`, `index.html`
 **Commit sugerido:** `feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy`
 
----
+### 📅 Fase 23 — Ingresos adicionales por miembro en Config (Junio 2026)
 
-## 3. Registro de Bugs y Soluciones
+**Contexto:** Identificado en auditoría de nota de voz. En v1 existían ingresos adicionales (bonos, primas). En v2.2 se perdieron al reconstruir `buildIncomeFromPerfil()`. Las familias piloto necesitan poder registrar bonos e ingresos variables mes a mes.
+
+**Decisiones de diseño:**
+- Ingreso adicional vive en Config → Ingresos, no en Tab Hoy (DA-16: Config es configuración del mes)
+- Agrupado por miembro — cada persona tiene su bloque independiente
+- Es variable: solo vive en el mes activo (`curM`), no se proyecta
+- Campo libre de nombre (Bono junio, Freelance, Arriendo…) + monto
+- Editable y eliminable después de creado
+- Identificado en `D.income` con flags `extra: true` y `quien: nombre`
+
+**Cambios implementados:**
+
+`js/ui.js` — `renderIngresosConfig()` refactorizada:
+- Agrupa ingresos por miembro leyendo `perfil.miembros`
+- Separa fijos (`!r.extra`) de adicionales (`r.extra`)
+- Muestra badges "fijo" / "+ extra" por fila
+- Botón ✏️ en fijos, botón ✏️ + × en extras
+- Botón "＋ Agregar ingreso — [Nombre]" por miembro
+- Ingresos sin miembro asignado (v1 legacy) aparecen al final sin badge
+
+`js/presupuesto.js` — nuevas funciones:
+- `abrirModalIngresoExtra(quien)` — abre modal con campos nombre + monto
+- `cerrarModalIngresoExtra()` — cierra modal
+- `guardarModalIngresoExtra()` — agrega `{ label, value, extra:true, quien, fixed:false }` a `D.income`, llama `recalc()` y `save()`
+- `eliminarIngresoExtra(i)` — hace `splice` en `D.income`, llama `recalc()` y `save()`
+
+`index.html`:
+- Nuevo modal `#cfgIngExtraModal` con campos: nombre libre + monto + hint "Solo aplica para este mes"
+
+`css/presupuesto.css`:
+- Nuevas clases: `.cfg-member-section`, `.cfg-member-lbl`, `.cfg-member-divider`, `.cfg-income-badge`, `.cfg-income-extra`, `.cfg-del-btn`, `.cfg-agregar-btn`
+
+**Archivos modificados:** `js/ui.js`, `js/presupuesto.js`, `index.html`, `css/presupuesto.css`
+**Commit:** `feat: ingresos adicionales por miembro en Config — modal agregar/editar/eliminar`
+
+---
 
 *(bugs #1 al #13 — ver versiones anteriores)*
 
@@ -315,7 +351,6 @@ Sesión de validación en producción y resolución de problemas específicos de
 ## 5. Deuda Técnica
 
 ### 🔴 Prioridad Alta — Antes del piloto
-- **Ingresos adicionales / bonos:** Agregar campo para bonificaciones e ingresos variables en Config → Ingresos. Aplica empleados y independientes. Mockup pendiente — próxima sesión.
 - **Onboarding tipoHogar:** Activar/desactivar categorías según tipo de hogar (C3). Hogares sin empleada no deben ver Servicio Doméstico con $0 sin contexto.
 
 ### 🟡 Prioridad Media — Post-piloto
@@ -383,6 +418,7 @@ Sesión de validación en producción y resolución de problemas específicos de
 | [confirmar] | fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18) |
 | [confirmar] | fix: onboarding P1 — subtítulo neutro, sin plural prematuro |
 | [pendiente] | feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy |
+| [pendiente] | feat: ingresos adicionales por miembro en Config — modal agregar/editar/eliminar |
 
 ---
 
@@ -403,10 +439,9 @@ Sesión de validación en producción y resolución de problemas específicos de
 ## 9. Próxima Sesión
 
 **Pendiente antes del piloto:**
-1. **Ingresos adicionales / bonos** — mockup primero, luego implementar en Config → Ingresos
-2. **Onboarding tipoHogar** — activar/desactivar categorías según tipo de hogar (C3)
+1. **Onboarding tipoHogar** — activar/desactivar categorías según tipo de hogar (C3). Único bloqueante restante.
 
-**Con esos dos cambios el piloto v2.3 está listo para lanzar.**
+**Con ese cambio el piloto v2.3 está listo para lanzar.**
 
 ---
 
