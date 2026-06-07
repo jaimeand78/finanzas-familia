@@ -151,7 +151,10 @@ function renderIngresosConfig() {
 
   // Obtener nombres de miembros del perfil
   const perfil   = (window.HOGAR && window.HOGAR.perfil) || {};
-  const miembros = Object.values(perfil.miembros || {}).filter(m => m.rol === 'adulto' && m.nombre);
+  // Intentar desde perfil.miembros, con fallback a HOGAR.miembros
+  const perfilMbrs = Object.values(perfil.miembros || {}).filter(m => m.nombre);
+  const hogarMbrs  = Object.values((window.HOGAR && window.HOGAR.miembros) || {}).filter(m => m.nombre);
+  const miembros   = perfilMbrs.length ? perfilMbrs : hogarMbrs;
 
   let html = '';
 
