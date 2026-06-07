@@ -305,3 +305,6 @@
   width: calc(100% - 2rem);
 }
 .cfg-agregar-btn:active { background: var(--color-surface); }
+
+/* fix: badge pegado al label en ingresos Config */
+.cfg-income-right { display: flex; align-items: center; gap: 6px; }
