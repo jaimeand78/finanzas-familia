@@ -402,15 +402,21 @@ window.mostrarCodigoInv = function() {
 
 window.onbNext = function() {
   _leerCampos(_onbStep);
-  if (_onbStep === 1)  { _onbStep = 15; _renderStep(); return; } // P1 → P1.5
-  if (_onbStep === 15) { _onbStep = 2;  _renderStep(); return; } // P1.5 → P2
+  if (_onbStep === 1)  { _onbStep = 15; _renderStep(); return; }
+  if (_onbStep === 15) {
+    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; } // solo flags → guardar directo
+    _onbStep = 2; _renderStep(); return;
+  }
   _onbStep++;
-  if (_onbStep > 5) _onbStep = 99; // resumen
+  if (_onbStep > 5) _onbStep = 99;
   _renderStep();
 };
 
 window.onbSkip = function() {
-  if (_onbStep === 15) { _onbStep = 2; _renderStep(); return; }
+  if (_onbStep === 15) {
+    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; }
+    _onbStep = 2; _renderStep(); return;
+  }
   _onbStep++;
   if (_onbStep > 5) _onbStep = 99;
   _renderStep();
