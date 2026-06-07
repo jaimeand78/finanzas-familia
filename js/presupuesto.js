@@ -23,7 +23,7 @@ window.abrirCompletarPerfil = function() {
   document.getElementById('bannerPerfilCompleto').style.display = 'none';
   // Precargar tipoHogar desde meta del hogar
   _onbData = {
-    tipoHogar:      (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.tipoHogar) || 'pareja',
+    tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
     tieneVehiculo:  true,
     tieneEmpleada:  false,
     tieneEducacion: false,
