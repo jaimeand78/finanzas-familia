@@ -324,3 +324,14 @@
 
 /* fix: toggle sw como div en lugar de button */
 .onb-toggle-sw { pointer-events: none; }
+
+/* ── Botones de acción en Mi hogar ────────────────────────────────────────── */
+.cfg-hogar-actions { display: flex; flex-direction: column; gap: .5rem; margin-top: .875rem; padding-top: .875rem; border-top: 0.5px solid var(--color-border-tertiary); }
+.cfg-action-btn { display: flex; align-items: center; gap: 10px; padding: .75rem 1rem; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); cursor: pointer; width: 100%; text-align: left; }
+.cfg-action-btn.danger { border-color: #F0997B; }
+.cfg-action-btn.danger .cfg-action-title { color: #993C1D; }
+.cfg-action-icon { font-size: 18px; flex-shrink: 0; }
+.cfg-action-info { flex: 1; }
+.cfg-action-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.cfg-action-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.cfg-action-arrow { font-size: 16px; color: var(--color-text-secondary); }

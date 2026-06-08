@@ -21,18 +21,7 @@ function _tx(singular, plural) {
 // Abre el onboarding directo en P1.5 para hogares existentes sin perfilCompleto
 window.abrirCompletarPerfil = function() {
   document.getElementById('bannerPerfilCompleto').style.display = 'none';
-  // Precargar tipoHogar desde meta del hogar
-  _onbData = {
-    tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
-    tieneVehiculo:  true,
-    tieneEmpleada:  true,
-    tieneEducacion: true,
-    tieneSeguros:   true,
-    _soloFlags:     true  // no tocar D.income ni D.categories
-  };
-  _onbStep = 15;
-  _renderStep();
-  document.getElementById('presupuestoModal').style.display = 'flex';
+  window.abrirActualizarCategorias();
 };
 
 function iniciarOnboarding() {
@@ -47,11 +36,32 @@ window.cerrarOnboarding = function() {
 };
 
 // Para abrir desde Config con los valores actuales precargados
-function abrirConfigPresupuesto() {
-  _onbData   = _leerDActual();
-  _onbStep   = 1;
+// Abre P1.5 con flags actuales precargados — solo actualiza categorías
+window.abrirActualizarCategorias = function() {
+  const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
+  _onbData = {
+    tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
+    tieneVehiculo:  perfil.tieneVehiculo  !== false,
+    tieneEmpleada:  perfil.tieneEmpleada  !== false,
+    tieneEducacion: perfil.tieneEducacion !== false,
+    tieneSeguros:   perfil.tieneSeguros   !== false,
+    _soloFlags:     true
+  };
+  _onbStep = 15;
   _renderStep();
   document.getElementById('presupuestoModal').style.display = 'flex';
+};
+
+// Abre onboarding completo desde P1 — cambia tipo de hogar e ingresos
+window.cambiarTipoHogar = function() {
+  _onbData = _leerDActual();
+  _onbStep = 1;
+  _renderStep();
+  document.getElementById('presupuestoModal').style.display = 'flex';
+};
+
+function abrirConfigPresupuesto() {
+  window.abrirActualizarCategorias();
 }
 
 // ── RENDER PASO ───────────────────────────────────────────────────────────────

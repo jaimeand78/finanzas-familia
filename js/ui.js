@@ -112,6 +112,8 @@ function renderConfigHogar() {
   const { nombre, tipo } = window.HOGAR.meta;
   const codigo   = window.HOGAR.codigoHogar;
   const miembros = Object.entries(window.HOGAR.miembros || {});
+  const tipoLabel = { soltero: 'Soltero/a', pareja: 'Pareja', familia: 'Familia' }[tipo] || tipo || '—';
+
   const chips = miembros.map(([uid, m]) => {
     const esCurrent = uid === window.UID;
     const nombre = m.nombre || (esCurrent && window.CURRENT_USER && window.CURRENT_USER.nombre) || '?';
@@ -121,10 +123,15 @@ function renderConfigHogar() {
       <span>${nombre}</span>
     </div>`;
   }).join('');
+
   el.innerHTML = `
     <div class="cfg-info-row">
       <span class="cfg-info-lbl">Nombre</span>
       <span class="cfg-info-val">${nombre || '—'}</span>
+    </div>
+    <div class="cfg-info-row">
+      <span class="cfg-info-lbl">Tipo</span>
+      <span class="cfg-info-val">${tipoLabel}</span>
     </div>
     <div class="cfg-info-row">
       <span class="cfg-info-lbl">Código</span>
@@ -134,7 +141,25 @@ function renderConfigHogar() {
     <div class="cfg-info-row" style="align-items:flex-start;">
       <span class="cfg-info-lbl">Miembros</span>
       <div class="cfg-members-row">${chips}</div>
-    </div>` : ''}`;
+    </div>` : ''}
+    <div class="cfg-hogar-actions">
+      <button class="cfg-action-btn" onclick="abrirActualizarCategorias()">
+        <span class="cfg-action-icon">🏷️</span>
+        <div class="cfg-action-info">
+          <div class="cfg-action-title">Actualizar categorías</div>
+          <div class="cfg-action-sub">Activa o desactiva vehículo, empleada, educación y más</div>
+        </div>
+        <span class="cfg-action-arrow">›</span>
+      </button>
+      <button class="cfg-action-btn danger" onclick="cambiarTipoHogar()">
+        <span class="cfg-action-icon">🔄</span>
+        <div class="cfg-action-info">
+          <div class="cfg-action-title">Cambiar tipo de hogar</div>
+          <div class="cfg-action-sub">Soltero → Pareja → Familia · reconfigura ingresos y presupuesto</div>
+        </div>
+        <span class="cfg-action-arrow">›</span>
+      </button>
+    </div>`;
 }
 
 function renderIngresosConfig() {
