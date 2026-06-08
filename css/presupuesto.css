@@ -178,7 +178,8 @@
 .cfg-collapsed { display: none !important; }
 
 /* Hogar info */
-.cfg-info-row { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; }
+.cfg-info-row { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; padding: .5rem 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cfg-info-row:last-of-type { border-bottom: none; }
 .cfg-info-lbl { color: var(--color-muted); }
 .cfg-info-val { font-weight: 600; color: var(--color-text); }
 .cfg-code { font-family: 'DM Mono', monospace; color: var(--color-primary); letter-spacing: .08em; }
