@@ -369,19 +369,21 @@ function renderAll() {
 function renderResumen() {
   if (!D.income) return;
 
+  const cats = window._catsFiltradas || D.categories || [];
+
   const tInc = D.income.reduce((s, r) => s + (r.value || 0), 0);
-  const tExp = D.categories.reduce((s, c) => {
+  const tExp = cats.reduce((s, c) => {
     return s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
   }, 0);
-  const tBud = D.categories.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
+  const tBud = cats.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
 
   const estado    = avail >= 0 ? 'Van bien 🟢' : 'Ojo con el gasto 🔴';
   const dispColor = avail >= 0 ? '#0F6E56' : '#993C1D';
 
-  // Todas las categorías con datos (incluyendo Ahorro)
-  const cats = D.categories.map(c => {
+  // Categorías con datos — usando cats filtradas
+  const catsData = cats.map(c => {
     const items = planItems(c);
     const act   = items.reduce((s, r) => s + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
     const bud   = items.reduce((s, r) => s + (r.budget || 0), 0);
@@ -398,7 +400,7 @@ function renderResumen() {
   const displayName = name => name.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\uFE0F\u20E3\u200D🏠🍽️🚗🎬👕❤️📚🛡️🎁💰🏡💸]+\s*/u, '').trim() || name;
 
   // ── BLOQUE AHORRO FIJO ────────────────────────────────────────────────────────
-  const ahorroData = cats.find(c => c.name.includes('Ahorro'));
+  const ahorroData = catsData.find(c => c.name.includes('Ahorro'));
   const ahorroEl   = document.getElementById('rAhorro');
   if (ahorroEl) {
     if (ahorroData && ahorroData.bud > 0) {
@@ -483,7 +485,7 @@ function renderResumen() {
     </div>`;
   };
 
-  const catsNoAhorro = cats.filter(c => !c.name.includes('Ahorro'));
+  const catsNoAhorro = catsData.filter(c => !c.name.includes('Ahorro'));
   const rojos        = catsNoAhorro.filter(c => c.pct > 100);
   const amarillos    = catsNoAhorro.filter(c => c.pct > 85 && c.pct <= 100);
   const verdes       = catsNoAhorro.filter(c => c.pct >= 0 && c.pct <= 85);
