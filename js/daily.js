@@ -88,7 +88,17 @@ function populateItemSel() {
   const catSel  = document.getElementById('dCat');
   const itemSel = document.getElementById('dItem');
   if (!catSel || !itemSel) return;
-  const items = DAILY_ITEMS[catSel.value] || [];
+
+  const flags = (typeof getPerfilFlags === 'function') ? getPerfilFlags() : {};
+  const ITEMS_VEHICULO = ['Cuota crédito / leasing', 'Combustible', 'Peajes', 'Parqueadero', 'Mantenimiento vehículo', 'Gasolina', 'SOAT', 'Seguro vehículo', 'Impuestos vehículo', 'Cuota del vehículo'];
+
+  let items = DAILY_ITEMS[catSel.value] || [];
+
+  // Si no tiene vehículo, filtrar ítems de vehículo en Transporte
+  if (!flags.tieneVehiculo && catSel.value.includes('Transporte')) {
+    items = items.filter(it => !ITEMS_VEHICULO.includes(it));
+  }
+
   itemSel.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
   updateNoteRequired();
 }
