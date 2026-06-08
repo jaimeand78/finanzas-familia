@@ -652,7 +652,6 @@ async function renderConfigPresupuesto() {
   el.innerHTML = cats + `
   <div class="cfg-bud-footer">
     <span class="cfg-bud-total">Total: <span class="cfg-mono">${fmt(totalGlobal)}</span></span>
-    <button class="cfg-reconf-btn" onclick="abrirConfigPresupuesto()">Reconfigurar 🧹</button>
   </div>`;
 }
 
