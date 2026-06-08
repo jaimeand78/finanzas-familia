@@ -68,7 +68,7 @@ Lema redefinido: *"Organizamos tu vida en pareja."*
 - **Etapa C:** Migración de datos a `hogares/[codigoHogar]/`
 - **Etapa D:** Finanzas v2 reconstruida con arquitectura modular (14 archivos JS)
 
-**Estado:** App en producción en `organiza2.github.io/finanzas-familia`
+**Estado:** App en producción en `organiza2.github.io/hogar`
 **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros (Jaime + Anny)
 
 ### 📅 Fase 9 — Diseño del Presupuesto Base y Onboarding (Junio 2026)

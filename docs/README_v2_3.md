@@ -4,7 +4,7 @@
 
 Organiza2 es una plataforma para organizar la vida en pareja y familia latinoamericana.
 
-**App en producción:** [organiza2.github.io/finanzas-familia](https://organiza2.github.io/finanzas-familia)
+**App en producción:** [organiza2.github.io/hogar](https://organiza2.github.io/hogar)
 
 ---
 

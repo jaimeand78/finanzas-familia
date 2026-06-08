@@ -40,7 +40,7 @@ Todos los módulos, pantallas, categorías, presupuestos, recordatorios y funcio
 ## 2. Estructura de Archivos
 
 ```
-organiza2/finanzas-familia/
+organiza2/hogar/
 ├── index.html
 ├── logo.png                  → Logo oficial (login screen)
 ├── manifest.json
