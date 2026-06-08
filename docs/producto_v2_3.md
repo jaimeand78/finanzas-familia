@@ -177,11 +177,15 @@ El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de 
 
 ---
 
-## 11. Antes del Piloto — Pendientes
+## 11. Antes del Piloto — Estado
 
-1. Rediseño tab Config — mockup primero
-2. Tab Análisis — afinar
-3. Fix iOS decimal (`type="text"` `inputmode="decimal"`)
+✅ Todos los pendientes resueltos. El piloto puede arrancar.
+
+| Item | Estado | Fase |
+|------|--------|------|
+| Rediseño tab Config | ✅ Resuelto | Fases 17, 18, 24 |
+| Tab Análisis — afinar | ✅ Resuelto | Fase 19 |
+| Fix iOS decimal | ✅ Resuelto | Fase 19 |
 
 ---
 

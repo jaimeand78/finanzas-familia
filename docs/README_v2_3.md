@@ -8,17 +8,20 @@ Organiza2 es una plataforma para organizar la vida en pareja y familia latinoame
 
 ---
 
-## Estado actual — v2.2 ✅
+## Estado actual — v2.3 ✅
 
 | Módulo | Estado |
 |--------|--------|
 | Login Google + Firebase Auth | ✅ |
 | Modelo de Hogar — crear/unirse por código | ✅ |
 | Finanzas v2 — arquitectura modular | ✅ |
-| Presupuesto Base + Onboarding 5 pantallas | ✅ |
-| Tab Resumen — semáforo por categoría | ✅ |
+| Presupuesto Base + Onboarding 6 pantallas (P1.5 flags) | ✅ |
+| Tab Resumen — ahorro fijo + semáforo + ¿Quién ha pagado? | ✅ |
+| Tab Análisis — tendencia rediseñada con daily | ✅ |
+| Tab Config — ingresos adicionales + acordeón + Mi hogar | ✅ |
+| C3 — filtro categorías/ítems por perfil del hogar | ✅ |
 | Pantalla login con logo | ✅ |
-| **Piloto 5-10 familias** | 🔲 Siguiente |
+| **Piloto 5-10 familias** | 🔲 En curso |
 
 > **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros en producción.
 
