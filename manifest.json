@@ -1,7 +1,7 @@
 {
-  "name": "Finanzas — Organiza2",
+  "name": "Organiza2",
   "short_name": "Organiza2",
-  "description": "Control de Finanzas Familiares",
+  "description": "Organizamos tu vida en pareja.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F5F3EE",
