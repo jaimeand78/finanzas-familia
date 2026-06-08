@@ -9,11 +9,11 @@
 
 | ✅ Logros | 🔲 Pendientes |
 |-----------|--------------|
-| App PWA en producción | Ingresos adicionales / bonos — próxima sesión |
-| Login Google + Firebase Auth (Etapa A) | Onboarding: activar/desactivar categorías por tipoHogar (C3) |
-| Modelo de Hogar + código invitación (Etapa B) | Piloto 5-10 familias |
-| Migración datos a hogares/ (Etapa C) | Exportar mes a PDF |
-| Finanzas v2 arquitectura modular (Etapa D) | Exportar año a Excel |
+| App PWA en producción | Piloto 5-10 familias |
+| Login Google + Firebase Auth (Etapa A) | Exportar mes a PDF |
+| Modelo de Hogar + código invitación (Etapa B) | Exportar año a Excel |
+| Migración datos a hogares/ (Etapa C) | |
+| Finanzas v2 arquitectura modular (Etapa D) | |
 | Migración Anny1130 → hogares/SNBDPA/ ✅ | |
 | Etapa E completa ✅ | |
 | Tab Resumen rediseñado — solo lectura ✅ | |
@@ -36,6 +36,12 @@
 | feat: ¿Quién ha pagado? — sección nueva al final del Resumen ✅ | |
 | fix: dailyTotals normaliza catKey sin emoji — Resumen correcto ✅ | |
 | feat: Ingresos adicionales por miembro en Config ✅ | |
+| feat: C3 — P1.5 flags de perfil, filtro categorías/ítems por hogar ✅ | |
+| fix: Bug #23 — onboarding soltero muestra un solo campo de ingreso ✅ | |
+| feat: Mi hogar con tipo + botones "Actualizar categorías" / "Cambiar tipo" ✅ | |
+| fix: Tab Hoy filtra ítems de vehículo según tieneVehiculo ✅ | |
+| fix: Tab Resumen usa categorías filtradas por perfil ✅ | |
+| fix: abrirCompletarPerfil no sobreescribe ingresos (_soloFlags) ✅ | |
 
 ---
 
@@ -330,8 +336,55 @@ Sesión de validación en producción y resolución de problemas específicos de
 - **Fix:** Agregada la clave con ítems: Salario empleada, Salario niñera, Prestaciones, Otros
 
 **Bug #22 — dailyTotals no coincidía con c.name en Resumen**
-- **Causa:** `syncDailyMonth()` acumulaba usando `v.category` con emoji (ej. `'🤝 Servicio Doméstico'`) pero `renderResumen()` busca por `c.name` sin emoji (ej. `'Servicio Doméstico'`)
+- **Causa:** `syncDailyMonth()` acumulaba usando `v.category` con emoji pero `renderResumen()` busca por `c.name` sin emoji
 - **Fix:** Normalizar `catKey` con `.replace(/^\S+\s/, '')` antes de acumular
+
+**Bug #23 — Onboarding P3 mostraba dos campos de ingreso para hogar Soltero**
+- **Causa:** `_tpl3()` siempre renderizaba dos campos sin verificar `tipoHogar`
+- **Fix:** Condicionar segundo campo con `!esSoltero`
+
+**Bug #24 — `guardarPresupuestoBase` sobreescribía ingresos al completar perfil**
+- **Causa:** `_aplicarOnbDataAD()` se ejecutaba con `inc1/inc2` vacíos al venir de `abrirCompletarPerfil`
+- **Fix:** Flag `_soloFlags: true` omite `_aplicarOnbDataAD()` y `save()` — DA-20
+
+**Bug #25 — Ingresos SNBDPA borrados por `save()` prematuro**
+- **Fix:** Restaurados manualmente vía consola del navegador con `db.ref(...).set([...])`
+
+**Bug #26 — `onbNext` navegaba a P2 aunque `_soloFlags: true`**
+- **Fix:** Detectar `_soloFlags` en `onbNext` y llamar `guardarPresupuestoBase()` directo
+
+**Bug #27 — Toggle switch apagado invisible**
+- **Causa:** `background: var(--color-border-secondary)` era casi transparente
+- **Fix:** Color explícito `#B4B2A9`
+
+**Bug #28 — `onclick="onbToggle(key, this)"` no funcionaba en móvil**
+- **Fix:** `id="sw-${key}"` en cada switch + `getElementById('sw-' + key)` en handler
+
+**Bug #29 — `renderResumen` usaba `D.categories` sin filtrar**
+- **Fix:** Usar `window._catsFiltradas` calculado en `renderAll()`
+
+**Bug #30 — `populateItemSel` no filtraba ítems de vehículo**
+- **Fix:** Lista `ITEMS_VEHICULO` y filtro por `tieneVehiculo` en `populateItemSel()`
+
+**Bug #31 — Campo `tipo` en Firebase vs `tipoHogar` en código**
+- **Fix:** Fallback `meta.tipo || meta.tipoHogar` en todas las lecturas
+
+**Bug #32 — Nombres de miembros en mayúsculas (ANNY)**
+- **Fix:** Comparación `.toLowerCase()` + capitalizar primer letra en display
+
+---
+
+### 📅 Fase 24 — C3 completo: filtro de categorías por perfil del hogar (Junio 2026)
+
+**Decisiones clave:**
+- P1.5 nueva pantalla entre P1 y P2 con 4 toggles: Vehículo, Servicio Doméstico, Educación (solo Familia), Seguros
+- Flags en `hogares/[codigo]/perfil/`: `tieneVehiculo`, `tieneEmpleada`, `tieneEducacion`, `tieneSeguros`, `perfilCompleto`
+- Transporte siempre visible — sin vehículo muestra solo "Transporte público" y "Otros"
+- Hogares existentes: banner azul "Completa tu perfil" una sola vez al propietario
+- Config → Mi hogar: "Actualizar categorías" (P1.5) y "Cambiar tipo de hogar" (onboarding completo)
+- Botón "Reconfigurar 🧹" eliminado del footer de Presupuesto base
+
+**Archivos modificados:** `js/presupuesto.js`, `js/app.js`, `js/finanzas.js`, `js/daily.js`, `js/ui.js`, `css/presupuesto.css`, `index.html`
 
 ---
 
@@ -345,25 +398,26 @@ Sesión de validación en producción y resolución de problemas específicos de
 **DA-17:** Siempre pedir el archivo actual antes de modificarlo — ver `REGLAS_IA.md`.
 **DA-18:** Config es una vista de configuración anual — nunca filtrar ítems de fecha fija por el mes actual.
 **DA-19:** Ahorro es un indicador de primer nivel en el Resumen — siempre visible en posición fija, no mezclado con el semáforo de categorías.
+**DA-20:** `_soloFlags: true` en `_onbData` indica flujo de solo actualización de flags — nunca llama `_aplicarOnbDataAD()` ni `save()`.
 
 ---
 
 ## 5. Deuda Técnica
 
-### 🔴 Prioridad Alta — Antes del piloto
-- **Onboarding tipoHogar:** Activar/desactivar categorías según tipo de hogar (C3). Hogares sin empleada no deben ver Servicio Doméstico con $0 sin contexto.
-
 ### 🟡 Prioridad Media — Post-piloto
+- Indicador visual de ítems que varían por mes (cesantías, SOAT, predial) en Config
 - Exportar mes a PDF
 - Exportar año completo a Excel
 - Presupuesto Base se aplica automáticamente al crear mes nuevo
-- Feedback in-app conectado a canal Discord (post-piloto, WhatsApp resuelve durante el piloto)
-- Onboarding dinámico completo por tipo de hogar (hijos, empleados, vehículo)
+- Feedback in-app conectado a canal Discord
+- Orden de categorías e ítems por frecuencia de uso
+- Modales inyectados desde JS en lugar de HTML estático (escalabilidad)
 
 ### 🟢 Prioridad Baja
 - Modo oscuro
 - Comparar mes actual vs mismo mes año anterior
 - Historial de cambios en presupuesto por ítem
+- Bug #23 verificar con cuenta nueva de Google (soltero real)
 
 ---
 
@@ -383,13 +437,17 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 > **Documentar los textos aprobados en la bitácora.**
 
-> **Config es configuración anual, no vista mensual.** Los ítems de fecha fija deben mostrar siempre su budget real — DA-18.
+> **Config es configuración anual, no vista mensual.** — DA-18.
 
 > **Los scripts one-shot de parche son la herramienta correcta para migrar datos puntuales.**
 
-> **El ahorro no es una categoría más — es el primer indicador de disciplina financiera.** Siempre en posición prominente, antes del semáforo de gastos — DA-19.
+> **El ahorro no es una categoría más — es el primer indicador de disciplina financiera.** — DA-19.
 
-> **Las notas de voz del usuario son auditorías de producto.** Procesarlas sistemáticamente antes de cada piloto para convertirlas en bugs y features priorizados.
+> **Las notas de voz del usuario son auditorías de producto.** Procesarlas sistemáticamente antes de cada piloto.
+
+> **`_soloFlags` es el patrón correcto para flujos parciales del onboarding.** Nunca asumir que un flujo parcial puede llamar funciones de guardado completo — DA-20.
+
+> **Siempre verificar en Firebase antes de asumir pérdida de datos.** Los datos pueden estar intactos aunque la UI no los muestre.
 
 ---
 
@@ -399,26 +457,18 @@ Sesión de validación en producción y resolución de problemas específicos de
 |------|-------------|
 | *(ver commits anteriores)* | Etapas A-D |
 | 0bf4024 | feat: Etapa E — Presupuesto Base, onboarding 5 pantallas, DAILY_ITEMS |
-| [confirmar] | fix: onboarding — textos y botón cancelar en resumen |
-| [confirmar] | feat: tab Resumen rediseñado — semáforo por categoría, solo lectura |
-| [confirmar] | feat: pantalla de login rediseñada con logo y beneficios |
-| [confirmar] | fix: fondo blanco en tarjetas verdes del Resumen |
-| [confirmar] | fix: calcPresupuestoBase, buildIncomeFromPerfil y renderAll completo |
-| [confirmar] | fix: Config limpio — sin bloques v1, solo hogar y presupuesto base |
-| [confirmar] | fix: nombres categorías, orden semáforo y fondo tarjetas en Resumen |
-| [confirmar] | docs: REGLAS_IA.md — reglas de trabajo para asistentes IA |
-| [confirmar] | docs: bitacora v2.5, arquitectura v2.3, producto v2.3, README actualizados |
-| [confirmar] | refactor: íconos globales — utils.js (ICONS + DAILY_ITEMS) + index.html |
-| [confirmar] | feat: renderHormiga() reescrita — lógica real gastos hormiga, umbral $20k |
-| [confirmar] | refactor: onboarding — _tx(), íconos, textos singular/plural, sin Mixto |
-| 60182e9 | feat: rediseño tab Config — secciones colapsables, acordeón presupuesto, modales edición |
-| [confirmar] | fix: nombres miembros en Config — guardar displayName en Firebase |
-| [confirmar] | fix: onboarding P4 servicios/transporte — total a ítem principal |
-| [confirmar] | feat: Tendencia rediseñada — daily incluido, barras dobles, promedio, insight dinámico |
-| [confirmar] | fix: Config carga budget anual — ítems fecha fija muestran valor real (DA-18) |
-| [confirmar] | fix: onboarding P1 — subtítulo neutro, sin plural prematuro |
-| [pendiente] | feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy |
-| [pendiente] | feat: ingresos adicionales por miembro en Config — modal agregar/editar/eliminar |
+| [confirmar] | feat: Resumen mejorado — ahorro arriba, quién pagó, fix Servicio Doméstico Tab Hoy |
+| [confirmar] | feat: ingresos adicionales por miembro en Config — modal agregar/editar/eliminar |
+| [confirmar] | fix: P3 onboarding oculta segundo ingreso para hogar Soltero |
+| [confirmar] | feat: C3 onboarding P1.5 — flags perfil, filtro categorias por hogar, completa tu perfil |
+| [confirmar] | fix: abrirCompletarPerfil guarda directo desde P1.5 sin navegar resto del onboarding |
+| [confirmar] | fix: toggles P1.5 usan id fijo y getElementById para compatibilidad movil |
+| [confirmar] | fix: toggle switch apagado color gris explicito para mayor contraste |
+| [confirmar] | fix: renderResumen usa categorias filtradas por perfil del hogar |
+| [confirmar] | fix: Tab Hoy filtra items de vehiculo en Transporte segun tieneVehiculo |
+| [confirmar] | fix: Transporte sin vehiculo muestra solo Transporte publico y Otros |
+| [confirmar] | feat: Mi hogar con tipo + botones actualizar categorias y cambiar tipo de hogar |
+| [confirmar] | fix: espaciado cfg-info-row y eliminar boton Reconfigurar de presupuesto base |
 
 ---
 
@@ -438,10 +488,17 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 ## 9. Próxima Sesión
 
-**Pendiente antes del piloto:**
-1. **Onboarding tipoHogar** — activar/desactivar categorías según tipo de hogar (C3). Único bloqueante restante.
+**El piloto v2.3 está listo para lanzar.** No hay bloqueantes técnicos pendientes.
 
-**Con ese cambio el piloto v2.3 está listo para lanzar.**
+**Al arrancar el piloto:**
+- Compartir la app con 5-10 familias
+- Canal WhatsApp para feedback durante las primeras 4 semanas
+- Criterios de éxito: 3 semanas de uso continuo, al menos 3 familias registrando gastos diariamente
+
+**Post-piloto según feedback:**
+- Indicador visual de ítems que varían por mes
+- Orden de categorías por frecuencia de uso
+- Feedback in-app con Discord
 
 ---
 
