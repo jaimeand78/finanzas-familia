@@ -192,20 +192,20 @@ Evitar:
 
 # Estado Actual del Proyecto
 
-**Fase actual:** Pre-piloto v2.3
+**Fase actual:** v2.3 — Piloto listo para lanzar
 
 **Implementado y en producción:**
 * Login Google + Firebase Auth
 * Modelo de Hogar con código de invitación
-* Presupuesto Base con onboarding conversacional
-* Tab Hoy — registro diario con selector categoría → ítem (incluye 🤝 Servicio Doméstico)
-* Tab Resumen — solo lectura: disponible · Ingresan/Gastado · Ahorro fijo · semáforo · ¿Quién ha pagado?
+* Presupuesto Base con onboarding conversacional (6 pantallas: P1 → P1.5 → P2 → P3 → P4 → P5)
+* P1.5 — flags de perfil: tieneVehiculo, tieneEmpleada, tieneEducacion, tieneSeguros
+* Tab Hoy — registro diario filtrado por perfil del hogar (categorías e ítems según flags)
+* Tab Resumen — solo lectura: disponible · Ingresan/Gastado · Ahorro fijo · semáforo filtrado · ¿Quién ha pagado?
 * Tab Análisis — Semáforo histórico · Tendencia con daily · Hormiga
-* Tab Config — Mi hogar · Ingresos · Presupuesto base · Cerrar sesión
+* Tab Config — Mi hogar (tipo + Actualizar categorías + Cambiar tipo de hogar) · Ingresos por miembro con adicionales · Presupuesto base · Cerrar sesión
+* Banner "Completa tu perfil" para hogares existentes sin flags configurados
 
-**Pendiente antes del piloto:**
-* Ingresos adicionales / bonos en Config → Ingresos (mockup primero)
-* Onboarding: activar/desactivar categorías por tipoHogar
+**No hay bloqueantes técnicos. El piloto puede arrancar.**
 
 **Módulos futuros:**
 * Planeador — no construir hasta validar Finanzas con familias reales
@@ -230,6 +230,7 @@ Evitar:
 | DA-17 | Siempre leer el archivo actual antes de modificarlo |
 | DA-18 | Config muestra budget anual — nunca filtrar ítems de fecha fija por mes actual |
 | DA-19 | Ahorro es indicador de primer nivel — posición fija en Resumen, antes del semáforo |
+| DA-20 | `_soloFlags: true` en `_onbData` indica flujo parcial — nunca llama `_aplicarOnbDataAD()` ni `save()` |
 
 ---
 
