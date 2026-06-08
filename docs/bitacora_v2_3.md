@@ -469,6 +469,31 @@ Sesión de validación en producción y resolución de problemas específicos de
 | [confirmar] | fix: Transporte sin vehiculo muestra solo Transporte publico y Otros |
 | [confirmar] | feat: Mi hogar con tipo + botones actualizar categorias y cambiar tipo de hogar |
 | [confirmar] | fix: espaciado cfg-info-row y eliminar boton Reconfigurar de presupuesto base |
+| — | docs: marcar pendientes pre-piloto como resueltos — README actualizado a v2.3 |
+| — | chore: simplificar título de la app |
+| — | ui: reemplazar marca Finanzas por Organiza2 en topbar y manifest |
+
+---
+
+## Fase 25 — Alineación de identidad de marca (Junio 2026)
+
+**Contexto:** Revisión pre-piloto de coherencia entre la visión del producto ("Organiza2 no es una app financiera") y los artefactos visibles al usuario.
+
+**Hallazgos:**
+- `<title>` decía "Organiza2 — Finanzas" → desalineado con identidad redefinida
+- Topbar mostraba "💰 Finanzas" → primer impacto visual incorrecto
+- `manifest.json` tenía `name: "Finanzas — Organiza2"` y `description: "Control de Finanzas Familiares"`
+- Documentación (`producto_v2_3.md`, `README_v2_3.md`) desactualizada respecto al estado real
+
+**Cambios aplicados:**
+- `index.html`: `<title>` → `Organiza2`; topbar → ícono `icono-181.png` + "Organiza2"
+- `manifest.json`: `name` → "Organiza2"; `description` → "Organizamos tu vida en pareja."
+- `docs/README_v2_3.md`: versión v2.2 → v2.3; tabla de módulos completada con C3, Config, Análisis
+- `docs/producto_v2_3.md`: Sección 11 — pendientes pre-piloto marcados como ✅ resueltos
+
+**Promesas del login validadas:** Las tres promesas ("Saben en qué se va el dinero", "Deciden juntos sin sorpresas", "Paz mental a fin de mes") están alineadas con la visión. No requieren cambio.
+
+**Decisión:** La identidad visible de la app ahora es coherente con la visión de plataforma de organización familiar, no app financiera.
 
 ---
 
