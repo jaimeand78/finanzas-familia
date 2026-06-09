@@ -32,8 +32,9 @@ function go(tab) {
   }
   if (tab === 'c') {
     renderConfigHogar();
-    if (typeof renderIngresosConfig  === 'function') renderIngresosConfig();
-    if (typeof renderConfigPresupuesto === 'function') renderConfigPresupuesto();
+    if (typeof renderIngresosConfig      === 'function') renderIngresosConfig();
+    if (typeof renderConfigPresupuesto   === 'function') renderConfigPresupuesto();
+    renderConfigHogarAcciones();
   }
 }
 
@@ -142,24 +143,7 @@ function renderConfigHogar() {
       <span class="cfg-info-lbl">Miembros</span>
       <div class="cfg-members-row">${chips}</div>
     </div>` : ''}
-    <div class="cfg-hogar-actions">
-      <button class="cfg-action-btn" onclick="abrirActualizarCategorias()">
-        <span class="cfg-action-icon">🏷️</span>
-        <div class="cfg-action-info">
-          <div class="cfg-action-title">Actualizar categorías</div>
-          <div class="cfg-action-sub">Activa o desactiva vehículo, empleada, educación y más</div>
-        </div>
-        <span class="cfg-action-arrow">›</span>
-      </button>
-      <button class="cfg-action-btn danger" onclick="cambiarTipoHogar()">
-        <span class="cfg-action-icon">🔄</span>
-        <div class="cfg-action-info">
-          <div class="cfg-action-title">Cambiar tipo de hogar</div>
-          <div class="cfg-action-sub">Soltero → Pareja → Familia · reconfigura ingresos y presupuesto</div>
-        </div>
-        <span class="cfg-action-arrow">›</span>
-      </button>
-    </div>`;
+    `;
 }
 
 function renderIngresosConfig() {
@@ -187,7 +171,7 @@ function renderIngresosConfig() {
   miembros.forEach((mbr, mi) => {
     const primerNombre = mbr.nombre.split(' ')[0].toLowerCase();
     const fijosMbr  = fijos.filter(r => r.label && r.label.toLowerCase().includes(primerNombre));
-    const extrasMbr = extras.filter(r => r.quien === mbr.nombre);
+    const extrasMbr = extras.filter(r => r.quien && r.quien.toLowerCase().includes(primerNombre));
 
     const nombreDisplay = mbr.nombre.charAt(0).toUpperCase() + mbr.nombre.slice(1).toLowerCase();
     if (mi > 0) html += `<div class="cfg-member-divider"></div>`;
@@ -246,6 +230,22 @@ function renderIngresosConfig() {
   const total = D.income.reduce((s, r) => s + (r.value || 0), 0);
   html += `<div class="cfg-income-total">Total: <span class="cfg-mono">${fmt(total)}</span></div>`;
   el.innerHTML = html;
+}
+
+// ── CONFIGURACIÓN DEL HOGAR — sección al final de Config ─────────────────────
+
+function renderConfigHogarAcciones() {
+  const el = document.getElementById('hogarAcciones');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="cfg-action-row" onclick="abrirActualizarCategorias()">
+      <span class="cfg-action-row-lbl">Actualizar categorías</span>
+      <span class="cfg-action-row-arr">›</span>
+    </div>
+    <div class="cfg-action-row danger" onclick="cambiarTipoHogar()">
+      <span class="cfg-action-row-lbl">Cambiar tipo de hogar</span>
+      <span class="cfg-action-row-arr">›</span>
+    </div>`;
 }
 
 // ── PWA iOS ───────────────────────────────────────────────────────────────────

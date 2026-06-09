@@ -497,6 +497,56 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 ---
 
+## Fase 26 — Bugs pre-piloto resueltos (Junio 2026)
+
+**Contexto:** Revisión exhaustiva antes del lanzamiento del piloto. Detectados y resueltos 6 bugs funcionales y 2 de diseño.
+
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | fix: bugs pre-piloto — onboarding, Config, ingresos, transporte |
+| — | docs: Fase 26 — bugs pre-piloto resueltos |
+
+### Bugs resueltos
+
+**Bug #33 — P1 onboarding sin botón Cancelar**
+- **Causa:** `_tpl1()` solo tenía botón "Continuar", sin forma de cerrar el modal
+- **Fix:** Agregado botón Cancelar en footer de P1
+- **Archivo:** `presupuesto.js`
+
+**Bug #34 — `defD()` Transporte incompleto**
+- **Causa:** Solo tenía Gasolina y Transporte público — faltaban Peajes, Parqueadero, Mantenimiento, Cuota crédito
+- **Fix:** Agregados los 4 ítems faltantes en `defD()`
+- **Archivo:** `finanzas.js`
+
+**Bug #35 — Restaurantes en Alimentación**
+- **Causa:** `defD()` heredado de v1 tenía Restaurantes en Alimentación
+- **Fix:** Eliminado de Alimentación — pertenece a Entretenimiento
+- **Archivo:** `finanzas.js`
+- **Nota SNBDPA:** requiere limpieza manual en Firebase
+
+**Bug #36 — Modal Config no muestra ítems de fecha fija**
+- **Causa:** `abrirModalCategoria` usaba solo `D` (mes actual) — ítems con `months[]` de otros meses no aparecían
+- **Fix:** Modal cruza `defD()` + `D`; ítems de otro mes se muestran deshabilitados con badge del mes
+- **Archivo:** `presupuesto.js`
+
+**Bug #37 — Onboarding no precarga valores al reconfigurar**
+- **Causa:** `_leerDActual()` tenía 3 labels incorrectos: `Arriendo / Hipoteca`, `Combustible`, `Ahorro programado`
+- **Fix:** Corregidos a `Hipoteca / Arriendo`, `Gasolina`, `Ahorro mensual`
+- **Archivo:** `presupuesto.js`
+
+**Bug #38 — Ingresos adicionales aparecen antes del ingreso base**
+- **Causa:** `r.quien === mbr.nombre` fallaba por diferencias de capitalización (ANNY vs Anny)
+- **Fix:** Comparación normalizada con `.toLowerCase().includes(primerNombre)`
+- **Archivo:** `ui.js`
+
+**Bug #39 — Sección "Configuración del hogar" mezclada con Mi hogar**
+- **Causa:** Botones vivían dentro de `renderConfigHogar()` sin separación visual
+- **Fix:** Nueva sección colapsable "🔄 Configuración del hogar" al final de Config con diseño de filas tipo texto
+- **Archivos:** `ui.js`, `index.html`, `presupuesto.css`
+
+---
+
 ## 8. Roadmap
 
 | Versión | Hitos | Estado |

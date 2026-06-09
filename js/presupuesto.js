@@ -113,6 +113,7 @@ function _tpl1() {
     </div>
   </div>
   <div class="onb-foot">
+    <button class="onb-skip" onclick="cerrarOnboarding()">Cancelar</button>
     <button class="onb-pri" onclick="onbNext()" ${!_onbData.tipoHogar ? 'disabled' : ''}>Continuar →</button>
   </div>
 </div>`;
@@ -668,29 +669,48 @@ window.cfgCatToggle = function(ci) {
 window.abrirModalCategoria = function(ci) {
   const cat = D && D.categories && D.categories[ci];
   if (!cat) return;
-  const items = planItems(cat);
+
+  // Usar defD() como fuente de todos los ítems posibles de la categoría
+  // para incluir los de fecha fija (months[]) que no están en el mes actual
+  const defCat = defD().categories.find(c => c.name === cat.name);
+  const defItems = defCat ? defCat.items : [];
+
+  // Cruzar: para cada ítem de defD, buscar el valor real en D (o planItems)
+  const itemsD = planItems(cat);
+  const items = defItems.map(di => {
+    const found = itemsD.find(r => r.label === di.label);
+    return found || di;
+  });
+  // Agregar ítems que estén en D pero no en defD (ítems legacy o custom)
+  itemsD.forEach(r => {
+    if (!items.find(i => i.label === r.label)) items.push(r);
+  });
+
   const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const freqs = ['mensual','bimestral','trimestral','semestral','anual'];
 
-  const rows = items.map((r, ri) => {
+  const rows = items.map((r) => {
+    // Buscar índice real en D.categories[ci].items para los updaters
+    const ri = (D.categories[ci].items || []).findIndex(it => it.label === r.label);
     const tieneMes = r.months && r.months.length;
     const mesActual = tieneMes ? r.months[0] : null;
     const control = tieneMes
       ? `<select class="cfg-freq-sel" style="border-color:var(--color-primary);background:rgba(29,158,117,.07);color:var(--color-primary);"
-           onchange="updMes(${ci},${ri},this.value)">
+           ${ri < 0 ? 'disabled' : `onchange="updMes(${ci},${ri},this.value)"`}>
            ${MESES.map((m, idx) => `<option value="${idx}"${idx === mesActual ? ' selected' : ''}>${m}</option>`).join('')}
          </select>`
-      : `<select class="cfg-freq-sel" onchange="updFrecuencia(${ci},${ri},this.value)">
+      : `<select class="cfg-freq-sel" ${ri < 0 ? 'disabled' : `onchange="updFrecuencia(${ci},${ri},this.value)"`}>
            ${freqs.map(f => `<option value="${f}"${(r.frecuencia||'mensual')===f?' selected':''}>${f}</option>`).join('')}
          </select>`;
+    const budgetVal = r.budget || 0;
     return `
     <div class="cfg-modal-row">
-      <label class="cfg-modal-lbl">${r.label}</label>
+      <label class="cfg-modal-lbl">${r.label}${tieneMes ? ` <span style="font-size:10px;color:var(--color-primary);">(${MESES[r.months[0]]})</span>` : ''}</label>
       <div style="display:flex;gap:6px;align-items:center;">
         <div class="onb-iw" style="flex:1;"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal"
-            value="${r.budget || ''}" placeholder="0"
-            oninput="updBudget(${ci},${ri},this.value)" />
+            value="${budgetVal || ''}" placeholder="0"
+            ${ri < 0 ? 'disabled title="Configura este ítem en el mes correspondiente"' : `oninput="updBudget(${ci},${ri},this.value)"`} />
         </div>
         ${control}
       </div>
@@ -855,13 +875,13 @@ function _leerDActual() {
   return {
     inc1:       (D.income && D.income[0] && D.income[0].value) || 0,
     inc2:       (D.income && D.income[1] && D.income[1].value) || 0,
-    arriendo:   g('Vivienda',       'Arriendo / Hipoteca'),
+    arriendo:   g('Vivienda',       'Hipoteca / Arriendo'),
     servicios:  g('Vivienda','Agua y Energía') + g('Vivienda','Gas') + g('Vivienda','Internet'),
-    transporte: g('Transporte',     'Combustible'),
+    transporte: g('Transporte',     'Gasolina'),
     cuotaVeh:   g('Transporte',     'Cuota crédito / leasing'),
     mercado:    g('Alimentación',   'Mercado'),
     entrete:    g('Entretenimiento','Salidas'),
-    ahorro:     g('Ahorro',         'Ahorro programado'),
+    ahorro:     g('Ahorro',         'Ahorro mensual'),
     tipoHogar:  (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.tipoHogar) || '',
     reto:       (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.reto) || ''
   };
