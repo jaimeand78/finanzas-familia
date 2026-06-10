@@ -547,6 +547,54 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 ---
 
+## Fase 27 — Sincronización de catálogos DAILY_ITEMS / defD() / onboarding (Junio 2026)
+
+**Contexto:** Durante la preparación del piloto se detectó que `defD()`, `DAILY_ITEMS` y `_aplicarOnbDataAD()` nunca estuvieron sincronizados. La causa raíz fue que crecieron de forma independiente desde v1 sin una revisión cruzada. El problema estaba oculto porque `migrateCategories()` parcheaba los datos de SNBDPA en tiempo real. Al limpiar `pl/` y arrancar desde cero, el problema quedó completamente expuesto.
+
+**Decisiones de producto tomadas:**
+- Catálogo único y definitivo — `DAILY_ITEMS` y `defD()` son idénticos en categorías e ítems
+- Regla de nomenclatura: primera letra de cada palabra principal en mayúscula (ej. `Frutas y Verduras`)
+- `Entretenimiento` renombrado a `Entretenimiento y Salidas`
+- `Servicio doméstico` eliminado de Vivienda — tiene su propia categoría
+- `Salario empleada` + `Salario niñera` → `Salario` (agrupador único)
+- Alimentación: `Mercado` reemplazado por `Frutas y Verduras` · `Aseo y Víveres` · `Loncheras`
+- Onboarding P5 "Mercado y loncheras" → divide el valor en 3 partes iguales entre los tres ítems
+- Transporte: `Gasolina` → `Combustible` (más genérico)
+- Ahorro: `Ahorro mensual` → `Ahorro Programado` + `Fondo Emergencia`
+- `Otros` solo en `DAILY_ITEMS` — no en `defD()`
+- Educación y Servicio Doméstico agregadas como categorías completas en `defD()`
+- Seguros e Impuestos: labels separados (`Seguro de Vida`, `Seguro de Hogar`, `Seguro Vehículo`)
+
+**Archivos modificados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `js/finanzas.js` | `defD()` reescrito completo — 11 categorías, 60+ ítems sincronizados |
+| `js/utils.js` | `DAILY_ITEMS` sincronizado · `ITEM_RENAMES` expandido · `migrateCategories` actualizada · `ICONS` actualizado |
+| `js/presupuesto.js` | `_aplicarOnbDataAD()` labels corregidos · mercado÷3 · `_leerDActual()` actualizado · Bug #36 Opción B (`_getOrCreateItem`) · Botón Cancelar P1 · `tieneBudget` detección |
+| `js/daily.js` | `ITEMS_VEHICULO` labels actualizados |
+
+**Limpieza Firebase SNBDPA:**
+- `pl/2025` eliminado — sin datos reales, legacy de v1
+- `pl/2026` eliminado — datos legacy con labels incorrectos de v1
+- `hogares/SNBDPA/pl/2026` · Restaurantes eliminado de Alimentación (12 meses)
+- Hogar reconfigurado desde cero con catálogo v2 limpio
+
+**Commits:**
+| Commit | Descripción |
+|--------|-------------|
+| 9fe42ff | fix: bugs pre-piloto — onboarding, Config, ingresos, transporte |
+| 705d2ff | fix: modal Config crea ítems nuevos en D al editar — Bug #36 Opción B |
+| — | fix: quitar Restaurantes de Alimentación en defD |
+| — | fix: detectar presupuesto no configurado por budget=0 |
+| — | fix: label Combustible → Gasolina en _aplicarOnbDataAD |
+| — | fix: quitar Restaurantes de migrateCategories |
+| 5b77a5e | fix: sincronizar defD(), DAILY_ITEMS y onboarding — catálogos unificados v2 |
+
+**Lección aprendida:** `defD()`, `DAILY_ITEMS` y `migrateCategories` son tres artefactos del mismo catálogo — deben modificarse siempre juntos. Cualquier cambio en uno requiere revisión de los otros dos. Documentar esta regla en `REGLAS_IA.md`.
+
+---
+
 ## 8. Roadmap
 
 | Versión | Hitos | Estado |
@@ -565,15 +613,22 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 **El piloto v2.3 está listo para lanzar.** No hay bloqueantes técnicos pendientes.
 
+**Antes de lanzar:**
+- Verificar onboarding completo end-to-end en SNBDPA (post limpieza de pl/)
+- Confirmar que Tab Hoy, Resumen y Análisis muestran datos correctos con catálogo v2
+
 **Al arrancar el piloto:**
-- Compartir la app con 5-10 familias
-- Canal WhatsApp para feedback durante las primeras 4 semanas
+- Mensaje de invitación redactado y aprobado (bit.ly/Organiza2)
+- Grupo WhatsApp "Organiza2 · Piloto Familias" creado
+- Canal de feedback activo durante 4 semanas
 - Criterios de éxito: 3 semanas de uso continuo, al menos 3 familias registrando gastos diariamente
 
 **Post-piloto según feedback:**
 - Indicador visual de ítems que varían por mes
 - Orden de categorías por frecuencia de uso
 - Feedback in-app con Discord
+- Personalización: agregar ítems propios al presupuesto (v1 feature, deferred)
+- Documentar regla en REGLAS_IA.md: defD() + DAILY_ITEMS + migrateCategories siempre se modifican juntos
 
 ---
 

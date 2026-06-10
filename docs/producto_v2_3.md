@@ -124,20 +124,21 @@ El Resumen responde una sola pregunta: **¿cómo vamos?**
 
 Lenguaje conversacional, no financiero. *"Lo que sí o sí hay que pagar"* en lugar de *"Gastos fijos"*.
 
-### Categorías Oficiales v2.0
+### Categorías Oficiales v2.3
 
 | # | Categoría | Tipo |
 |---|-----------|------|
 | 1 | 🏠 Vivienda | Fijos + variables |
-| 2 | 🍽️ Alimentación | Variables |
+| 2 | 🧺 Alimentación | Variables |
 | 3 | 🚗 Transporte | Fijos + variables |
-| 4 | 🎬 Entretenimiento | Fijos + variables |
+| 4 | 🍿 Entretenimiento y Salidas | Fijos + variables |
 | 5 | 👕 Vestuario | Variables |
-| 6 | ❤️ Salud y Belleza | Fijos + variables |
+| 6 | 💅 Salud y Belleza | Fijos + variables |
 | 7 | 📚 Educación | Fijos + variables |
 | 8 | 🛡️ Seguros e Impuestos | Anuales / por mes |
 | 9 | 🎁 Regalos y Celebraciones | Variables |
-| 10 | 💰 Ahorro | Fijo mensual |
+| 10 | 🐷 Ahorro | Fijo mensual |
+| 11 | 🤝 Servicio Doméstico | Fijos + variables |
 
 ### Modelo de Colaboración
 

@@ -141,14 +141,18 @@ organiza2-a09ef (Realtime Database)
 
 ---
 
-## 6. Dos Niveles de Detalle — DA-10
+## 6. Catálogo Único — DA-10 (actualizado Junio 2026)
 
-**Nunca mezclar estos dos catálogos:**
+**`defD()` y `DAILY_ITEMS` son el mismo catálogo.** Desde v2.3 ambos tienen exactamente las mismas categorías e ítems con los mismos labels.
 
-| Nivel | Constante/Función | Dónde se usa | Propósito |
-|-------|------------------|--------------|-----------|
-| Agrupado | `defD()` | Tab Config, presupuesto base | Planear el mes |
-| Detallado | `DAILY_ITEMS` | Tab Hoy, registro diario | Entender en qué se gastó |
+| Constante/Función | Dónde se usa | Propósito |
+|------------------|--------------|-----------|
+| `defD()` | Tab Config, presupuesto base, onboarding | Planear el mes — incluye `budget`, `fixed`, `months` |
+| `DAILY_ITEMS` | Tab Hoy, registro diario | Registrar gastos — incluye `Otros` en cada categoría |
+
+**Diferencia única:** `DAILY_ITEMS` tiene `Otros` en cada categoría. `defD()` no.
+
+**Regla crítica:** Cualquier cambio en categorías o ítems debe aplicarse en los tres artefactos simultáneamente: `defD()` + `DAILY_ITEMS` + `migrateCategories`. Nunca modificar uno sin los otros.
 
 ---
 
@@ -210,10 +214,10 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-7 | `getCapabilidades(perfil)` controla toda la UX — pendiente implementar | 🔲 Pendiente |
 | DA-8 | `calcPresupuestoBase(item, mes)` — única función de provisión mensual | ✅ Implementado |
 | DA-9 | Perfil progresivo — app sugiere completar contextualmente | 🔲 Pendiente |
-| DA-10 | Dos niveles: `defD()` para presupuesto, `DAILY_ITEMS` para diario | ✅ Implementado |
+| DA-10 | Catálogo único: `defD()` y `DAILY_ITEMS` son idénticos — modificar siempre juntos con `migrateCategories` | ✅ Implementado |
 | DA-11 | Ingresos dinámicos desde `buildIncomeFromPerfil()` | ✅ Implementado |
 | DA-12 | Cuota crédito vehículo en Transporte, no en Vivienda | ✅ Implementado |
-| DA-13 | Restaurantes → Entretenimiento (no Alimentación) | ✅ Implementado |
+| DA-13 | Restaurantes en Entretenimiento y Salidas — eliminado de Alimentación | ✅ Implementado |
 | DA-14 | Tab Resumen es solo lectura — sin inputs | ✅ Implementado |
 | DA-15 | Login con logo oficial `logo.png` | ✅ Implementado |
 | DA-16 | Config solo muestra configuración — no gastos reales del mes | ✅ Implementado |
