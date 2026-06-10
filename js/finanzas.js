@@ -52,12 +52,8 @@ function defD() {
         { label:'Mercado', value:0, budget:0, fixed:false }
       ]},
       { name:'Transporte', items:[
-        { label:'Gasolina',                value:0, budget:0, fixed:false },
-        { label:'Transporte público',      value:0, budget:0, fixed:false },
-        { label:'Peajes',                  value:0, budget:0, fixed:false },
-        { label:'Parqueadero',             value:0, budget:0, fixed:false },
-        { label:'Mantenimiento vehículo',  value:0, budget:0, fixed:false },
-        { label:'Cuota crédito / leasing', value:0, budget:0, fixed:false }
+        { label:'Gasolina',           value:0, budget:0, fixed:false },
+        { label:'Transporte público', value:0, budget:0, fixed:false }
       ]},
       { name:'Salud y Belleza', items:[
         { label:'Droguería',    value:0, budget:0, fixed:false },
