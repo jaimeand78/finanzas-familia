@@ -87,27 +87,41 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
 
 ---
 
-## 7. Módulo Finanzas — Estado v2.2
+## 7. Módulo Finanzas — Estado v2.5
 
 ### Tabs
 
 | Tab | Propósito | Tipo |
 |-----|-----------|------|
-| 💰 Hoy | Registrar gastos del día | Escritura |
-| 📊 Resumen | Ver cómo va el mes — semáforo por categoría | Solo lectura |
-| 📈 Análisis | Semáforo histórico, tendencia, gastos hormiga | Solo lectura |
+| ✏️ Hoy | Registrar gastos del día | Escritura |
+| 📊 Cómo vamos | Ver cómo va el mes — diseño simple para cualquier usuario | Solo lectura |
+| 📈 Análisis | Semáforo histórico, tendencia, hormiga, balance por miembro | Solo lectura |
 | ⚙️ Config | Info hogar + Presupuesto Base | Configuración |
 
-### Tab Resumen — Diseño v2.2
+### Tab Análisis — Sub-tabs v2.5
 
-El Resumen responde una sola pregunta: **¿cómo vamos?**
+| Sub-tab | Propósito |
+|---------|-----------|
+| 🚦 Semáforo | Todas las categorías con detalle, navegable por mes |
+| 📉 Tendencia | Gastos vs presupuesto últimos 6 meses con promedio |
+| 🐜 Hormiga | Gastos pequeños — total, % del mes, por categoría |
+| 👥 ¿Quién pagó? | Balance por miembro — real vs proporcional según ingresos |
 
-- Número grande de disponible (verde = bien, rojo = problema)
-- Semáforo por categoría: rojo (pasó límite) / amarillo (>85%) / verde (bien)
-- Rojo y amarillo expandidos por defecto — el problema se ve de inmediato
-- Ahorro siempre expandido con "✓ cumplido" cuando está al 100%
-- Categorías verdes colapsadas — se abren al tocar
-- Orden: rojo → amarillo → ahorro → verde → sin presupuesto
+**¿Quién pagó? — diseño:**
+- Balance global con barras de porcentaje por miembro
+- Proporción esperada calculada automáticamente desde los ingresos del perfil
+- Veredicto: *"Están nivelados"* / *"Jaime pagó $X más de lo esperado"*
+- Desglose por categoría con barras dobles por miembro
+
+### Tab Cómo vamos — Diseño v2.5
+
+El tab responde una sola pregunta: **¿cómo vamos?** Diseñado para el usuario no técnico — una ama de casa debe entenderlo de primera vista, sin fricción.
+
+- **Número grande de disponible** — verde si hay margen, rojo si se pasó
+- **Barra de progreso** — *Gastado $X de $Y* — contexto inmediato sin dos cifras frías
+- **Ahorro del mes** — siempre visible si tiene presupuesto, badge "✓ cumplido"
+- **Solo categorías en rojo/amarillo** — el problema se ve de inmediato
+- **"El resto de categorías van bien ✅"** — mensaje tranquilizador si todo está en orden
 
 **Principio de diseño:** Una mamá mira colores, no números. Si todo está verde, respira. Si hay rojo, se enfoca ahí.
 

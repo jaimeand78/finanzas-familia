@@ -51,10 +51,10 @@ organiza2/hogar/
 │   ├── firebase-paths.js     → dKey(), dayKey(), hKey() por codigoHogar
 │   ├── auth.js               → initLogin, loginWithGoogle, signOutUser
 │   ├── hogar.js              → crearHogar, unirseHogar, loadHogar, onboarding UI
-│   ├── finanzas.js           → subMonth, save, recalc, renderResumen, renderExpSecs, defD
+│   ├── finanzas.js           → subMonth, save, recalc, renderResumen (solo rojos/amarillos), renderExpSecs, defD
 │   ├── presupuesto.js        → onboarding 5 pantallas, guardarPresupuestoBase, banner miembro 2
 │   ├── daily.js              → subDaily, submitDaily, renderDailyList, syncDailyMonth
-│   ├── analisis.js           → renderSemaforo, renderTendencia, renderHormiga
+│   ├── analisis.js           → renderSemaforo, renderTendencia, renderHormiga, renderQuienPago
 │   ├── ui.js                 → go(), goAn(), toast(), setSS(), updateDayLabel()
 │   └── app.js                → punto de entrada, onUserReady, onHogarReady, appLista
 ├── css/

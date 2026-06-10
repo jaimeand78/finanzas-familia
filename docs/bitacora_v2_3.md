@@ -45,7 +45,12 @@
 | fix: Bug #40 — renderHormiga categorías sin emoji duplicado ni nombre v1 ✅ | |
 | fix: Bug #41 — P1.5 header simple y "Guardar cambios" en flujos _solo ✅ | |
 | fix: Bug #42 — "Actualizar mi hogar" (P1+P1.5) y "Reconfigurar presupuesto 🧹" ✅ | |
-| fix: Bug #43 — barra progreso 1-4, sin barra P1/P1.5, 3 flujos Config ✅ | |
+| fix: Bug #43 — barra progreso 1-4, sin barra P1/P1.5, 3 flujos Config ✅ |
+| fix: `who` usa nombre canónico del hogar en lugar de displayName Google ✅ | |
+| feat: tab "Resumen" renombrado a "Cómo vamos" — diseño simplificado ✅ | |
+| feat: barra de progreso gastado/presupuesto reemplaza mini cards ✅ | |
+| feat: semáforo muestra solo rojos/amarillos + "El resto van bien" ✅ | |
+| feat: sub-tab "¿Quién pagó?" en Análisis — balance proporcional por ingresos ✅ | | |
 
 ---
 
@@ -708,6 +713,47 @@ Sesión de validación en producción y resolución de problemas específicos de
 | *(ninguno)* | "Reconfigurar presupuesto 🧹" | P1.5 → P2→P5 | flags + presupuesto completo |
 
 **Archivos:** `presupuesto.js`, `presupuesto.css`, `ui.js`
+
+---
+
+## Fase 30 — Rediseño "Cómo vamos" + sub-tab "¿Quién pagó?" (Junio 2026)
+
+**Contexto:** Revisión estratégica de los tabs Resumen y Análisis. El tab Resumen tenía demasiada información para una ama de casa — mini cards frías, estado de texto redundante, categorías verdes innecesarias, y "¿Quién ha pagado?" sin contexto de balance. Se rediseñó completo con enfoque en simplicidad y claridad para el usuario no técnico.
+
+### Decisiones de producto
+
+| Decisión | Resultado |
+|----------|-----------|
+| Nombre del tab | "Resumen" → **"Cómo vamos"** (sin signos de interrogación en UI) |
+| Mini cards "Ingresan / Gastado" | Eliminadas → reemplazadas por **barra de progreso** gastado/presupuesto |
+| Estado "Van bien 🟢 / Ojo con el gasto" | Eliminado — redundante con el color del número grande |
+| Semáforo de categorías | Solo rojos/amarillos visibles → verdes ocultos con "El resto van bien ✅" |
+| "¿Quién ha pagado?" | Movido a **sub-tab propio en Análisis** con balance proporcional |
+| Campo `who` en gastos diarios | Corregido: usa `HOGAR.miembros[uid].nombre` en lugar de `displayName` de Google |
+
+### Sub-tab "¿Quién pagó?" — diseño
+
+- Balance global por miembro con barras de porcentaje
+- Proporción esperada calculada desde `HOGAR.miembros[uid].ingreso`
+- Veredicto automático: *nivelados* / *X pagó $Y más de lo esperado*
+- Desglose por categoría con barras dobles (color por miembro)
+- Umbral de tolerancia: 5% del total del mes
+
+### Commits
+
+| Commit | Descripción |
+|--------|-------------|
+| `cfd3bc8` | fix: who usa nombre del hogar en lugar de displayName de Google |
+| — | feat: tab Cómo vamos simplificado + sub-tab ¿Quién pagó? en Análisis |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `finanzas.js` | `user` se deriva de `HOGAR.miembros[uid].nombre`; `renderResumen` simplificado; `renderQuienPago` eliminado; variables muertas `rEstado/rInc/rExp` limpiadas |
+| `analisis.js` | `renderQuienPago` nueva con balance proporcional + veredicto + por categoría |
+| `ui.js` | `goAn()` actualizado para manejar sub-tab `who` |
+| `index.html` | Tab "Cómo vamos", HTML simplificado (`rProgreso`, `rTodoBien`), sub-tab `👥 ¿Quién pagó?` |
 
 ---
 
