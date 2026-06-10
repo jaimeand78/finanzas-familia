@@ -45,6 +45,7 @@
 | fix: Bug #40 — renderHormiga categorías sin emoji duplicado ni nombre v1 ✅ | |
 | fix: Bug #41 — P1.5 header simple y "Guardar cambios" en flujos _solo ✅ | |
 | fix: Bug #42 — "Actualizar mi hogar" (P1+P1.5) y "Reconfigurar presupuesto 🧹" ✅ | |
+| fix: Bug #43 — barra progreso 1-4, sin barra P1/P1.5, 3 flujos Config ✅ | |
 
 ---
 
@@ -669,6 +670,44 @@ Sesión de validación en producción y resolución de problemas específicos de
 | `_soloFlags: true` | Banner "Completa tu perfil" | Solo P1.5 | flags de perfil |
 | `_soloHogar: true` | "Actualizar mi hogar" | P1 → P1.5 | tipoHogar + flags de perfil |
 | *(ninguno)* | "Reconfigurar presupuesto 🧹" | P1 → P5 | todo |
+
+## Fase 29 — Rediseño progreso onboarding + 3 flujos de configuración (Junio 2026)
+
+**Contexto:** Durante las pruebas pre-piloto se detectó que la numeración "1 de 5" aparecía dos veces (P1 y P1.5), y que los flujos de configuración desde Config no estaban bien definidos.
+
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | fix: bug #43 — barra de progreso 1-4, sin barra en P1/P1.5, 3 flujos Config |
+| — | docs: Fase 29 |
+
+### Bug #43 — Doble "1 de 5" y flujos de configuración mal definidos
+
+**Causa:** P1 y P1.5 ambas mostraban `_prog(1)` — el usuario veía "1 de 5" en dos pantallas consecutivas. Además los botones de Config no tenían flujos bien separados.
+
+**Fix — Progreso:**
+- P1 y P1.5: sin barra de progreso (son pantallas de configuración del hogar, previas al presupuesto)
+- P2→P5: barra de progreso verde + contador "1 de 4" a "4 de 4"
+- `_prog()` reescrita con barra en lugar de puntos
+
+**Fix — Flujos Config:**
+
+| Botón | Flujo | Flag | Qué guarda |
+|-------|-------|------|------------|
+| Actualizar mi hogar | Solo P1 → guardar | `_soloTipo` | `meta/tipoHogar` |
+| Cambiar mi meta | Solo P2 → guardar | `_soloMeta` | `meta/reto` |
+| Reconfigurar presupuesto 🧹 | P1.5 → P2 → P3 → P4 → P5 | *(ninguno)* | flags + presupuesto completo |
+
+**DA-21 actualizado:**
+
+| Flag | Punto de entrada | Flujo | Qué guarda |
+|------|-----------------|-------|------------|
+| `_soloFlags: true` | Banner "Completa tu perfil" | Solo P1.5 | flags de perfil |
+| `_soloTipo: true` | "Actualizar mi hogar" | Solo P1 | tipoHogar en meta |
+| `_soloMeta: true` | "Cambiar mi meta" | Solo P2 | reto en meta |
+| *(ninguno)* | "Reconfigurar presupuesto 🧹" | P1.5 → P2→P5 | flags + presupuesto completo |
+
+**Archivos:** `presupuesto.js`, `presupuesto.css`, `ui.js`
 
 ---
 

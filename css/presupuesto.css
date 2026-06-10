@@ -35,11 +35,11 @@
 }
 
 /* ── PROGRESO ── */
-.onb-prog { display: flex; align-items: center; gap: .35rem; padding: 1rem 1.25rem .5rem; }
+.onb-prog { padding: .75rem 1.25rem .25rem; }
+.onb-prog-bar { height: 4px; background: var(--color-border-tertiary); border-radius: 2px; }
+.onb-prog-fill { height: 4px; background: #1D9E75; border-radius: 2px; transition: width .3s ease; }
 .onb-solo-header { padding: 1rem 1.25rem .5rem; font-size: .85rem; font-weight: 600; color: var(--color-text-primary); }
-.onb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border); transition: background .2s; }
-.onb-dot.act { background: var(--color-primary); }
-.onb-step-n { margin-left: auto; font-size: .72rem; color: var(--color-muted); }
+.onb-step-n { display: block; font-size: .7rem; color: var(--color-text-secondary); text-align: right; margin-top: 4px; }
 
 /* ── CABECERA ── */
 .onb-emoji { font-size: 2rem; text-align: center; }

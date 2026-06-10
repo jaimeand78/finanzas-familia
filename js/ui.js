@@ -242,6 +242,10 @@ function renderConfigHogarAcciones() {
       <span class="cfg-action-row-lbl">Actualizar mi hogar</span>
       <span class="cfg-action-row-arr">›</span>
     </div>
+    <div class="cfg-action-row" onclick="cambiarMeta()">
+      <span class="cfg-action-row-lbl">Cambiar mi meta</span>
+      <span class="cfg-action-row-arr">›</span>
+    </div>
     <div class="cfg-action-row danger" onclick="cambiarTipoHogar()">
       <span class="cfg-action-row-lbl">Reconfigurar presupuesto 🧹</span>
       <span class="cfg-action-row-arr">›</span>

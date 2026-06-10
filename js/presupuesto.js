@@ -36,23 +36,30 @@ window.cerrarOnboarding = function() {
 };
 
 // Para abrir desde Config con los valores actuales precargados
-// Abre P1 + P1.5 — actualiza tipo de hogar y flags de perfil, sin tocar ingresos ni presupuesto
+// Abre solo P1 — cambia tipo de hogar en meta, sin tocar flags ni presupuesto
 window.abrirActualizarHogar = function() {
-  const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
   _onbData = {
-    tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
-    tieneVehiculo:  perfil.tieneVehiculo  !== false,
-    tieneEmpleada:  perfil.tieneEmpleada  !== false,
-    tieneEducacion: perfil.tieneEducacion !== false,
-    tieneSeguros:   perfil.tieneSeguros   !== false,
-    _soloHogar:     true
+    tipoHogar: (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
+    _soloTipo: true
   };
   _onbStep = 1;
   _renderStep();
   document.getElementById('presupuestoModal').style.display = 'flex';
 };
 
-// Abre P1.5 con flags actuales precargados — solo actualiza categorías
+// Abre solo P2 — cambia la meta/reto del hogar
+window.cambiarMeta = function() {
+  _onbData = {
+    tipoHogar: (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
+    reto:      (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.reto) || null,
+    _soloMeta: true
+  };
+  _onbStep = 2;
+  _renderStep();
+  document.getElementById('presupuestoModal').style.display = 'flex';
+};
+
+// Abre P1.5 con flags actuales precargados — solo actualiza categorías (usado por banner)
 window.abrirActualizarCategorias = function() {
   const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
   _onbData = {
@@ -68,10 +75,16 @@ window.abrirActualizarCategorias = function() {
   document.getElementById('presupuestoModal').style.display = 'flex';
 };
 
-// Abre onboarding completo desde P1 — cambia tipo de hogar e ingresos
+// Reconfigurar presupuesto 🧹 — arranca en P1.5 y continúa P2→P5
 window.cambiarTipoHogar = function() {
-  _onbData = _leerDActual();
-  _onbStep = 1;
+  const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
+  _onbData = Object.assign(_leerDActual(), {
+    tieneVehiculo:  perfil.tieneVehiculo  !== false,
+    tieneEmpleada:  perfil.tieneEmpleada  !== false,
+    tieneEducacion: perfil.tieneEducacion !== false,
+    tieneSeguros:   perfil.tieneSeguros   !== false
+  });
+  _onbStep = 15;
   _renderStep();
   document.getElementById('presupuestoModal').style.display = 'flex';
 };
@@ -99,10 +112,8 @@ function _renderStep() {
 // ── BARRA DE PROGRESO ─────────────────────────────────────────────────────────
 
 function _prog(step) {
-  const dots = [1,2,3,4,5].map(i =>
-    `<div class="onb-dot${i <= step ? ' act' : ''}"></div>`
-  ).join('');
-  return `<div class="onb-prog">${dots}<span class="onb-step-n">${step} de 5</span></div>`;
+  const pct = Math.round((step / 4) * 100);
+  return `<div class="onb-prog"><div class="onb-prog-bar"><div class="onb-prog-fill" style="width:${pct}%"></div></div><span class="onb-step-n">${step} de 4</span></div>`;
 }
 
 // ── PANTALLA 1 — ¿Cómo es su hogar? ──────────────────────────────────────────
@@ -111,7 +122,6 @@ function _tpl1() {
   const sel = t => _onbData.tipoHogar === t ? ' sel' : '';
   return `
 <div class="onb-page">
-  ${_prog(1)}
   <div class="onb-body">
     <div class="onb-emoji">🏠</div>
     <h2 class="onb-title">¿Cómo es tu hogar?</h2>
@@ -159,7 +169,7 @@ function _tpl15() {
   const esSolo = d._soloFlags || d._soloHogar;
   return `
 <div class="onb-page">
-  ${esSolo ? `<div class="onb-solo-header">Actualizar mi hogar</div>` : _prog(1)}
+  ${esSolo ? `<div class="onb-solo-header">Actualizar mi hogar</div>` : ''}
   <div class="onb-body">
     <div class="onb-emoji">🏡</div>
     <h2 class="onb-title">¿Qué ${_tx('quieres','quieren')} presupuestar?</h2>
@@ -195,7 +205,7 @@ function _tpl2() {
   ];
   return `
 <div class="onb-page">
-  ${_prog(2)}
+  ${_prog(1)}
   <div class="onb-body">
     <div class="onb-emoji">🤔</div>
     <h2 class="onb-title">${_tx('¿Cuál es tu mayor reto?','¿Cuál es su mayor reto?')}</h2>
@@ -227,7 +237,7 @@ function _tpl3() {
   const lbl2 = miembros[1] ? 'Ingreso de ' + miembros[1].nombre : 'Segundo ingreso';
   return `
 <div class="onb-page">
-  ${_prog(3)}
+  ${_prog(2)}
   <div class="onb-body">
     <div class="onb-emoji">💵</div>
     <h2 class="onb-title">${_tx('¿Con cuánto cuentas este mes?','¿Con cuánto cuentan este mes?')}</h2>
@@ -265,7 +275,7 @@ function _tpl4() {
   const tieneVeh = _onbData.tieneVehiculo !== false;
   return `
 <div class="onb-page">
-  ${_prog(4)}
+  ${_prog(3)}
   <div class="onb-body">
     <div class="onb-emoji">📌</div>
     <h2 class="onb-title">Lo que sí o sí hay que pagar</h2>
@@ -318,7 +328,7 @@ function _tpl4() {
 function _tpl5() {
   return `
 <div class="onb-page">
-  ${_prog(5)}
+  ${_prog(4)}
   <div class="onb-body">
     <div class="onb-emoji">🎢</div>
     <h2 class="onb-title">Lo que varía según el mes</h2>
@@ -430,11 +440,15 @@ window.mostrarCodigoInv = function() {
 
 window.onbNext = function() {
   _leerCampos(_onbStep);
-  if (_onbStep === 1)  { _onbStep = 15; _renderStep(); return; }
+  if (_onbStep === 1) {
+    if (_onbData._soloTipo) { guardarPresupuestoBase(); return; } // solo tipo → guardar
+    _onbStep = 15; _renderStep(); return;
+  }
   if (_onbStep === 15) {
-    if (_onbData._soloFlags || _onbData._soloHogar) { guardarPresupuestoBase(); return; }
+    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; }
     _onbStep = 2; _renderStep(); return;
   }
+  if (_onbStep === 2 && _onbData._soloMeta) { guardarPresupuestoBase(); return; }
   _onbStep++;
   if (_onbStep > 5) _onbStep = 99;
   _renderStep();
@@ -442,9 +456,10 @@ window.onbNext = function() {
 
 window.onbSkip = function() {
   if (_onbStep === 15) {
-    if (_onbData._soloFlags || _onbData._soloHogar) { guardarPresupuestoBase(); return; }
+    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; }
     _onbStep = 2; _renderStep(); return;
   }
+  if (_onbStep === 2 && _onbData._soloMeta) { guardarPresupuestoBase(); return; }
   _onbStep++;
   if (_onbStep > 5) _onbStep = 99;
   _renderStep();
@@ -473,42 +488,51 @@ function _leerCampos(step) {
 
 window.guardarPresupuestoBase = async function() {
   const soloFlags = _onbData._soloFlags === true;
-  const soloHogar = _onbData._soloHogar === true;
-  if (!soloFlags && !soloHogar) _aplicarOnbDataAD();
+  const soloTipo  = _onbData._soloTipo  === true;
+  const soloMeta  = _onbData._soloMeta  === true;
+  const esFlujoParcial = soloFlags || soloTipo || soloMeta;
+  if (!esFlujoParcial) _aplicarOnbDataAD();
   const cH = window.HOGAR && window.HOGAR.codigoHogar;
   if (cH) {
     try {
       const updates = {};
-      if (!soloFlags && !soloHogar) {
+      // Flujo completo o Reconfigurar presupuesto
+      if (!esFlujoParcial) {
         updates['meta/presupuestoBase'] = true;
         if (_onbData.reto) updates['meta/reto'] = _onbData.reto;
       }
-      // _soloHogar sí guarda tipoHogar en meta
-      if ((soloHogar || !soloFlags) && _onbData.tipoHogar) {
+      // Guardar tipoHogar: flujo completo o soloTipo
+      if ((soloTipo || !esFlujoParcial) && _onbData.tipoHogar) {
         updates['meta/tipoHogar'] = _onbData.tipoHogar;
+        if (window.HOGAR.meta) window.HOGAR.meta.tipoHogar = _onbData.tipoHogar;
       }
-      // Siempre guardar flags de perfil
-      updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
-      updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
-      updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
-      updates['perfil/tieneSeguros']   = _onbData.tieneSeguros   !== false;
-      updates['perfil/perfilCompleto'] = true;
+      // Guardar reto: soloMeta o flujo completo
+      if (soloMeta && _onbData.reto) {
+        updates['meta/reto'] = _onbData.reto;
+      }
+      // Guardar flags de perfil: soloFlags o flujo completo/reconfigurar
+      if (!soloTipo && !soloMeta) {
+        updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
+        updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
+        updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
+        updates['perfil/tieneSeguros']   = _onbData.tieneSeguros   !== false;
+        updates['perfil/perfilCompleto'] = true;
+        window.HOGAR.perfil = Object.assign(window.HOGAR.perfil || {}, {
+          tieneVehiculo:  _onbData.tieneVehiculo  !== false,
+          tieneEmpleada:  _onbData.tieneEmpleada  !== false,
+          tieneEducacion: _onbData.tieneEducacion !== false,
+          tieneSeguros:   _onbData.tieneSeguros   !== false,
+          perfilCompleto: true
+        });
+      }
       await db.ref(`hogares/${cH}`).update(updates);
-      // Actualizar window.HOGAR.perfil localmente
-      window.HOGAR.perfil = Object.assign(window.HOGAR.perfil || {}, {
-        tieneVehiculo:  _onbData.tieneVehiculo  !== false,
-        tieneEmpleada:  _onbData.tieneEmpleada  !== false,
-        tieneEducacion: _onbData.tieneEducacion !== false,
-        tieneSeguros:   _onbData.tieneSeguros   !== false,
-        perfilCompleto: true
-      });
     } catch(e) { console.error('guardarPresupuestoBase:', e); }
   }
-  if (!soloFlags && !soloHogar) save();
+  if (!esFlujoParcial) save();
   cerrarOnboarding();
-  toast('✅ Perfil del hogar guardado');
+  toast('✅ Guardado');
   if (typeof renderAll === 'function') renderAll();
-  if (!soloFlags && !soloHogar) renderConfigPresupuesto();
+  if (!esFlujoParcial) renderConfigPresupuesto();
 };
 
 function _aplicarOnbDataAD() {
