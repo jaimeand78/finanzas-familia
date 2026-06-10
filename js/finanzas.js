@@ -17,7 +17,10 @@ let user = '';
 
 function arrancarFinanzas() {
   const fu = firebase.auth(firebase.app('fp')).currentUser;
-  if (fu) user = (fu.displayName || fu.email || '').split(' ')[0].split('@')[0];
+  if (fu) {
+    const mbr = window.HOGAR && window.HOGAR.miembros && window.HOGAR.miembros[fu.uid];
+    user = mbr ? mbr.nombre : (fu.displayName || fu.email || '').split(' ')[0].split('@')[0];
+  }
   updateWhoChip();
   subMonth();
   appLista();
