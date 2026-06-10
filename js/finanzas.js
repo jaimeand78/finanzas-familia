@@ -373,10 +373,6 @@ function recalc() {
 
   set('rDisp',  fmt(avail));
   cls('rDisp',  'r-disp-val ' + (avail >= 0 ? 'g' : 'r'));
-  set('rEstado', avail >= 0 ? 'Van bien 🟢' : 'Ojo con el gasto 🔴');
-
-  set('rInc',  fmt(tInc));
-  set('rExp',  fmt(tExp));
 
   if (curTab === 'm') renderResumen();
   if (curTab === 'c') renderExpSecs();
@@ -413,7 +409,6 @@ function renderResumen() {
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
 
-  const estado    = avail >= 0 ? 'Van bien 🟢' : 'Ojo con el gasto 🔴';
   const dispColor = avail >= 0 ? '#0F6E56' : '#993C1D';
 
   // Categorías con datos — usando cats filtradas
@@ -522,93 +517,46 @@ function renderResumen() {
   const catsNoAhorro = catsData.filter(c => !c.name.includes('Ahorro'));
   const rojos        = catsNoAhorro.filter(c => c.pct > 100);
   const amarillos    = catsNoAhorro.filter(c => c.pct > 85 && c.pct <= 100);
-  const verdes       = catsNoAhorro.filter(c => c.pct >= 0 && c.pct <= 85);
-  const sinBud       = catsNoAhorro.filter(c => c.pct === -1);
-  const ordenadas    = [...rojos, ...amarillos, ...verdes, ...sinBud];
+  const conProblema  = [...rojos, ...amarillos];
 
   const el = document.getElementById('resumenCats');
-  if (el) el.innerHTML = ordenadas.map(c => tarjeta(c)).join('');
+  if (el) el.innerHTML = conProblema.map(c => tarjeta(c)).join('');
 
-  // ── QUIÉN HA PAGADO ───────────────────────────────────────────────────────────
-  renderQuienPago();
+  // ── BARRA DE PROGRESO ─────────────────────────────────────────────────────────
+  const progEl = document.getElementById('rProgreso');
+  if (progEl && base > 0) {
+    const pctProg  = Math.min(Math.round((tExp / base) * 100), 100);
+    const barColor = pctProg > 100 ? '#D85A30' : pctProg > 85 ? '#BA7517' : '#1D9E75';
+    progEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-muted);margin-bottom:5px;">
+        <span>Gastado ${fmt(tExp)}</span>
+        <span>de ${fmt(base)}</span>
+      </div>
+      <div style="height:7px;background:var(--color-border);border-radius:99px;overflow:hidden;">
+        <div style="width:${pctProg}%;height:100%;background:${barColor};border-radius:99px;"></div>
+      </div>`;
+  } else if (progEl) {
+    progEl.innerHTML = '';
+  }
 
-  // Actualizar cabecera
+  // ── TODO BIEN ─────────────────────────────────────────────────────────────────
+  const todoBienEl = document.getElementById('rTodoBien');
+  if (todoBienEl) {
+    if (conProblema.length === 0 && catsData.length > 0) {
+      todoBienEl.style.display = 'flex';
+      todoBienEl.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--color-surface);border:0.5px solid var(--color-border);">
+          <span style="font-size:16px;">✅</span>
+          <span style="font-size:13px;color:var(--color-muted);">El resto de categorías van bien</span>
+        </div>`;
+    } else {
+      todoBienEl.style.display = 'none';
+    }
+  }
+
+  // ── CABECERA ──────────────────────────────────────────────────────────────────
   const dEl = document.getElementById('rDisp');
   if (dEl) { dEl.textContent = fmt(avail); dEl.style.color = dispColor; }
-  const eEl = document.getElementById('rEstado');
-  if (eEl) eEl.textContent = estado;
-  const iEl = document.getElementById('rInc');
-  if (iEl) iEl.textContent = fmt(tInc);
-  const xEl = document.getElementById('rExp');
-  if (xEl) xEl.textContent = fmt(tExp);
-}
-
-// ── QUIÉN HA PAGADO — carga desde daily/ del mes actual ──────────────────────
-
-async function renderQuienPago() {
-  const el = document.getElementById('rQuienPago');
-  if (!el) return;
-
-  try {
-    const mm   = String(curM + 1).padStart(2, '0');
-    const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curY}/${mm}`).once('value');
-
-    // Acumular por miembro
-    const totales = {};
-    snap.forEach(daySnap => daySnap.forEach(itemSnap => {
-      const v = itemSnap.val();
-      if (!v.who || !v.amount) return;
-      totales[v.who] = (totales[v.who] || 0) + v.amount;
-    }));
-
-    const miembros = Object.entries(totales).sort((a, b) => b[1] - a[1]);
-    const total    = miembros.reduce((s, [, v]) => s + v, 0);
-
-    if (!miembros.length || !total) {
-      el.style.display = 'none';
-      return;
-    }
-
-    // Colores por posición
-    const colores = [
-      { bg: '#E6F1FB', text: '#185FA5', bar: '#378ADD' },
-      { bg: '#FBEAF0', text: '#993556', bar: '#D4537E' },
-      { bg: '#E1F5EE', text: '#085041', bar: '#1D9E75' },
-      { bg: '#FAEEDA', text: '#854F0B', bar: '#BA7517' }
-    ];
-
-    const filas = miembros.map(([nombre, monto], i) => {
-      const pct = Math.round((monto / total) * 100);
-      const col = colores[i % colores.length];
-      const ini = nombre.substring(0, 2).toUpperCase();
-      return `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:${col.bg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:${col.text};flex-shrink:0;">${ini}</div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:500;color:var(--color-text);margin-bottom:4px;">${nombre}</div>
-          <div style="height:6px;background:var(--color-border);border-radius:3px;overflow:hidden;">
-            <div style="width:${pct}%;height:100%;background:${col.bar};border-radius:3px;"></div>
-          </div>
-        </div>
-        <div style="text-align:right;min-width:72px;">
-          <div style="font-size:14px;font-weight:500;color:var(--color-text);">${fmt(monto)}</div>
-          <div style="font-size:11px;color:var(--color-muted);">${pct}%</div>
-        </div>
-      </div>`;
-    }).join('');
-
-    el.style.display = 'block';
-    el.innerHTML = `
-      <p style="font-size:12px;font-weight:500;color:var(--color-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .75rem;">¿Quién ha pagado?</p>
-      ${filas}
-      <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:0.5px solid var(--color-border);margin-top:.25rem;">
-        <span style="font-size:12px;color:var(--color-muted);">Total registrado</span>
-        <span style="font-size:13px;font-weight:500;color:var(--color-text);">${fmt(total)}</span>
-      </div>`;
-  } catch(e) {
-    console.error('renderQuienPago:', e);
-    el.style.display = 'none';
-  }
 }
 
 // Toggle expand/colapsar tarjeta de categoría en Resumen

@@ -134,7 +134,7 @@
     <!-- Tabs -->
     <div class="tabs" id="tabBar">
       <button class="tab on"  id="tab-d" onclick="go('d')">✏️ Hoy</button>
-      <button class="tab"     id="tab-m" onclick="go('m')">📊 Resumen</button>
+      <button class="tab"     id="tab-m" onclick="go('m')">📊 Cómo vamos</button>
       <button class="tab"     id="tab-x" onclick="go('x')">📈 Análisis</button>
       <button class="tab"     id="tab-c" onclick="go('c')">⚙️ Config</button>
     </div>
@@ -172,7 +172,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAB RESUMEN — solo lectura ═══ -->
+    <!-- ═══ TAB CÓMO VAMOS — solo lectura ═══ -->
     <div id="pm" class="pg">
       <div class="pg-inner">
 
@@ -184,26 +184,22 @@
         </div>
 
         <!-- Cabecera — disponible -->
-        <div class="sec" style="text-align:center; padding:1.25rem 1rem;">
-          <p id="rEstado" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--color-muted);margin:0 0 6px;"></p>
+        <div class="sec" style="text-align:center; padding:1.25rem 1rem 1rem;">
           <p id="rDisp" class="r-disp-val g" style="font-size:2.2rem;font-weight:700;font-family:'DM Mono',monospace;margin:0;"></p>
           <p style="font-size:.8rem;color:var(--color-muted);margin:4px 0 0;">disponible este mes</p>
         </div>
 
-        <!-- Mini cards ingresos / gastado -->
-        <div class="cards" style="grid-template-columns:1fr 1fr;">
-          <div class="card"><div class="cl">Ingresan</div><div class="cv g" id="rInc">$0</div></div>
-          <div class="card"><div class="cl">Gastado</div><div class="cv r" id="rExp">$0</div></div>
-        </div>
+        <!-- Barra de progreso gastado/presupuesto -->
+        <div id="rProgreso" style="margin-bottom:.75rem;"></div>
 
         <!-- Ahorro fijo — siempre visible si tiene presupuesto -->
         <div id="rAhorro" style="display:none;background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:12px;margin-bottom:.75rem;"></div>
 
-        <!-- Categorías semáforo -->
-        <div id="resumenCats" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
+        <!-- Categorías semáforo — solo rojos y amarillos -->
+        <div id="resumenCats" style="display:flex;flex-direction:column;gap:8px;margin-bottom:.75rem;"></div>
 
-        <!-- Quién ha pagado -->
-        <div id="rQuienPago" style="display:none;background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:12px 14px;margin-bottom:1rem;"></div>
+        <!-- Todo bien — aparece si no hay rojos ni amarillos -->
+        <div id="rTodoBien" style="display:none;"></div>
 
       </div>
     </div>
@@ -220,10 +216,12 @@
           <button class="an-tab on" id="ant-sem" onclick="goAn('sem')">🚦 Semáforo</button>
           <button class="an-tab"    id="ant-ten" onclick="goAn('ten')">📉 Tendencia</button>
           <button class="an-tab"    id="ant-hor" onclick="goAn('hor')">🐜 Hormiga</button>
+          <button class="an-tab"    id="ant-who" onclick="goAn('who')">👥 ¿Quién pagó?</button>
         </div>
         <div id="an-sem" class="an-pg on"></div>
         <div id="an-ten" class="an-pg"></div>
         <div id="an-hor" class="an-pg"></div>
+        <div id="an-who" class="an-pg"></div>
       </div>
     </div>
 

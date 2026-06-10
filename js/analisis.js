@@ -1,5 +1,5 @@
 // js/analisis.js
-// Responsabilidad: tab Análisis — Semáforo, Tendencia, Hormiga.
+// Responsabilidad: tab Análisis — Semáforo, Tendencia, Hormiga, ¿Quién pagó?
 // Depende de: utils.js, firebase-paths.js, finanzas.js (D, curY, curM, dailyTotals)
 
 // Mes propio del tab Análisis — independiente del tab Resumen
@@ -360,6 +360,182 @@ async function renderHormiga() {
 
   } catch(e) {
     console.error('renderHormiga:', e);
+    el.innerHTML = '<div class="sec" style="font-size:.85rem;color:var(--color-muted);padding:1rem;">Sin datos disponibles</div>';
+  }
+}
+
+// ── ¿QUIÉN PAGÓ? ──────────────────────────────────────────────────────────────
+// Balance por miembro vs proporción esperada según ingresos del perfil
+
+async function renderQuienPago() {
+  const el = document.getElementById('an-who');
+  if (!el) return;
+
+  el.innerHTML = `<div style="padding:1rem 0;text-align:center;font-size:.85rem;color:var(--color-muted);">Cargando...</div>`;
+
+  try {
+    const mm   = String(curMx + 1).padStart(2, '0');
+    const snap = await db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curYx}/${mm}`).once('value');
+
+    // Acumular totales y por categoría por miembro
+    const totales = {};
+    const porCat  = {};
+
+    snap.forEach(daySnap => daySnap.forEach(itemSnap => {
+      const v   = itemSnap.val();
+      if (!v.who || !v.amount) return;
+      totales[v.who] = (totales[v.who] || 0) + v.amount;
+      const rawCat = (v.category || 'Otros').replace(/^\S+\s/, '');
+      const cat    = CAT_RENAMES[rawCat] || rawCat;
+      if (!porCat[cat]) porCat[cat] = {};
+      porCat[cat][v.who] = (porCat[cat][v.who] || 0) + v.amount;
+    }));
+
+    const miembros = Object.keys(totales);
+    const total    = Object.values(totales).reduce((s, v) => s + v, 0);
+
+    if (!miembros.length || !total) {
+      el.innerHTML = `<div class="sec" style="padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">👥</div>
+        <div style="font-size:.9rem;font-weight:500;color:var(--color-text-primary);">Sin gastos registrados este mes</div>
+        <div style="font-size:.8rem;color:var(--color-muted);margin-top:.25rem;">Los gastos del Tab Hoy aparecerán aquí</div>
+      </div>`;
+      return;
+    }
+
+    // Colores por miembro (posición)
+    const COLORES = [
+      { bar: '#378ADD', bg: '#E6F1FB', text: '#0C447C' },
+      { bar: '#D4537E', bg: '#FBEAF0', text: '#72243E' },
+      { bar: '#1D9E75', bg: '#E1F5EE', text: '#085041' },
+      { bar: '#BA7517', bg: '#FAEEDA', text: '#633806' }
+    ];
+    const colMap = {};
+    miembros.forEach((m, i) => { colMap[m] = COLORES[i % COLORES.length]; });
+
+    // Proporción esperada desde ingresos del perfil
+    let ingTotPerfil = 0;
+    const ingPerfil = {};
+    if (window.HOGAR && window.HOGAR.miembros) {
+      Object.values(window.HOGAR.miembros).forEach(mbr => {
+        if (mbr.nombre && mbr.ingreso) {
+          ingPerfil[mbr.nombre] = mbr.ingreso;
+          ingTotPerfil += mbr.ingreso;
+        }
+      });
+    }
+
+    // ── BALANCE GLOBAL ────────────────────────────────────────────────────────
+    const filasBalance = miembros.map(nombre => {
+      const monto  = totales[nombre] || 0;
+      const pctReal = Math.round((monto / total) * 100);
+      const col    = colMap[nombre];
+      const ini    = nombre.substring(0, 2).toUpperCase();
+      return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:${col.bg};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:${col.text};flex-shrink:0;">${ini}</div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:var(--color-text);margin-bottom:4px;">
+              <span>${nombre}</span>
+              <span>${fmt(monto)} · ${pctReal}%</span>
+            </div>
+            <div style="height:6px;background:var(--color-border);border-radius:99px;overflow:hidden;">
+              <div style="width:${pctReal}%;height:100%;background:${col.bar};border-radius:99px;"></div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Proporción esperada según ingresos
+    let esperadoHtml = '';
+    if (ingTotPerfil > 0 && miembros.length > 1) {
+      const partes = miembros.map(n => {
+        const pct = ingPerfil[n] ? Math.round((ingPerfil[n] / ingTotPerfil) * 100) : 0;
+        return `${n} ${pct}%`;
+      }).join(' · ');
+      esperadoHtml = `
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-muted);padding-top:8px;border-top:0.5px solid var(--color-border);margin-top:4px;">
+          <span>Esperado según ingresos</span>
+          <span>${partes}</span>
+        </div>`;
+    }
+
+    // ── VEREDICTO ─────────────────────────────────────────────────────────────
+    let veredictoHtml = '';
+    if (ingTotPerfil > 0 && miembros.length > 1) {
+      const diffs = miembros.map(nombre => {
+        const pctReal = (totales[nombre] || 0) / total;
+        const pctEsp  = ingPerfil[nombre] ? ingPerfil[nombre] / ingTotPerfil : 0;
+        return { nombre, diff: Math.round((pctReal - pctEsp) * total) };
+      });
+      const maxDiff = diffs.reduce((a, b) => Math.abs(a.diff) > Math.abs(b.diff) ? a : b);
+      const umbral  = total * 0.05;
+      if (Math.abs(maxDiff.diff) <= umbral) {
+        veredictoHtml = `
+          <div style="background:#E1F5EE;border-radius:10px;padding:10px 14px;margin-bottom:.75rem;font-size:13px;color:#085041;line-height:1.5;">
+            ✅ Están nivelados. La proporción de pagos va acorde a sus ingresos.
+          </div>`;
+      } else if (maxDiff.diff > 0) {
+        veredictoHtml = `
+          <div style="background:#FAEEDA;border-radius:10px;padding:10px 14px;margin-bottom:.75rem;font-size:13px;color:#854F0B;line-height:1.5;">
+            ⚖️ <strong>${maxDiff.nombre}</strong> ha pagado ${fmt(Math.abs(maxDiff.diff))} más de lo esperado este mes.
+          </div>`;
+      }
+    }
+
+    // ── POR CATEGORÍA ─────────────────────────────────────────────────────────
+    const catsOrdenadas = Object.entries(porCat)
+      .filter(([, vals]) => Object.values(vals).reduce((s, v) => s + v, 0) > 0)
+      .sort((a, b) => {
+        const ta = Object.values(a[1]).reduce((s, v) => s + v, 0);
+        const tb = Object.values(b[1]).reduce((s, v) => s + v, 0);
+        return tb - ta;
+      });
+
+    const filasCat = catsOrdenadas.map(([cat, vals]) => {
+      const catTotal = Object.values(vals).reduce((s, v) => s + v, 0);
+      const barras   = miembros.map(nombre => {
+        const monto = vals[nombre] || 0;
+        const w     = catTotal > 0 ? Math.round((monto / catTotal) * 100) : 0;
+        const col   = colMap[nombre];
+        return `
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="flex:1;height:5px;background:var(--color-border);border-radius:99px;overflow:hidden;">
+              <div style="width:${w}%;height:100%;background:${col.bar};border-radius:99px;"></div>
+            </div>
+            <span style="font-size:11px;color:var(--color-muted);min-width:52px;text-align:right;">${fmt(monto)}</span>
+          </div>`;
+      }).join('');
+      return `
+        <div style="margin-bottom:12px;">
+          <div style="font-size:13px;color:var(--color-text);margin-bottom:5px;">${ICONS[cat] || '💸'} ${cat}</div>
+          ${barras}
+        </div>`;
+    }).join('');
+
+    // Leyenda
+    const leyenda = miembros.map(nombre => {
+      const col = colMap[nombre];
+      return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-muted);">
+        <div style="width:8px;height:8px;border-radius:2px;background:${col.bar};"></div>${nombre}
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-title">Balance del mes</span></div>
+        ${filasBalance}
+        ${esperadoHtml}
+      </div>
+      ${veredictoHtml}
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-title">Por categoría</span></div>
+        <div style="display:flex;gap:12px;margin-bottom:12px;">${leyenda}</div>
+        ${filasCat || '<div style="font-size:.85rem;color:var(--color-muted);">Sin datos</div>'}
+      </div>`;
+
+  } catch(e) {
+    console.error('renderQuienPago:', e);
     el.innerHTML = '<div class="sec" style="font-size:.85rem;color:var(--color-muted);padding:1rem;">Sin datos disponibles</div>';
   }
 }

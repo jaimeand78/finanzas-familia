@@ -39,15 +39,16 @@ function go(tab) {
 }
 
 function goAn(sub) {
-  ['sem','ten','hor'].forEach(s => {
+  ['sem','ten','hor','who'].forEach(s => {
     document.getElementById('an-' + s)?.classList.remove('on');
     document.getElementById('ant-' + s)?.classList.remove('on');
   });
   document.getElementById('an-'  + sub)?.classList.add('on');
   document.getElementById('ant-' + sub)?.classList.add('on');
-  if (sub === 'sem' && typeof renderSemaforo  === 'function') renderSemaforo();
-  if (sub === 'ten' && typeof renderTendencia === 'function') renderTendencia();
-  if (sub === 'hor' && typeof renderHormiga   === 'function') renderHormiga();
+  if (sub === 'sem' && typeof renderSemaforo    === 'function') renderSemaforo();
+  if (sub === 'ten' && typeof renderTendencia   === 'function') renderTendencia();
+  if (sub === 'hor' && typeof renderHormiga     === 'function') renderHormiga();
+  if (sub === 'who' && typeof renderQuienPago   === 'function') renderQuienPago();
 }
 
 // ── LABEL DEL MES ─────────────────────────────────────────────────────────────
