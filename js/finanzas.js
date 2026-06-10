@@ -42,44 +42,76 @@ function defD() {
     ],
     categories: [
       { name:'Vivienda', items:[
-        { label:'Hipoteca / Arriendo', value:0, budget:0, fixed:true  },
+        { label:'Arriendo / Hipoteca', value:0, budget:0, fixed:true  },
+        { label:'Administración',      value:0, budget:0, fixed:true  },
         { label:'Agua y Energía',      value:0, budget:0, fixed:true  },
         { label:'Gas',                 value:0, budget:0, fixed:true  },
         { label:'Internet',            value:0, budget:0, fixed:true  },
-        { label:'Administración',      value:0, budget:0, fixed:true  }
+        { label:'Telefonía',           value:0, budget:0, fixed:false },
+        { label:'Mantenimiento Hogar', value:0, budget:0, fixed:false }
       ]},
       { name:'Alimentación', items:[
-        { label:'Mercado', value:0, budget:0, fixed:false }
+        { label:'Frutas y Verduras', value:0, budget:0, fixed:false },
+        { label:'Aseo y Víveres',    value:0, budget:0, fixed:false },
+        { label:'Loncheras',         value:0, budget:0, fixed:false }
       ]},
       { name:'Transporte', items:[
-        { label:'Gasolina',           value:0, budget:0, fixed:false },
-        { label:'Transporte público', value:0, budget:0, fixed:false }
+        { label:'Combustible',            value:0, budget:0, fixed:false },
+        { label:'Transporte Público',     value:0, budget:0, fixed:false },
+        { label:'Peajes',                 value:0, budget:0, fixed:false },
+        { label:'Parqueaderos',           value:0, budget:0, fixed:false },
+        { label:'Mantenimiento Vehículo', value:0, budget:0, fixed:false },
+        { label:'Cuota Crédito / Leasing',value:0, budget:0, fixed:true  }
       ]},
-      { name:'Salud y Belleza', items:[
-        { label:'Droguería',    value:0, budget:0, fixed:false },
-        { label:'Citas médicas',value:0, budget:0, fixed:false }
-      ]},
-      { name:'Entretenimiento', items:[
-        { label:'Streaming', value:0, budget:0, fixed:true  },
-        { label:'Salidas',   value:0, budget:0, fixed:false }
-      ]},
-      { name:'Seguros e Impuestos', items:[
-        { label:'Seguro de vida / hogar', value:0, budget:0, fixed:true },
-        { label:'Seguro vehículo',        value:0, budget:0, fixed:true },
-        { label:'Impuesto predial',       value:0, budget:0, fixed:true, months:[3] },
-        { label:'Impuestos vehículo',     value:0, budget:0, fixed:true, months:[4] },
-        { label:'SOAT vehículo',          value:0, budget:0, fixed:true, months:[8] }
+      { name:'Entretenimiento y Salidas', items:[
+        { label:'Streaming',    value:0, budget:0, fixed:true  },
+        { label:'Restaurantes', value:0, budget:0, fixed:false },
+        { label:'Cine',         value:0, budget:0, fixed:false },
+        { label:'Salidas',      value:0, budget:0, fixed:false },
+        { label:'Viajes',       value:0, budget:0, fixed:false },
+        { label:'Vacaciones',   value:0, budget:0, fixed:false }
       ]},
       { name:'Vestuario', items:[
-        { label:'Ropa',    value:0, budget:0, fixed:false },
-        { label:'Zapatos', value:0, budget:0, fixed:false }
+        { label:'Ropa',      value:0, budget:0, fixed:false },
+        { label:'Zapatos',   value:0, budget:0, fixed:false },
+        { label:'Uniformes', value:0, budget:0, fixed:false }
+      ]},
+      { name:'Salud y Belleza', items:[
+        { label:'Medicina Prepagada',   value:0, budget:0, fixed:true  },
+        { label:'Gimnasio',             value:0, budget:0, fixed:true  },
+        { label:'Droguería',            value:0, budget:0, fixed:false },
+        { label:'Cita Médica',          value:0, budget:0, fixed:false },
+        { label:'Cita Pediátrica',      value:0, budget:0, fixed:false },
+        { label:'Peluquería',           value:0, budget:0, fixed:false },
+        { label:'Servicios Estéticos',  value:0, budget:0, fixed:false }
+      ]},
+      { name:'Educación', items:[
+        { label:'Universidad',                value:0, budget:0, fixed:true  },
+        { label:'Colegio',                    value:0, budget:0, fixed:true  },
+        { label:'Jardín',                     value:0, budget:0, fixed:true  },
+        { label:'Matrícula',                  value:0, budget:0, fixed:false },
+        { label:'Actividades Extracurriculares', value:0, budget:0, fixed:false }
+      ]},
+      { name:'Seguros e Impuestos', items:[
+        { label:'Seguro de Vida',     value:0, budget:0, fixed:true  },
+        { label:'Seguro de Hogar',    value:0, budget:0, fixed:true  },
+        { label:'Seguro Vehículo',    value:0, budget:0, fixed:true  },
+        { label:'SOAT',               value:0, budget:0, fixed:true, months:[8] },
+        { label:'Impuestos Vehículo', value:0, budget:0, fixed:true, months:[4] },
+        { label:'Impuesto Predial',   value:0, budget:0, fixed:true, months:[3] }
       ]},
       { name:'Regalos y Celebraciones', items:[
         { label:'Regalos',       value:0, budget:0, fixed:false },
         { label:'Celebraciones', value:0, budget:0, fixed:false }
       ]},
       { name:'Ahorro', items:[
-        { label:'Ahorro mensual', value:0, budget:0, fixed:true }
+        { label:'Ahorro Programado', value:0, budget:0, fixed:true  },
+        { label:'Fondo Emergencia',  value:0, budget:0, fixed:false }
+      ]},
+      { name:'Servicio Doméstico', items:[
+        { label:'Salario',      value:0, budget:0, fixed:true  },
+        { label:'Prestaciones', value:0, budget:0, fixed:false },
+        { label:'Otros',        value:0, budget:0, fixed:false }
       ]}
     ]
   };
@@ -107,9 +139,9 @@ function filtrarItemsPorPerfil(catName, items) {
     const l = item.label || '';
     // Ítems de vehículo — solo si tieneVehiculo
     if (!f.tieneVehiculo && (
-      l.includes('Gasolina') || l.includes('SOAT') ||
-      l.includes('vehículo') || l.includes('Vehículo') ||
-      l.includes('leasing') || l.includes('Cuota del vehículo')
+      l.includes('Combustible') || l.includes('SOAT') ||
+      l.includes('Vehículo') || l.includes('vehículo') ||
+      l.includes('Leasing') || l.includes('leasing')
     )) return false;
     return true;
   });

@@ -32,50 +32,83 @@ const ICONS = {
 const DAILY_ITEMS = {
   '🏠 Vivienda': [
     'Arriendo / Hipoteca','Administración','Agua y Energía',
-    'Gas','Internet','Telefonía','Servicio doméstico','Mantenimiento hogar','Otros'
+    'Gas','Internet','Telefonía','Mantenimiento Hogar','Otros'
   ],
   '🧺 Alimentación': [
-    'Frutas y verduras','Aseo y víveres','Loncheras','Otros'
+    'Frutas y Verduras','Aseo y Víveres','Loncheras','Otros'
   ],
   '🚗 Transporte': [
-    'Cuota crédito / leasing','Combustible','Transporte público',
-    'Peajes','Parqueadero','Mantenimiento vehículo','Otros'
+    'Combustible','Transporte Público','Peajes',
+    'Parqueaderos','Mantenimiento Vehículo','Cuota Crédito / Leasing','Otros'
   ],
-  '🍿 Entretenimiento': [
+  '🍿 Entretenimiento y Salidas': [
     'Streaming','Restaurantes','Cine','Salidas','Viajes','Vacaciones','Otros'
   ],
   '👕 Vestuario': [
-    'Ropa','Zapatos','Uniforme','Otros'
+    'Ropa','Zapatos','Uniformes','Otros'
   ],
   '💅 Salud y Belleza': [
-    'Medicina prepagada','Gimnasio','Droguería',
-    'Cita médica','Cita pediátrica','Peluquería','Servicios estéticos','Otros'
+    'Medicina Prepagada','Gimnasio','Droguería',
+    'Cita Médica','Cita Pediátrica','Peluquería','Servicios Estéticos','Otros'
   ],
   '📚 Educación': [
-    'Universidad','Colegio','Jardín','Matrícula','Actividades extracurriculares','Otros'
+    'Universidad','Colegio','Jardín','Matrícula','Actividades Extracurriculares','Otros'
   ],
   '🛡️ Seguros e Impuestos': [
-    'Seguro de vida','Seguro de hogar','Seguro vehículo',
-    'SOAT','Impuestos vehículo','Impuesto predial'
+    'Seguro de Vida','Seguro de Hogar','Seguro Vehículo',
+    'SOAT','Impuestos Vehículo','Impuesto Predial','Otros'
   ],
   '🎁 Regalos y Celebraciones': [
     'Regalos','Celebraciones','Otros'
   ],
   '🐷 Ahorro': [
-    'Ahorro programado','Fondo emergencia','Otros'
+    'Ahorro Programado','Fondo Emergencia','Otros'
   ],
   '🤝 Servicio Doméstico': [
-    'Salario empleada','Salario niñera','Prestaciones','Otros'
+    'Salario','Prestaciones','Otros'
   ]
 };
 
 // ── RENOMBRES HISTÓRICOS ──────────────────────────────────────────────────────
 
 const ITEM_RENAMES = {
-  'Seguro vida / hogar':      'Seguro de vida / hogar',
-  'Impuesto vehículo':        'Impuestos vehículo',
-  'Combustible / peajes':     'Gasolina',
-  'Colegios / universidades': 'Colegio'
+  'Seguro vida / hogar':      'Seguro de Vida',
+  'Seguro de vida / hogar':   'Seguro de Vida',
+  'Impuesto vehículo':        'Impuestos Vehículo',
+  'Impuestos vehículo':       'Impuestos Vehículo',
+  'SOAT vehículo':            'SOAT',
+  'Combustible / peajes':     'Combustible',
+  'Gasolina':                 'Combustible',
+  'Colegios / universidades': 'Colegio',
+  'Ahorro mensual':           'Ahorro Programado',
+  'Ahorro programado':        'Ahorro Programado',
+  'Fondo emergencia':         'Fondo Emergencia',
+  'Transporte público':       'Transporte Público',
+  'Mantenimiento hogar':      'Mantenimiento Hogar',
+  'Mantenimiento vehículo':   'Mantenimiento Vehículo',
+  'Cuota crédito / leasing':  'Cuota Crédito / Leasing',
+  'Frutas y verduras':        'Frutas y Verduras',
+  'Aseo y víveres':           'Aseo y Víveres',
+  'Lonchera':                 'Loncheras',
+  'Medicina prepagada':       'Medicina Prepagada',
+  'Cita médica':              'Cita Médica',
+  'Citas médicas':            'Cita Médica',
+  'Cita pediátrica':          'Cita Pediátrica',
+  'Citas pediátricas':        'Cita Pediátrica',
+  'Servicios estéticos':      'Servicios Estéticos',
+  'Actividades extracurriculares': 'Actividades Extracurriculares',
+  'Seguro vehículo':          'Seguro Vehículo',
+  'Seguro de hogar':          'Seguro de Hogar',
+  'Seguro de vida':           'Seguro de Vida',
+  'Impuesto predial':         'Impuesto Predial',
+  'Salario empleada':         'Salario',
+  'Salario niñera':           'Salario',
+  'Salario Empleada':         'Salario',
+  'Salario Niñera':           'Salario',
+  'Uniforme':                 'Uniformes',
+  'Parqueadero':              'Parqueaderos',
+  'Ropa':                     'Ropa',
+  'Zapatos':                  'Zapatos'
 };
 
 // ── FORMATEADORES ─────────────────────────────────────────────────────────────
@@ -195,70 +228,144 @@ function migrateCategories(data) {
   if (!data || !data.categories) return data;
   const plan = {
     'Seguros e Impuestos': {
-      remove: ['Seguro vida / hogar','Impuesto vehículo'],
+      remove: ['Seguro vida / hogar','Seguro de vida / hogar','Impuesto vehículo','SOAT vehículo'],
       ensure: [
-        { label:'Seguro de vida / hogar', fixed:true },
-        { label:'Seguro vehículo',        fixed:true },
-        { label:'Impuesto predial',       fixed:true, months:[3] },
-        { label:'Impuestos vehículo',     fixed:true, months:[4] },
-        { label:'SOAT vehículo',          fixed:true, months:[8] }
+        { label:'Seguro de Vida',     fixed:true },
+        { label:'Seguro de Hogar',    fixed:true },
+        { label:'Seguro Vehículo',    fixed:true },
+        { label:'SOAT',               fixed:true, months:[8] },
+        { label:'Impuestos Vehículo', fixed:true, months:[4] },
+        { label:'Impuesto Predial',   fixed:true, months:[3] }
       ]
     },
     'Alimentación': {
-      remove: ['Restaurantes'],
+      remove: ['Restaurantes','Mercado'],
       ensure: [
-        { label:'Frutas y verduras', fixed:false },
-        { label:'Aseo y víveres',    fixed:false },
-        { label:'Lonchera',          fixed:false }
+        { label:'Frutas y Verduras', fixed:false },
+        { label:'Aseo y Víveres',    fixed:false },
+        { label:'Loncheras',         fixed:false }
       ]
     },
     'Transporte': {
-      remove: ['Combustible / peajes'],
+      remove: ['Combustible / peajes','Gasolina'],
       ensure: [
-        { label:'Gasolina',            fixed:false },
-        { label:'Peajes',              fixed:false },
-        { label:'Transporte público',  fixed:false }
+        { label:'Combustible',             fixed:false },
+        { label:'Transporte Público',      fixed:false },
+        { label:'Peajes',                  fixed:false },
+        { label:'Parqueaderos',            fixed:false },
+        { label:'Mantenimiento Vehículo',  fixed:false },
+        { label:'Cuota Crédito / Leasing', fixed:true  }
+      ]
+    },
+    'Entretenimiento': {
+      remove: [],
+      ensure: [],
+      rename: 'Entretenimiento y Salidas'
+    },
+    'Entretenimiento y Salidas': {
+      remove: [],
+      ensure: [
+        { label:'Streaming',    fixed:true  },
+        { label:'Restaurantes', fixed:false },
+        { label:'Cine',         fixed:false },
+        { label:'Salidas',      fixed:false },
+        { label:'Viajes',       fixed:false },
+        { label:'Vacaciones',   fixed:false }
       ]
     },
     'Educación': {
-      remove: ['Colegios / universidades'],
+      remove: ['Colegios / universidades','Cuotas extras','Actividades extracurriculares'],
       ensure: [
-        { label:'Colegio',                      fixed:true  },
-        { label:'Jardín',                       fixed:true  },
-        { label:'Actividades extracurriculares',fixed:false },
-        { label:'Cuotas extras',                fixed:false }
+        { label:'Universidad',                   fixed:true  },
+        { label:'Colegio',                       fixed:true  },
+        { label:'Jardín',                        fixed:true  },
+        { label:'Matrícula',                     fixed:false },
+        { label:'Actividades Extracurriculares', fixed:false }
       ]
     },
     'Servicio Doméstico': {
-      remove: [],
+      remove: [
+        'Salario Empleada','Salario Niñera','Salario empleada','Salario niñera',
+        'Intereses Cesantías Empleada','Cesantías Empleada',
+        'Prima Junio Empleada','Prima Diciembre Empleada',
+        'Intereses Cesantías Niñera','Cesantías Niñera',
+        'Prima Junio Niñera','Prima Diciembre Niñera'
+      ],
       ensure: [
-        { label:'Salario Empleada',             fixed:true              },
-        { label:'Intereses Cesantías Empleada', fixed:true, months:[0]  },
-        { label:'Cesantías Empleada',           fixed:true, months:[1]  },
-        { label:'Prima Junio Empleada',         fixed:true, months:[5]  },
-        { label:'Prima Diciembre Empleada',     fixed:true, months:[11] },
-        { label:'Salario Niñera',               fixed:true              },
-        { label:'Intereses Cesantías Niñera',   fixed:true, months:[0]  },
-        { label:'Cesantías Niñera',             fixed:true, months:[1]  },
-        { label:'Prima Junio Niñera',           fixed:true, months:[5]  },
-        { label:'Prima Diciembre Niñera',       fixed:true, months:[11] }
+        { label:'Salario',      fixed:true  },
+        { label:'Prestaciones', fixed:false }
+      ]
+    },
+    'Vivienda': {
+      remove: ['Servicio doméstico','Hipoteca / Arriendo'],
+      ensure: [
+        { label:'Arriendo / Hipoteca', fixed:true  },
+        { label:'Administración',      fixed:true  },
+        { label:'Agua y Energía',      fixed:true  },
+        { label:'Gas',                 fixed:true  },
+        { label:'Internet',            fixed:true  },
+        { label:'Telefonía',           fixed:false },
+        { label:'Mantenimiento Hogar', fixed:false }
+      ]
+    },
+    'Vestuario': {
+      remove: ['Uniforme'],
+      ensure: [
+        { label:'Ropa',      fixed:false },
+        { label:'Zapatos',   fixed:false },
+        { label:'Uniformes', fixed:false }
+      ]
+    },
+    'Salud y Belleza': {
+      remove: ['Citas médicas','Cita médica','Citas pediátricas'],
+      ensure: [
+        { label:'Medicina Prepagada',  fixed:true  },
+        { label:'Gimnasio',            fixed:true  },
+        { label:'Droguería',           fixed:false },
+        { label:'Cita Médica',         fixed:false },
+        { label:'Cita Pediátrica',     fixed:false },
+        { label:'Peluquería',          fixed:false },
+        { label:'Servicios Estéticos', fixed:false }
+      ]
+    },
+    'Ahorro': {
+      remove: ['Ahorro mensual','Ahorro programado'],
+      ensure: [
+        { label:'Ahorro Programado', fixed:true  },
+        { label:'Fondo Emergencia',  fixed:false }
       ]
     }
   };
 
-  // Categorías nuevas en v2.0 — no existían en v1, se agregan si el hogar no las tiene
+  // Categorías nuevas en v2 — se agregan si el hogar no las tiene
   const newCats = [
     { name:'Vestuario', items:[
-      { label:'Ropa',  value:0, budget:0, fixed:false },
-      { label:'Zapatos', value:0, budget:0, fixed:false }
+      { label:'Ropa',      value:0, budget:0, fixed:false },
+      { label:'Zapatos',   value:0, budget:0, fixed:false },
+      { label:'Uniformes', value:0, budget:0, fixed:false }
     ]},
     { name:'Regalos y Celebraciones', items:[
       { label:'Regalos',       value:0, budget:0, fixed:false },
       { label:'Celebraciones', value:0, budget:0, fixed:false }
+    ]},
+    { name:'Entretenimiento y Salidas', items:[
+      { label:'Streaming',    value:0, budget:0, fixed:true  },
+      { label:'Restaurantes', value:0, budget:0, fixed:false },
+      { label:'Cine',         value:0, budget:0, fixed:false },
+      { label:'Salidas',      value:0, budget:0, fixed:false },
+      { label:'Viajes',       value:0, budget:0, fixed:false },
+      { label:'Vacaciones',   value:0, budget:0, fixed:false }
     ]}
   ];
 
   let changed = false;
+
+  // Renombrar categoría Entretenimiento → Entretenimiento y Salidas
+  data.categories = data.categories.map(c => {
+    if (c.name === 'Entretenimiento') { changed = true; return { ...c, name: 'Entretenimiento y Salidas' }; }
+    return c;
+  });
+
   newCats.forEach(nc => {
     if (!data.categories.find(c => c.name === nc.name)) {
       data.categories.push(nc);

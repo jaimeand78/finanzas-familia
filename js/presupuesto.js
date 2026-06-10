@@ -113,6 +113,7 @@ function _tpl1() {
     </div>
   </div>
   <div class="onb-foot">
+    <button class="onb-skip" onclick="cerrarOnboarding()">Cancelar</button>
     <button class="onb-pri" onclick="onbNext()" ${!_onbData.tipoHogar ? 'disabled' : ''}>Continuar →</button>
   </div>
 </div>`;
@@ -516,13 +517,18 @@ function _aplicarOnbDataAD() {
     if (item) item.budget = val;
   };
 
-  if (_onbData.arriendo)   setBudget('Vivienda',       'Arriendo / Hipoteca', _onbData.arriendo);
-  if (_onbData.servicios) setBudget('Vivienda', 'Agua y Energía', _onbData.servicios);
-  if (_onbData.transporte) setBudget('Transporte',     'Combustible',              _onbData.transporte);
-  if (_onbData.cuotaVeh)   setBudget('Transporte',     'Cuota crédito / leasing',  _onbData.cuotaVeh);
-  if (_onbData.mercado)    setBudget('Alimentación',   'Mercado',                  _onbData.mercado);
-  if (_onbData.entrete)    setBudget('Entretenimiento','Salidas',                   _onbData.entrete);
-  if (_onbData.ahorro)     setBudget('Ahorro',         'Ahorro programado',         _onbData.ahorro);
+  if (_onbData.arriendo)   setBudget('Vivienda',                'Arriendo / Hipoteca',      _onbData.arriendo);
+  if (_onbData.servicios)  setBudget('Vivienda',                'Agua y Energía',            _onbData.servicios);
+  if (_onbData.transporte) setBudget('Transporte',              'Combustible',               _onbData.transporte);
+  if (_onbData.cuotaVeh)   setBudget('Transporte',              'Cuota Crédito / Leasing',   _onbData.cuotaVeh);
+  if (_onbData.mercado) {
+    const tercio = Math.round(_onbData.mercado / 3);
+    setBudget('Alimentación', 'Frutas y Verduras', tercio);
+    setBudget('Alimentación', 'Aseo y Víveres',    tercio);
+    setBudget('Alimentación', 'Loncheras',          tercio);
+  }
+  if (_onbData.entrete)    setBudget('Entretenimiento y Salidas', 'Salidas',           _onbData.entrete);
+  if (_onbData.ahorro)     setBudget('Ahorro',                    'Ahorro Programado', _onbData.ahorro);
 }
 
 // ── BANNER MIEMBRO 2 ──────────────────────────────────────────────────────────
@@ -673,29 +679,44 @@ window.cfgCatToggle = function(ci) {
 window.abrirModalCategoria = function(ci) {
   const cat = D && D.categories && D.categories[ci];
   if (!cat) return;
-  const items = planItems(cat);
+
+  // Cruzar defD() + D para mostrar todos los ítems posibles de la categoría
+  const defCat   = defD().categories.find(c => c.name === cat.name);
+  const defItems = defCat ? defCat.items : [];
+  const itemsD   = planItems(cat);
+
+  // Lista completa: primero los de defD, luego legacy/custom de D
+  const items = defItems.map(di => {
+    const found = itemsD.find(r => r.label === di.label);
+    return found || { ...di, budget: 0 };
+  });
+  itemsD.forEach(r => {
+    if (!items.find(i => i.label === r.label)) items.push(r);
+  });
+
   const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const freqs = ['mensual','bimestral','trimestral','semestral','anual'];
 
-  const rows = items.map((r, ri) => {
-    const tieneMes = r.months && r.months.length;
+  const rows = items.map((r) => {
+    const ri = (D.categories[ci].items || []).findIndex(it => it.label === r.label);
+    const tieneMes  = r.months && r.months.length;
     const mesActual = tieneMes ? r.months[0] : null;
     const control = tieneMes
       ? `<select class="cfg-freq-sel" style="border-color:var(--color-primary);background:rgba(29,158,117,.07);color:var(--color-primary);"
-           onchange="updMes(${ci},${ri},this.value)">
+           onchange="updMesModal(${ci},'${r.label}',this.value)">
            ${MESES.map((m, idx) => `<option value="${idx}"${idx === mesActual ? ' selected' : ''}>${m}</option>`).join('')}
          </select>`
-      : `<select class="cfg-freq-sel" onchange="updFrecuencia(${ci},${ri},this.value)">
+      : `<select class="cfg-freq-sel" onchange="updFrecuenciaModal(${ci},'${r.label}',this.value)">
            ${freqs.map(f => `<option value="${f}"${(r.frecuencia||'mensual')===f?' selected':''}>${f}</option>`).join('')}
          </select>`;
     return `
     <div class="cfg-modal-row">
-      <label class="cfg-modal-lbl">${r.label}</label>
+      <label class="cfg-modal-lbl">${r.label}${tieneMes ? ` <span style="font-size:10px;color:var(--color-primary);">(${MESES[r.months[0]]})</span>` : ''}</label>
       <div style="display:flex;gap:6px;align-items:center;">
         <div class="onb-iw" style="flex:1;"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal"
             value="${r.budget || ''}" placeholder="0"
-            oninput="updBudget(${ci},${ri},this.value)" />
+            oninput="updBudgetModal(${ci},'${r.label}',this.value)" />
         </div>
         ${control}
       </div>
@@ -707,6 +728,42 @@ window.abrirModalCategoria = function(ci) {
   document.getElementById('cfgCatModalTitle').textContent = cat.name;
   document.getElementById('cfgCatModalBody').innerHTML = rows;
   modal.style.display = 'flex';
+};
+
+// Helper: obtener o crear ítem en D por label
+function _getOrCreateItem(ci, label) {
+  if (!D.categories || !D.categories[ci]) return -1;
+  let ri = D.categories[ci].items.findIndex(it => it.label === label);
+  if (ri < 0) {
+    const defCat  = defD().categories.find(c => c.name === D.categories[ci].name);
+    const defItem = defCat && defCat.items.find(it => it.label === label);
+    D.categories[ci].items.push(defItem
+      ? { ...defItem, value: 0, budget: 0 }
+      : { label, value: 0, budget: 0, fixed: false });
+    ri = D.categories[ci].items.length - 1;
+  }
+  return ri;
+}
+
+window.updBudgetModal = function(ci, label, val) {
+  const ri = _getOrCreateItem(ci, label);
+  if (ri < 0) return;
+  D.categories[ci].items[ri].budget = parseFloat((val||'').replace(/[^0-9.]/g,'')) || 0;
+  recalc(); save();
+};
+
+window.updFrecuenciaModal = function(ci, label, val) {
+  const ri = _getOrCreateItem(ci, label);
+  if (ri < 0) return;
+  D.categories[ci].items[ri].frecuencia = val;
+  recalc(); save();
+};
+
+window.updMesModal = function(ci, label, val) {
+  const ri = _getOrCreateItem(ci, label);
+  if (ri < 0) return;
+  D.categories[ci].items[ri].months = [parseInt(val)];
+  recalc(); save();
 };
 
 window.cerrarModalCategoria = function() {
@@ -860,13 +917,13 @@ function _leerDActual() {
   return {
     inc1:       (D.income && D.income[0] && D.income[0].value) || 0,
     inc2:       (D.income && D.income[1] && D.income[1].value) || 0,
-    arriendo:   g('Vivienda',       'Arriendo / Hipoteca'),
-    servicios:  g('Vivienda','Agua y Energía') + g('Vivienda','Gas') + g('Vivienda','Internet'),
-    transporte: g('Transporte',     'Combustible'),
-    cuotaVeh:   g('Transporte',     'Cuota crédito / leasing'),
-    mercado:    g('Alimentación',   'Mercado'),
-    entrete:    g('Entretenimiento','Salidas'),
-    ahorro:     g('Ahorro',         'Ahorro programado'),
+    arriendo:   g('Vivienda',                'Arriendo / Hipoteca'),
+    servicios:  g('Vivienda',                'Agua y Energía') + g('Vivienda','Gas') + g('Vivienda','Internet'),
+    transporte: g('Transporte',              'Combustible'),
+    cuotaVeh:   g('Transporte',              'Cuota Crédito / Leasing'),
+    mercado:    g('Alimentación',            'Frutas y Verduras') + g('Alimentación','Aseo y Víveres') + g('Alimentación','Loncheras'),
+    entrete:    g('Entretenimiento y Salidas','Salidas'),
+    ahorro:     g('Ahorro',                  'Ahorro Programado'),
     tipoHogar:  (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.tipoHogar) || '',
     reto:       (window.HOGAR && window.HOGAR.meta && window.HOGAR.meta.reto) || ''
   };
