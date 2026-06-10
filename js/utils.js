@@ -205,12 +205,11 @@ function migrateCategories(data) {
       ]
     },
     'Alimentación': {
-      remove: [],
+      remove: ['Restaurantes'],
       ensure: [
         { label:'Frutas y verduras', fixed:false },
         { label:'Aseo y víveres',    fixed:false },
-        { label:'Lonchera',          fixed:false },
-        { label:'Restaurantes',      fixed:false }
+        { label:'Lonchera',          fixed:false }
       ]
     },
     'Transporte': {
