@@ -238,12 +238,12 @@ function renderConfigHogarAcciones() {
   const el = document.getElementById('hogarAcciones');
   if (!el) return;
   el.innerHTML = `
-    <div class="cfg-action-row" onclick="abrirActualizarCategorias()">
-      <span class="cfg-action-row-lbl">Actualizar categorías</span>
+    <div class="cfg-action-row" onclick="abrirActualizarHogar()">
+      <span class="cfg-action-row-lbl">Actualizar mi hogar</span>
       <span class="cfg-action-row-arr">›</span>
     </div>
     <div class="cfg-action-row danger" onclick="cambiarTipoHogar()">
-      <span class="cfg-action-row-lbl">Cambiar tipo de hogar</span>
+      <span class="cfg-action-row-lbl">Reconfigurar presupuesto 🧹</span>
       <span class="cfg-action-row-arr">›</span>
     </div>`;
 }

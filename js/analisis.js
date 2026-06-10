@@ -257,7 +257,8 @@ async function renderHormiga() {
         if (amt > 0 && amt < HORMIGA_UMBRAL) {
           totalHormiga += amt;
           countHormiga++;
-          const cat = v.category || 'Otros';
+          const rawCat = (v.category || 'Otros').replace(/^\S+\s/, '');
+          const cat = CAT_RENAMES[rawCat] || rawCat;
           if (!catTotals[cat]) catTotals[cat] = { total: 0, count: 0 };
           catTotals[cat].total += amt;
           catTotals[cat].count++;

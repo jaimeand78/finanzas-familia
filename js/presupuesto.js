@@ -36,6 +36,22 @@ window.cerrarOnboarding = function() {
 };
 
 // Para abrir desde Config con los valores actuales precargados
+// Abre P1 + P1.5 — actualiza tipo de hogar y flags de perfil, sin tocar ingresos ni presupuesto
+window.abrirActualizarHogar = function() {
+  const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
+  _onbData = {
+    tipoHogar:      (window.HOGAR && window.HOGAR.meta && (window.HOGAR.meta.tipoHogar || window.HOGAR.meta.tipo)) || 'pareja',
+    tieneVehiculo:  perfil.tieneVehiculo  !== false,
+    tieneEmpleada:  perfil.tieneEmpleada  !== false,
+    tieneEducacion: perfil.tieneEducacion !== false,
+    tieneSeguros:   perfil.tieneSeguros   !== false,
+    _soloHogar:     true
+  };
+  _onbStep = 1;
+  _renderStep();
+  document.getElementById('presupuestoModal').style.display = 'flex';
+};
+
 // Abre P1.5 con flags actuales precargados — solo actualiza categorías
 window.abrirActualizarCategorias = function() {
   const perfil = (window.HOGAR && window.HOGAR.perfil) || {};
@@ -140,9 +156,10 @@ function _tpl15() {
     </div>`;
   };
   const esFamilia = d.tipoHogar === 'familia';
+  const esSolo = d._soloFlags || d._soloHogar;
   return `
 <div class="onb-page">
-  ${_prog(1)}
+  ${esSolo ? `<div class="onb-solo-header">Actualizar mi hogar</div>` : _prog(1)}
   <div class="onb-body">
     <div class="onb-emoji">🏡</div>
     <h2 class="onb-title">¿Qué ${_tx('quieres','quieren')} presupuestar?</h2>
@@ -156,7 +173,7 @@ function _tpl15() {
     <p class="onb-toggle-hint">Vivienda, Alimentación y Ahorro siempre activos</p>
   </div>
   <div class="onb-foot">
-    <button class="onb-pri" onclick="onbNext()">Continuar →</button>
+    <button class="onb-pri" onclick="onbNext()">${esSolo ? 'Guardar cambios' : 'Continuar →'}</button>
   </div>
 </div>`;
 }
@@ -415,7 +432,7 @@ window.onbNext = function() {
   _leerCampos(_onbStep);
   if (_onbStep === 1)  { _onbStep = 15; _renderStep(); return; }
   if (_onbStep === 15) {
-    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; } // solo flags → guardar directo
+    if (_onbData._soloFlags || _onbData._soloHogar) { guardarPresupuestoBase(); return; }
     _onbStep = 2; _renderStep(); return;
   }
   _onbStep++;
@@ -425,7 +442,7 @@ window.onbNext = function() {
 
 window.onbSkip = function() {
   if (_onbStep === 15) {
-    if (_onbData._soloFlags) { guardarPresupuestoBase(); return; }
+    if (_onbData._soloFlags || _onbData._soloHogar) { guardarPresupuestoBase(); return; }
     _onbStep = 2; _renderStep(); return;
   }
   _onbStep++;
@@ -456,15 +473,19 @@ function _leerCampos(step) {
 
 window.guardarPresupuestoBase = async function() {
   const soloFlags = _onbData._soloFlags === true;
-  if (!soloFlags) _aplicarOnbDataAD();
+  const soloHogar = _onbData._soloHogar === true;
+  if (!soloFlags && !soloHogar) _aplicarOnbDataAD();
   const cH = window.HOGAR && window.HOGAR.codigoHogar;
   if (cH) {
     try {
       const updates = {};
-      if (!soloFlags) {
+      if (!soloFlags && !soloHogar) {
         updates['meta/presupuestoBase'] = true;
-        if (_onbData.tipoHogar) updates['meta/tipoHogar'] = _onbData.tipoHogar;
-        if (_onbData.reto)      updates['meta/reto']      = _onbData.reto;
+        if (_onbData.reto) updates['meta/reto'] = _onbData.reto;
+      }
+      // _soloHogar sí guarda tipoHogar en meta
+      if ((soloHogar || !soloFlags) && _onbData.tipoHogar) {
+        updates['meta/tipoHogar'] = _onbData.tipoHogar;
       }
       // Siempre guardar flags de perfil
       updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
@@ -483,11 +504,11 @@ window.guardarPresupuestoBase = async function() {
       });
     } catch(e) { console.error('guardarPresupuestoBase:', e); }
   }
-  if (!soloFlags) save();
+  if (!soloFlags && !soloHogar) save();
   cerrarOnboarding();
   toast('✅ Perfil del hogar guardado');
   if (typeof renderAll === 'function') renderAll();
-  if (!soloFlags) renderConfigPresupuesto();
+  if (!soloFlags && !soloHogar) renderConfigPresupuesto();
 };
 
 function _aplicarOnbDataAD() {

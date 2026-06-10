@@ -42,6 +42,9 @@
 | fix: Tab Hoy filtra ítems de vehículo según tieneVehiculo ✅ | |
 | fix: Tab Resumen usa categorías filtradas por perfil ✅ | |
 | fix: abrirCompletarPerfil no sobreescribe ingresos (_soloFlags) ✅ | |
+| fix: Bug #40 — renderHormiga categorías sin emoji duplicado ni nombre v1 ✅ | |
+| fix: Bug #41 — P1.5 header simple y "Guardar cambios" en flujos _solo ✅ | |
+| fix: Bug #42 — "Actualizar mi hogar" (P1+P1.5) y "Reconfigurar presupuesto 🧹" ✅ | |
 
 ---
 
@@ -629,6 +632,43 @@ Sesión de validación en producción y resolución de problemas específicos de
 - Feedback in-app con Discord
 - Personalización: agregar ítems propios al presupuesto (v1 feature, deferred)
 - Documentar regla en REGLAS_IA.md: defD() + DAILY_ITEMS + migrateCategories siempre se modifican juntos
+
+## Fase 28 — Bugs pre-piloto: Hormiga, onboarding _soloHogar, botones Config (Junio 2026)
+
+**Contexto:** Revisión de la app antes del lanzamiento del piloto. Detectados 3 bugs funcionales/UX.
+
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | fix: bugs #40 #41 #42 — hormiga categorías, onboarding soloHogar, botones Config |
+| — | docs: Fase 28 |
+
+### Bugs resueltos
+
+**Bug #40 — renderHormiga mostraba categorías con emoji duplicado o nombre v1**
+- **Causa:** `v.category` en Firebase incluye emoji de prefijo (ej. `"🍿 Entretenimiento y Salidas"`). Al usarlo como clave de agrupación, ICONS no encontraba la entrada y el emoji se duplicaba. Registros anteriores a Fase 27 tenían nombres v1 (`"Entretenimiento"`) sin mapeo.
+- **Fix:** Normalizar `v.category` al leer: quitar emoji con `.replace(/^\S+\s/, '')` y aplicar `CAT_RENAMES` para mapear v1 → v2.
+- **Archivos:** `utils.js` (nuevo `CAT_RENAMES`), `analisis.js` (línea 260)
+
+**Bug #41 — P1.5 mostraba "1 de 5" y "Continuar →" al venir de _soloFlags/_soloHogar**
+- **Causa:** `_tpl15()` siempre renderizaba `_prog(1)` y el botón "Continuar →" sin importar el contexto, generando confusión — el usuario esperaba 4 pasos más.
+- **Fix:** En `_tpl15()`, detectar `_soloFlags || _soloHogar` → reemplazar barra de progreso por header simple "Actualizar mi hogar" y cambiar botón a "Guardar cambios".
+- **Archivos:** `presupuesto.js`, `presupuesto.css` (nueva clase `.onb-solo-header`)
+
+**Bug #42 — Botones "Configuración del hogar" con nombres confusos**
+- **Causa:** "Actualizar categorías" no es lenguaje de usuario final; "Cambiar tipo de hogar" sugería una acción limitada cuando en realidad lanzaba todo el onboarding.
+- **Fix:**
+  - "Actualizar categorías" → **"Actualizar mi hogar"**: nuevo flujo `_soloHogar:true` — lanza P1 + P1.5, guarda `tipoHogar` en meta + flags de perfil, sin tocar ingresos ni presupuesto.
+  - "Cambiar tipo de hogar" → **"Reconfigurar presupuesto 🧹"**: onboarding completo P1→P5, sin cambios de comportamiento.
+- **Archivos:** `ui.js`, `presupuesto.js`
+
+### DA-21 — Flujos de actualización del hogar
+
+| Flag | Punto de entrada | Flujo | Qué guarda |
+|------|-----------------|-------|------------|
+| `_soloFlags: true` | Banner "Completa tu perfil" | Solo P1.5 | flags de perfil |
+| `_soloHogar: true` | "Actualizar mi hogar" | P1 → P1.5 | tipoHogar + flags de perfil |
+| *(ninguno)* | "Reconfigurar presupuesto 🧹" | P1 → P5 | todo |
 
 ---
 

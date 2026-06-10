@@ -111,6 +111,11 @@ const ITEM_RENAMES = {
   'Zapatos':                  'Zapatos'
 };
 
+const CAT_RENAMES = {
+  'Entretenimiento':    'Entretenimiento y Salidas',
+  'Servicio doméstico': 'Servicio Doméstico'
+};
+
 // ── FORMATEADORES ─────────────────────────────────────────────────────────────
 
 function fmt(n) {

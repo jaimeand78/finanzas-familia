@@ -36,6 +36,7 @@
 
 /* ── PROGRESO ── */
 .onb-prog { display: flex; align-items: center; gap: .35rem; padding: 1rem 1.25rem .5rem; }
+.onb-solo-header { padding: 1rem 1.25rem .5rem; font-size: .85rem; font-weight: 600; color: var(--color-text-primary); }
 .onb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border); transition: background .2s; }
 .onb-dot.act { background: var(--color-primary); }
 .onb-step-n { margin-left: auto; font-size: .72rem; color: var(--color-muted); }
