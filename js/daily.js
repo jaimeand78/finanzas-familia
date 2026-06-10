@@ -90,7 +90,7 @@ function populateItemSel() {
   if (!catSel || !itemSel) return;
 
   const flags = (typeof getPerfilFlags === 'function') ? getPerfilFlags() : {};
-  const ITEMS_VEHICULO = ['Cuota crédito / leasing', 'Combustible', 'Peajes', 'Parqueadero', 'Mantenimiento vehículo', 'Gasolina', 'SOAT', 'Seguro vehículo', 'Impuestos vehículo', 'Cuota del vehículo'];
+  const ITEMS_VEHICULO = ['Cuota Crédito / Leasing','Combustible','Peajes','Parqueaderos','Mantenimiento Vehículo','SOAT','Seguro Vehículo','Impuestos Vehículo'];
 
   let items = DAILY_ITEMS[catSel.value] || [];
 

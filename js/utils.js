@@ -11,18 +11,18 @@ const COLORS  = ['#1D9E75','#378ADD','#D85A30','#BA7517','#D4537E','#534AB7','#6
 
 // Categorías oficiales v2.0 — íconos por nombre (sin emoji en la clave)
 const ICONS = {
-  'Vivienda':               '🏠',
-  'Alimentación':           '🧺',
-  'Transporte':             '🚗',
-  'Entretenimiento':        '🍿',
-  'Vestuario':              '👕',
-  'Salud y Belleza':        '💅',
-  'Educación':              '📚',
-  'Seguros e Impuestos':    '🛡️',
-  'Regalos y Celebraciones':'🎁',
-  'Ahorro':                 '🐷',
-  'Servicio Doméstico':     '🤝',
-  'Otros':                  '💸'
+  'Vivienda':                  '🏠',
+  'Alimentación':              '🧺',
+  'Transporte':                '🚗',
+  'Entretenimiento y Salidas': '🍿',
+  'Vestuario':                 '👕',
+  'Salud y Belleza':           '💅',
+  'Educación':                 '📚',
+  'Seguros e Impuestos':       '🛡️',
+  'Regalos y Celebraciones':   '🎁',
+  'Ahorro':                    '🐷',
+  'Servicio Doméstico':        '🤝',
+  'Otros':                     '💸'
 };
 
 // ── CATÁLOGO DE REGISTRO DIARIO — DA-10 ──────────────────────────────────────
