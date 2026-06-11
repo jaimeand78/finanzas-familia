@@ -179,24 +179,56 @@ function calcPresupuestoBase(item, mesActual) {
 
 ## 8. Reglas de Seguridad Firebase
 
+> Reglas desplegadas en producción — Junio 2026. Archivo histórico en `docs/firebase-rules.json`.
+
 ```json
 {
   "rules": {
-    "hogares": {
-      "$codigoHogar": {
-        ".read":  "auth != null && root.child('usuarios').child(auth.uid).child('codigoHogar').val() === $codigoHogar",
-        ".write": "auth != null && root.child('usuarios').child(auth.uid).child('codigoHogar').val() === $codigoHogar"
-      }
-    },
     "usuarios": {
       "$uid": {
         ".read":  "auth != null && auth.uid === $uid",
         ".write": "auth != null && auth.uid === $uid"
       }
-    }
+    },
+    "hogares": {
+      "$codigoHogar": {
+        ".read": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()",
+        "meta": {
+          ".read":  "auth != null",
+          ".write": "auth != null && (!data.exists() || root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists())"
+        },
+        "miembros": {
+          "$uid": {
+            ".read":  "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "perfil": {
+          ".write": "auth != null && (!root.child('hogares').child($codigoHogar).child('meta').exists() || root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists())"
+        },
+        "pl":    { ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()" },
+        "daily": { ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()" },
+        "hist":  { ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()" }
+      }
+    },
+    "pl":    { ".read": "false", ".write": "false" },
+    "daily": { ".read": "false", ".write": "false" },
+    "viaje": { ".read": "false", ".write": "false" },
+    "hist":  { ".read": "false", ".write": "false" }
   }
 }
 ```
+
+**Lógica por nodo:**
+| Nodo | Read | Write |
+|------|------|-------|
+| `usuarios/$uid` | Propio uid | Propio uid |
+| `hogares/$codigo` | Miembro del hogar | — |
+| `hogares/$codigo/meta` | Cualquier auth (validar código al unirse) | Hogar nuevo o miembro |
+| `hogares/$codigo/miembros/$uid` | Propio uid (antes de ser miembro) | Propio uid |
+| `hogares/$codigo/perfil` | Hereda de `$codigo` | Hogar nuevo o miembro |
+| `hogares/$codigo/pl/daily/hist` | Hereda de `$codigo` | Solo miembros |
+| `pl/daily/viaje/hist` (raíz, v1) | Bloqueado | Bloqueado |
 
 ---
 

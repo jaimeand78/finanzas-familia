@@ -1,0 +1,53 @@
+{
+  "rules": {
+
+    "usuarios": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "hogares": {
+      "$codigoHogar": {
+
+        ".read": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()",
+
+        "meta": {
+          ".read":  "auth != null",
+          ".write": "auth != null && (!data.exists() || root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists())"
+        },
+
+        "miembros": {
+          "$uid": {
+            ".read":  "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+
+        "perfil": {
+          ".write": "auth != null && (!root.child('hogares').child($codigoHogar).child('meta').exists() || root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists())"
+        },
+
+        "pl": {
+          ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()"
+        },
+
+        "daily": {
+          ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()"
+        },
+
+        "hist": {
+          ".write": "auth != null && root.child('hogares').child($codigoHogar).child('miembros').child(auth.uid).exists()"
+        }
+
+      }
+    },
+
+    "pl":     { ".read": "false", ".write": "false" },
+    "daily":  { ".read": "false", ".write": "false" },
+    "viaje":  { ".read": "false", ".write": "false" },
+    "hist":   { ".read": "false", ".write": "false" }
+
+  }
+}
