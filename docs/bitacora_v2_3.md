@@ -9,10 +9,10 @@
 
 | ✅ Logros | 🔲 Pendientes |
 |-----------|--------------|
-| App PWA en producción | Piloto 5-10 familias |
-| Login Google + Firebase Auth (Etapa A) | Exportar mes a PDF |
-| Modelo de Hogar + código invitación (Etapa B) | Exportar año a Excel |
-| Migración datos a hogares/ (Etapa C) | |
+| App PWA en producción | Reglas Firebase (A1) — consola |
+| Login Google + Firebase Auth (Etapa A) | Piloto 5-10 familias |
+| Modelo de Hogar + código invitación (Etapa B) | Exportar mes a PDF |
+| Migración datos a hogares/ (Etapa C) | Exportar año a Excel |
 | Finanzas v2 arquitectura modular (Etapa D) | |
 | Migración Anny1130 → hogares/SNBDPA/ ✅ | |
 | Etapa E completa ✅ | |
@@ -45,12 +45,16 @@
 | fix: Bug #40 — renderHormiga categorías sin emoji duplicado ni nombre v1 ✅ | |
 | fix: Bug #41 — P1.5 header simple y "Guardar cambios" en flujos _solo ✅ | |
 | fix: Bug #42 — "Actualizar mi hogar" (P1+P1.5) y "Reconfigurar presupuesto 🧹" ✅ | |
-| fix: Bug #43 — barra progreso 1-4, sin barra P1/P1.5, 3 flujos Config ✅ |
+| fix: Bug #43 — barra progreso 1-4, sin barra P1/P1.5, 3 flujos Config ✅ | |
 | fix: `who` usa nombre canónico del hogar en lugar de displayName Google ✅ | |
 | feat: tab "Resumen" renombrado a "Cómo vamos" — diseño simplificado ✅ | |
 | feat: barra de progreso gastado/presupuesto reemplaza mini cards ✅ | |
 | feat: semáforo muestra solo rojos/amarillos + "El resto van bien" ✅ | |
-| feat: sub-tab "¿Quién pagó?" en Análisis — balance proporcional por ingresos ✅ | | |
+| feat: sub-tab "¿Quién pagó?" en Análisis — balance proporcional por ingresos ✅ | |
+| fix: A2 eduFlag — Pareja/Soltero no guardan tieneEducacion:true ✅ | |
+| fix: A3 — filtro C3 aplicado en Config y Semáforo ✅ | |
+| fix: C2 _soloHogar huérfano eliminado de _tpl15 ✅ | |
+| fix: C5 textos — Registren y desglosas ✅ | |
 
 ---
 
@@ -615,6 +619,56 @@ Sesión de validación en producción y resolución de problemas específicos de
 | v3.0 | Planeador MVP | 🔲 |
 | v4.0 | Alimentación | 🔲 |
 | v5.0 | Monetización | 🔲 |
+
+---
+
+## Fase 31 — Fixes pre-piloto: auditoria v2.3 (Junio 2026)
+
+**Contexto:** Auditoria técnica completa `auditoria_v2_3_junio2026.md`. Se resuelven los hallazgos críticos A2 y A3, más dos items de limpieza (C2 y C5) que estaban en el mismo archivo.
+
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | fix: A2 eduFlag + A3 filtro Config y Semáforo + C2 _soloHogar + C5 textos |
+| — | docs: Fase 31 |
+
+### Hallazgos resueltos
+
+**A2 — Bug: hogares Pareja/Soltero guardaban tieneEducacion: true** (`presupuesto.js`)
+- **Causa:** El toggle de Educación no se renderiza cuando `tipoHogar !== 'familia'`, por lo que `_onbData.tieneEducacion` queda `undefined`. La expresión `undefined !== false` evalúa a `true`, guardando el flag como activo para todos los hogares no-familia.
+- **Fix:** `const eduFlag = (_onbData.tipoHogar === 'familia') ? (_onbData.tieneEducacion !== false) : false;` — aplicado en `updates` y en `window.HOGAR.perfil` dentro de `guardarPresupuestoBase()`.
+- **Archivos:** `presupuesto.js` (~línea 517)
+
+**A3 — Filtro C3 no aplicado en Config ni en Semáforo** (`presupuesto.js`, `analisis.js`)
+- **Decisión de producto:** Opción A — aplicar el filtro en Config y Análisis para consistencia total.
+- **Fix renderConfigPresupuesto:** `catsVisibles = filtrarCategoriasPorPerfil(D.categories || [])` para display y totalGlobal. El `ci` pasado a `abrirModalCategoria` se deriva con `D.categories.findIndex(c => c.name === cat.name)` para mantener el índice original de D — no el índice filtrado.
+- **Fix _renderSemaforoConData:** `_catsF = filtrarCategoriasPorPerfil(data.categories)` para tExp, tBud y el listado de categorías. Comportamiento ahora idéntico a `renderResumen`.
+- **Archivos:** `presupuesto.js` (~línea 668), `analisis.js` (~línea 53)
+
+**C2 parcial — `_soloHogar` huérfano en `_tpl15()`** (`presupuesto.js`)
+- **Causa:** Fase 29 reemplazó el flag `_soloHogar` por `_soloTipo`, pero la condición en `_tpl15` aún lo referenciaba. Nada lo seteaba.
+- **Fix:** `const esSolo = d._soloFlags;` (eliminado `|| d._soloHogar`).
+- **Archivos:** `presupuesto.js` (~línea 169)
+
+**C5 — Errores de texto en `presupuesto.js`**
+- `'Regístren'` → `'Registren'` en `_tplResumen` (tilde incorrecta en imperativo).
+- `'desglosás'` → `'desglosas'` en `_tpl4` (voseo; la app usa tuteo en todo el flujo).
+- **Archivos:** `presupuesto.js` (~líneas 293, 386)
+
+### Estado auditoria post-Fase 31
+| Hallazgo | Estado |
+|----------|--------|
+| A1 — Reglas Firebase | 🔲 Pendiente (requiere consola Firebase) |
+| A2 — Flag Educación | ✅ Resuelto |
+| A3 — Filtro Config + Semáforo | ✅ Resuelto |
+| B1–B5 | 🔲 Post-piloto |
+| C1 — ~150 líneas muertas finanzas.js | 🔲 Post-piloto |
+| C2 — vKey(), raw(), _soloHogar | ✅ _soloHogar resuelto · vKey() y raw() post-piloto |
+| C3 — cleanDuplicates/applyFixedYear | 🔲 Post-piloto |
+| C4 — 'Otros' en defD() Servicio Doméstico | 🔲 Post-piloto |
+| C5 — Textos | ✅ Resuelto |
+| C6 — Manifest / viewport | 🔲 Post-piloto |
+| D1–D4 — Docs | 🔲 Post-piloto |
 
 ---
 

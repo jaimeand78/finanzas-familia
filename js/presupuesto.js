@@ -166,7 +166,7 @@ function _tpl15() {
     </div>`;
   };
   const esFamilia = d.tipoHogar === 'familia';
-  const esSolo = d._soloFlags || d._soloHogar;
+  const esSolo = d._soloFlags;
   return `
 <div class="onb-page">
   ${esSolo ? `<div class="onb-solo-header">Actualizar mi hogar</div>` : ''}
@@ -290,7 +290,7 @@ function _tpl4() {
         </div>
       </div>
       <div class="onb-field">
-        <label>💡 Servicios <span class="onb-badge">total estimado — lo desglosás en Config</span></label>
+        <label>💡 Servicios <span class="onb-badge">total estimado — lo desglosas en Config</span></label>
         <div class="onb-iw"><span class="onb-pre">$</span>
           <input type="text" inputmode="decimal" id="oSvc"
             value="${_onbData.servicios || ''}" placeholder="0"
@@ -383,7 +383,7 @@ function _tplResumen() {
     if (pct > 100) insight = `⚠️ Los gastos planeados superan los ingresos. ${_tx('Ajusta algún valor antes de guardar.','Ajusten algún valor antes de guardar.')}`;
     else if (pct > 90) insight = `📊 ${_tx('Estás muy ajustado.','Están muy ajustados.')} Cualquier gasto extra puede desequilibrar el mes.`;
     else if (_onbData.reto === 'ahorro' && !_onbData.ahorro) insight = `💡 ${_tx('Pusiste ahorro en cero — configúralo aunque sea con poco para crear el hábito.','Pusieron ahorro en cero — configúrenlo aunque sea con poco para crear el hábito.')}`;
-    else if (libre > inc * 0.2) insight = `🎉 Buen margen disponible. ${_tx('Registra los gastos diarios para ver la foto completa.','Regístren los gastos diarios para ver la foto completa.')}`;
+    else if (libre > inc * 0.2) insight = `🎉 Buen margen disponible. ${_tx('Registra los gastos diarios para ver la foto completa.','Registren los gastos diarios para ver la foto completa.')}`;
     else insight = `📋 Presupuesto base listo. ${_tx('Registra los gastos diarios para entender en qué se va el dinero.','Registren los gastos diarios para entender en qué se va el dinero.')}`;
   }
 
@@ -512,15 +512,18 @@ window.guardarPresupuestoBase = async function() {
       }
       // Guardar flags de perfil: soloFlags o flujo completo/reconfigurar
       if (!soloTipo && !soloMeta) {
+        // A2: Educación solo puede ser true en hogares familia — el toggle no se renderiza
+        // en otros tipos, por lo que _onbData.tieneEducacion sería undefined → !== false = true.
+        const eduFlag = (_onbData.tipoHogar === 'familia') ? (_onbData.tieneEducacion !== false) : false;
         updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
         updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
-        updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
+        updates['perfil/tieneEducacion'] = eduFlag;
         updates['perfil/tieneSeguros']   = _onbData.tieneSeguros   !== false;
         updates['perfil/perfilCompleto'] = true;
         window.HOGAR.perfil = Object.assign(window.HOGAR.perfil || {}, {
           tieneVehiculo:  _onbData.tieneVehiculo  !== false,
           tieneEmpleada:  _onbData.tieneEmpleada  !== false,
-          tieneEducacion: _onbData.tieneEducacion !== false,
+          tieneEducacion: eduFlag,
           tieneSeguros:   _onbData.tieneSeguros   !== false,
           perfilCompleto: true
         });
@@ -661,13 +664,17 @@ async function renderConfigPresupuesto() {
     return budgetAnual[key] || fallback || 0;
   };
 
-  const totalGlobal = D.categories.reduce((s, cat) => {
+  // A3: Config solo muestra las categorías que aplican al perfil del hogar
+  const catsVisibles = filtrarCategoriasPorPerfil(D.categories || []);
+  const totalGlobal = catsVisibles.reduce((s, cat) => {
     return s + planItems(cat).reduce((cs, r) => {
       return cs + getBudget(cat.name, r.label, r.budget);
     }, 0);
   }, 0);
 
-  const cats = D.categories.map((cat, ci) => {
+  const cats = catsVisibles.map((cat) => {
+    // ci es el índice en D.categories (no en catsVisibles) — necesario para abrirModalCategoria
+    const ci = D.categories.findIndex(c => c.name === cat.name);
     const items = planItems(cat);
     const total = items.reduce((s, r) => s + getBudget(cat.name, r.label, r.budget), 0);
     const sinDef = total === 0;
