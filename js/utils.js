@@ -65,7 +65,7 @@ const DAILY_ITEMS = {
     'Ahorro Programado','Fondo Emergencia','Otros'
   ],
   '🤝 Servicio Doméstico': [
-    'Salario','Prestaciones','Intereses Cesantías','Cesantías','Prima','Otros'
+    'Salario','Prestaciones','Intereses Cesantías','Cesantías','Prima Junio','Prima Diciembre','Otros'
   ]
 };
 
@@ -295,14 +295,16 @@ function migrateCategories(data) {
         'Prima Junio Empleada','Prima Diciembre Empleada',
         'Intereses Cesantías Niñera','Cesantías Niñera',
         'Prima Junio Niñera','Prima Diciembre Niñera',
-        'Otros'
+        'Prima'
       ],
       ensure: [
-        { label:'Salario',             fixed:true                 },
-        { label:'Prestaciones',        fixed:true                 },
-        { label:'Intereses Cesantías', fixed:true, months:[0]    },
-        { label:'Cesantías',           fixed:true, months:[1]    },
-        { label:'Prima',               fixed:true, months:[5,11] }
+        { label:'Salario',             fixed:true              },
+        { label:'Prestaciones',        fixed:true              },
+        { label:'Intereses Cesantías', fixed:true, months:[0]  },
+        { label:'Cesantías',           fixed:true, months:[1]  },
+        { label:'Prima Junio',         fixed:true, months:[5]  },
+        { label:'Prima Diciembre',     fixed:true, months:[11] },
+        { label:'Otros',               fixed:false             }
       ]
     },
     'Vivienda': {
