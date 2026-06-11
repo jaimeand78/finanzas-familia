@@ -112,9 +112,11 @@ function defD() {
         { label:'Fondo Emergencia',  value:0, budget:0, fixed:false }
       ]},
       { name:'Servicio Doméstico', items:[
-        { label:'Salario',      value:0, budget:0, fixed:true  },
-        { label:'Prestaciones', value:0, budget:0, fixed:false },
-        { label:'Otros',        value:0, budget:0, fixed:false }
+        { label:'Salario',             value:0, budget:0, fixed:true                 },
+        { label:'Prestaciones',        value:0, budget:0, fixed:true                 },
+        { label:'Intereses Cesantías', value:0, budget:0, fixed:true, months:[0]    },
+        { label:'Cesantías',           value:0, budget:0, fixed:true, months:[1]    },
+        { label:'Prima',               value:0, budget:0, fixed:true, months:[5,11] }
       ]}
     ]
   };
