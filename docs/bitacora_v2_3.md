@@ -55,7 +55,7 @@
 | fix: A3 — filtro C3 aplicado en Config y Semáforo ✅ | |
 | fix: C2 _soloHogar huérfano eliminado de _tpl15 ✅ | |
 | fix: C5 textos — Registren y desglosas ✅ | |
-| feat: Servicio Doméstico — Intereses Cesantías, Cesantías, Prima + C4 Otros ✅ | |
+| feat: Servicio Doméstico — Intereses Cesantías, Cesantías, Prima Junio/Dic + DA-10 ✅ | |
 
 ---
 
@@ -688,41 +688,58 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 ---
 
-## Fase 32 — Servicio Doméstico: prestaciones sociales específicas (Junio 2026)
+## Fase 32 — Servicio Doméstico: estructura final pre-piloto (Junio 2026)
 
-**Contexto:** Pre-piloto. Se agregan los ítems de obligaciones laborales anuales para empleada doméstica, reemplazando el ítem genérico "Prestaciones" (que se mantiene para EPS/ARL) y eliminando "Otros" (C4 de auditoría).
+**Contexto:** Pre-piloto. Se definen los ítems definitivos de Servicio Doméstico con tres iteraciones en la misma sesión. Se aclara la distinción DA-10 (Otros en daily sí, en presupuesto no).
 
-### Commit
-```
-feat: Servicio Domestico — Intereses Cesantias, Cesantias, Prima + fix Prestaciones fixed:true + C4 Otros
-```
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | feat: Servicio Domestico — Intereses Cesantias, Cesantias, Prima + fix Prestaciones fixed:true + C4 Otros |
+| — | fix: Servicio Domestico — Prima separada en Junio/Diciembre + devolver Otros |
+| — | fix: Servicio Domestico — quitar Otros de defD y ensure, DA-10 correcta |
+| — | docs: Fase 32 |
 
-### Cambios — DA-10: los tres artefactos modificados simultáneamente
+### Decisiones de producto
+
+**Prestaciones (EPS + ARL):** se mantiene como ítem separado de las obligaciones anuales. No es redundante — cubre las cotizaciones mensuales al sistema de seguridad social. Corregido de `fixed:false` → `fixed:true`.
+
+**Prima separada en dos ítems:** en Colombia se pagan dos primas semestrales independientes. Tenerlas como un solo ítem `months:[5,11]` impedía presupuestarlas por separado. Se separaron en `Prima Junio` y `Prima Diciembre`.
+
+**Otros — distinción DA-10 confirmada:** `Otros` existe en `DAILY_ITEMS` para registrar gastos imprevistos (horas extras, uniformes, transporte nocturno). No existe en `defD()` porque si no se sabe cuánto va a ser ni si ocurrirá, no tiene sentido presupuestarlo — contaminaría el total del mes con un número inventado.
+
+### Cambios finales — tres artefactos simultáneos (DA-10)
 
 **`defD()` en `finanzas.js`**
-- `Prestaciones`: corregido de `fixed:false` → `fixed:true` (EPS + ARL son costo fijo mensual)
-- Agregados 3 ítems con `months[]`:
-  - `Intereses Cesantías` — `months:[0]` (enero)
-  - `Cesantías` — `months:[1]` (febrero)
-  - `Prima` — `months:[5,11]` (junio y diciembre)
-- Eliminado `Otros` (violaba DA-10)
+- `Prestaciones` — `fixed:false` → `fixed:true`
+- Agregados: `Intereses Cesantías` (months:[0]), `Cesantías` (months:[1]), `Prima Junio` (months:[5]), `Prima Diciembre` (months:[11])
+- Eliminados: `Prima` (combinada), `Otros`
 
 **`DAILY_ITEMS` en `utils.js`**
-- Agregados `'Intereses Cesantías'`, `'Cesantías'`, `'Prima'`
-- `'Otros'` se conserva (DA-10: DAILY_ITEMS siempre tiene Otros por categoría)
+- Agregados: `'Intereses Cesantías'`, `'Cesantías'`, `'Prima Junio'`, `'Prima Diciembre'`
+- `'Otros'` se conserva (DA-10)
 
 **`migrateCategories()` en `utils.js`**
-- `ensure`: agregados los 3 ítems nuevos con `months[]` — hogares existentes los reciben al cargar
-- `remove`: agregado `'Otros'` — se limpia de datos guardados en Firebase al cargar
+- `remove`: nombres v1 (Empleada/Niñera), `'Prima'` (combinada), `'Otros'`
+- `ensure`: 6 ítems con estructura final
+
+### Incidente SNBDPA — limpieza manual Firebase
+Durante el desarrollo se desplegó una versión intermedia con `Prima` (months:[5,11]) que quedó escrita en Firebase antes de ser removida. Al desplegar el fix, `migrateCategories` no ejecutó el `remove` porque todos los `ensure` ya estaban satisfechos. Se limpió manualmente vía consola del navegador.
+
+**No afecta familias del piloto** — sus hogares son nuevos y nunca tuvieron `Prima` combinada.
+
+**Lección registrada:** cuando un ítem cambia de nombre o se divide en commits consecutivos sobre un hogar activo, limpiar Firebase manualmente si ya se había desplegado la versión intermedia.
 
 ### Estructura final Servicio Doméstico
-| Ítem | Tipo | Mes |
-|------|------|-----|
-| Salario | fixed mensual | — |
-| Prestaciones | fixed mensual | — |
-| Intereses Cesantías | fixed anual | Enero |
-| Cesantías | fixed anual | Febrero |
-| Prima | fixed semestral | Junio + Diciembre |
+| Ítem | Tipo | Mes | Artefacto |
+|------|------|-----|-----------|
+| Salario | fixed mensual | — | defD + DAILY |
+| Prestaciones (EPS/ARL) | fixed mensual | — | defD + DAILY |
+| Intereses Cesantías | fixed anual | Enero | defD + DAILY |
+| Cesantías | fixed anual | Febrero | defD + DAILY |
+| Prima Junio | fixed semestral | Junio | defD + DAILY |
+| Prima Diciembre | fixed semestral | Diciembre | defD + DAILY |
+| Otros | — | — | solo DAILY |
 
 ---
 
