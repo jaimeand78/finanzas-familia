@@ -261,3 +261,34 @@ body { padding-bottom: 80px; }
 
 /* ── RESUMEN — tarjetas de categoría ─────────────────────────────────────────── */
 .res-cat { transition: none; }
+
+/* ── MODAL OVERLAY COMPARTIDO ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 310;
+  align-items: center; justify-content: center;
+  padding: 1rem; box-sizing: border-box;
+}
+#presupuestoModal { z-index: 300; }
+
+/* ── BANNER PERFIL COMPLETO ── */
+#bannerPerfilCompleto {
+  background: #E6F1FB;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: .75rem;
+}
+.banner-perfil-title   { font-size: 13px; font-weight: 600; color: #185FA5; margin-bottom: .25rem; }
+.banner-perfil-body    { font-size: 13px; color: #185FA5; margin-bottom: .75rem; }
+.banner-perfil-btns    { display: flex; gap: .5rem; }
+.banner-perfil-btn-pri { flex: 2; padding: 8px; border: none; border-radius: 8px; background: #185FA5; color: white; font-size: 13px; font-weight: 600; cursor: pointer; }
+.banner-perfil-btn-sec { flex: 1; padding: 8px; border: 0.5px solid #B8D4F0; border-radius: 8px; background: none; color: #185FA5; font-size: 13px; cursor: pointer; }
+
+/* ── TAB CÓMO VAMOS ── */
+.r-sec-header  { text-align: center; padding: 1.25rem 1rem 1rem; }
+#rDisp         { font-size: 2.2rem; font-weight: 700; font-family: 'DM Mono', monospace; margin: 0; }
+.r-disp-label  { font-size: .8rem; color: var(--color-muted); margin: 4px 0 0; }
+#rProgreso     { margin-bottom: .75rem; }
+#rAhorro       { background: #E1F5EE; border: 0.5px solid #9FE1CB; border-radius: 12px; margin-bottom: .75rem; }
+#resumenCats   { display: flex; flex-direction: column; gap: 8px; margin-bottom: .75rem; }

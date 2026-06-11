@@ -84,3 +84,20 @@ button {
 .btn-logout:hover {
   background: var(--color-bg);
 }
+
+/* ── TOPBAR LOGO ── */
+.topbar-logo-img {
+  height: 24px; width: 24px;
+  border-radius: 6px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* ── BANNER PWA iOS ── */
+#pwab {
+  background: #E8F5EF;
+  padding: .75rem 1rem;
+  font-size: .8rem;
+  text-align: center;
+  color: #085041;
+}

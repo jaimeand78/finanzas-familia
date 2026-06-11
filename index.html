@@ -55,47 +55,47 @@
   </div>
 
   <!-- ── ONBOARDING HOGAR ── -->
-  <div id="hogarScreen" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; padding:1rem;">
-    <div class="login-card" style="text-align:left; gap:.75rem;">
+  <div id="hogarScreen" style="display:none;">
+    <div class="login-card">
       <div id="paso-decision">
-        <div class="login-logo" style="text-align:center;">🏠</div>
-        <h2 style="text-align:center; font-size:1.2rem;">Bienvenido</h2>
-        <p style="text-align:center; color:var(--color-muted); font-size:.9rem;">¿Cómo quieres empezar?</p>
-        <div style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
-          <button class="btn-google" onclick="onbCrear()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600;">Crear mi hogar</button>
+        <div class="login-logo">🏠</div>
+        <h2 class="hogar-title">Bienvenido</h2>
+        <p class="hogar-sub">¿Cómo quieres empezar?</p>
+        <div class="hogar-btns">
+          <button class="btn-google btn-hogar-primary" onclick="onbCrear()">Crear mi hogar</button>
           <button class="btn-google" onclick="onbUnirse()">Tengo un código</button>
         </div>
       </div>
       <div id="paso-crear" style="display:none;">
-        <h2 style="font-size:1.2rem; margin-bottom:1rem;">Crear hogar</h2>
+        <h2 class="hogar-step-title">Crear hogar</h2>
         <label class="ob-label">Nombre del hogar</label>
         <input id="ob-nombre" type="text" placeholder="Ej: Hogar Ibarra" class="ob-input" onkeydown="if(event.key==='Enter') onbSubmitCrear()"/>
         <label class="ob-label">Tipo de hogar</label>
-        <div style="display:flex; flex-direction:column; gap:.5rem; margin-bottom:1rem;">
+        <div class="hogar-radio-group">
           <label class="ob-radio"><input type="radio" name="ob-tipo" value="soltero"> Soltero</label>
           <label class="ob-radio"><input type="radio" name="ob-tipo" value="pareja"> Pareja</label>
           <label class="ob-radio"><input type="radio" name="ob-tipo" value="familia"> Familia</label>
         </div>
         <p id="ob-error-crear" class="ob-error" style="display:none;"></p>
-        <button id="btn-crear-hogar" class="btn-google" onclick="onbSubmitCrear()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Crear hogar</button>
+        <button id="btn-crear-hogar" class="btn-google btn-hogar-primary" onclick="onbSubmitCrear()">Crear hogar</button>
         <button onclick="mostrarPaso('paso-decision')" class="btn-volver">← Volver</button>
       </div>
       <div id="paso-unirse" style="display:none;">
-        <h2 style="font-size:1.2rem; margin-bottom:1rem;">Unirse a un hogar</h2>
+        <h2 class="hogar-step-title">Unirse a un hogar</h2>
         <label class="ob-label">Código del hogar</label>
         <input id="ob-codigo" type="text" placeholder="Ej: K8M4XQ" maxlength="6" class="ob-input ob-codigo"
           oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter') onbSubmitUnirse()"/>
         <p id="ob-error-unirse" class="ob-error" style="display:none;"></p>
-        <button id="btn-unirse-hogar" class="btn-google" onclick="onbSubmitUnirse()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Unirme</button>
+        <button id="btn-unirse-hogar" class="btn-google btn-hogar-primary" onclick="onbSubmitUnirse()">Unirme</button>
         <button onclick="mostrarPaso('paso-decision')" class="btn-volver">← Volver</button>
       </div>
-      <div id="paso-confirmacion" style="display:none; text-align:center;">
-        <div style="font-size:2.5rem; margin-bottom:.5rem;">🎉</div>
-        <h2 style="font-size:1.1rem;">¡Hogar <span id="conf-nombre"></span> creado!</h2>
-        <p style="color:var(--color-muted); font-size:.9rem; margin:.5rem 0;">Comparte este código con tu pareja:</p>
+      <div id="paso-confirmacion" class="paso-conf" style="display:none;">
+        <div class="paso-conf-emoji">🎉</div>
+        <h2 class="paso-conf-title">¡Hogar <span id="conf-nombre"></span> creado!</h2>
+        <p class="paso-conf-sub">Comparte este código con tu pareja:</p>
         <div id="conf-codigo" onclick="onbCopiarCodigo()" class="conf-codigo-box"></div>
-        <p style="font-size:.75rem; color:var(--color-muted); margin-bottom:.75rem;">Toca el código para copiarlo</p>
-        <button class="btn-google" onclick="onbConfirmado()" style="background:var(--color-primary); color:#fff; border:none; font-weight:600; width:100%;">Entrar a Organiza2 →</button>
+        <p class="paso-conf-hint">Toca el código para copiarlo</p>
+        <button class="btn-google btn-hogar-primary" onclick="onbConfirmado()">Entrar a Organiza2 →</button>
       </div>
     </div>
   </div>
@@ -106,7 +106,7 @@
     <!-- Topbar -->
     <div class="topbar">
       <span class="app-title">
-        <img src="./icono-181.png" style="height:24px;width:24px;border-radius:6px;vertical-align:middle;margin-right:6px;">
+        <img src="./icono-181.png" class="topbar-logo-img">
         Organiza2
       </span>
       <div class="topbar-right">
@@ -119,12 +119,12 @@
 
     <!-- Banner miembro 2 -->
     <div id="bannerMiembro2" style="display:none;"></div>
-    <div id="bannerPerfilCompleto" style="display:none;background:#E6F1FB;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.75rem;">
-      <div style="font-size:13px;font-weight:600;color:#185FA5;margin-bottom:.25rem;">✨ Nueva función disponible</div>
-      <div style="font-size:13px;color:#185FA5;margin-bottom:.75rem;">Dinos qué quieren presupuestar para ver solo lo que importa a su hogar.</div>
-      <div style="display:flex;gap:.5rem;">
-        <button onclick="abrirCompletarPerfil()" style="flex:2;padding:8px;border:none;border-radius:8px;background:#185FA5;color:white;font-size:13px;font-weight:600;cursor:pointer;">Completar ahora →</button>
-        <button onclick="document.getElementById('bannerPerfilCompleto').style.display='none'" style="flex:1;padding:8px;border:0.5px solid #B8D4F0;border-radius:8px;background:none;color:#185FA5;font-size:13px;cursor:pointer;">Después</button>
+    <div id="bannerPerfilCompleto" style="display:none;">
+      <div class="banner-perfil-title">✨ Nueva función disponible</div>
+      <div class="banner-perfil-body">Dinos qué quieren presupuestar para ver solo lo que importa a su hogar.</div>
+      <div class="banner-perfil-btns">
+        <button onclick="abrirCompletarPerfil()" class="banner-perfil-btn-pri">Completar ahora →</button>
+        <button onclick="document.getElementById('bannerPerfilCompleto').style.display='none'" class="banner-perfil-btn-sec">Después</button>
       </div>
     </div>
 
@@ -184,19 +184,19 @@
         </div>
 
         <!-- Cabecera — disponible -->
-        <div class="sec" style="text-align:center; padding:1.25rem 1rem 1rem;">
-          <p id="rDisp" class="r-disp-val g" style="font-size:2.2rem;font-weight:700;font-family:'DM Mono',monospace;margin:0;"></p>
-          <p style="font-size:.8rem;color:var(--color-muted);margin:4px 0 0;">disponible este mes</p>
+        <div class="sec r-sec-header">
+          <p id="rDisp" class="r-disp-val g"></p>
+          <p class="r-disp-label">disponible este mes</p>
         </div>
 
         <!-- Barra de progreso gastado/presupuesto -->
-        <div id="rProgreso" style="margin-bottom:.75rem;"></div>
+        <div id="rProgreso"></div>
 
         <!-- Ahorro fijo — siempre visible si tiene presupuesto -->
-        <div id="rAhorro" style="display:none;background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:12px;margin-bottom:.75rem;"></div>
+        <div id="rAhorro" style="display:none;"></div>
 
         <!-- Categorías semáforo — solo rojos y amarillos -->
-        <div id="resumenCats" style="display:flex;flex-direction:column;gap:8px;margin-bottom:.75rem;"></div>
+        <div id="resumenCats"></div>
 
         <!-- Todo bien — aparece si no hay rojos ni amarillos -->
         <div id="rTodoBien" style="display:none;"></div>
@@ -284,7 +284,7 @@
   </div><!-- /appShell -->
 
   <!-- Modal editar categoría -->
-  <div id="cfgCatModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+  <div id="cfgCatModal" class="modal-overlay" style="display:none;">
     <div class="cfg-modal-inner">
       <div class="cfg-modal-hdr">
         <span id="cfgCatModalTitle" class="cfg-modal-title"></span>
@@ -298,7 +298,7 @@
   </div>
 
   <!-- Modal editar ingreso -->
-  <div id="cfgIngModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+  <div id="cfgIngModal" class="modal-overlay" style="display:none;">
     <div class="cfg-modal-inner">
       <div class="cfg-modal-hdr">
         <span id="cfgIngModalTitle" class="cfg-modal-title"></span>
@@ -321,7 +321,7 @@
   </div>
 
   <!-- Modal agregar ingreso adicional -->
-  <div id="cfgIngExtraModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:310; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+  <div id="cfgIngExtraModal" class="modal-overlay" style="display:none;">
     <div class="cfg-modal-inner">
       <div class="cfg-modal-hdr">
         <span id="cfgIngExtraTitulo" class="cfg-modal-title"></span>
@@ -332,17 +332,17 @@
         <div class="cfg-modal-row">
           <label class="cfg-modal-lbl">¿Qué es?</label>
           <input type="text" id="cfgIngExtraLabel" placeholder="Ej: Bono junio, Freelance, Arriendo…"
-            style="width:100%;border:0.5px solid var(--color-border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--color-bg);color:var(--color-text);box-sizing:border-box;" />
+            class="modal-text-input" />
         </div>
-        <div class="cfg-modal-row" style="margin-top:10px;">
+        <div class="cfg-modal-row cfg-modal-row-mt">
           <label class="cfg-modal-lbl">Monto</label>
           <div class="onb-iw"><span class="onb-pre">$</span>
             <input type="text" inputmode="decimal" id="cfgIngExtraMonto" placeholder="0" />
           </div>
         </div>
-        <div class="cfg-modal-row" style="margin-top:10px;">
+        <div class="cfg-modal-row cfg-modal-row-mt">
           <label class="cfg-modal-lbl">¿En qué mes aplica?</label>
-          <select id="cfgIngExtraMes" style="width:100%;border:0.5px solid var(--color-border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--color-bg);color:var(--color-text);box-sizing:border-box;">
+          <select id="cfgIngExtraMes" class="modal-text-input">
             <option value="0">Enero</option>
             <option value="1">Febrero</option>
             <option value="2">Marzo</option>
@@ -357,7 +357,7 @@
             <option value="11">Diciembre</option>
           </select>
         </div>
-        <p style="font-size:11px;color:var(--color-muted);margin-top:8px;">💡 Solo aparece en el mes que selecciones</p>
+        <p class="modal-hint">💡 Solo aparece en el mes que selecciones</p>
       </div>
       <div class="cfg-modal-foot">
         <button class="onb-skip" onclick="cerrarModalIngresoExtra()">Cancelar</button>
@@ -370,12 +370,12 @@
   <div id="toast"></div>
 
   <!-- PWA Banner iOS -->
-  <div id="pwab" style="display:none; background:#E8F5EF; padding:.75rem 1rem; font-size:.8rem; text-align:center; color:#085041;">
+  <div id="pwab" style="display:none;">
     📱 <strong>Instalar en iPhone:</strong> Safari → botón compartir ⬆️ → "Agregar a pantalla de inicio"
   </div>
 
   <!-- Modal Presupuesto Base -->
-  <div id="presupuestoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
+  <div id="presupuestoModal" class="modal-overlay" style="display:none;">
     <div id="onbInner"></div>
   </div>
 

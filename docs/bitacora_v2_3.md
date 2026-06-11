@@ -56,6 +56,7 @@
 | fix: C2 _soloHogar huérfano eliminado de _tpl15 ✅ | |
 | fix: C5 textos — Registren y desglosas ✅ | |
 | feat: Servicio Doméstico — Intereses Cesantías, Cesantías, Prima Junio/Dic + DA-10 ✅ | |
+| refactor: inline styles → CSS — index.html de 51 a 19 atributos style ✅ | |
 
 ---
 
@@ -740,6 +741,31 @@ Durante el desarrollo se desplegó una versión intermedia con `Prima` (months:[
 | Prima Junio | fixed semestral | Junio | defD + DAILY |
 | Prima Diciembre | fixed semestral | Diciembre | defD + DAILY |
 | Otros | — | — | solo DAILY |
+
+---
+
+## Fase 33 — Refactor: inline styles → CSS (Junio 2026)
+
+**Contexto:** Pre-piloto. Se mueven los estilos inline de `index.html` a los archivos CSS correspondientes. De 51 atributos `style=` quedan solo 19, todos únicamente `display:none` controlados por JS — no se pueden mover sin cambiar los archivos JS.
+
+### Commit
+```
+refactor: mover inline styles a CSS — solo display:none queda inline
+```
+
+### Archivos modificados
+| Archivo | Cambio |
+|---------|--------|
+| `index.html` | 51 → 19 atributos `style=` (solo `display:none`) |
+| `css/login.css` | Clases onboarding hogar: `#hogarScreen`, `.hogar-title`, `.hogar-sub`, `.hogar-btns`, `.hogar-radio-group`, `.hogar-step-title`, `.btn-hogar-primary`, `.paso-conf*` |
+| `css/base.css` | `.topbar-logo-img`, `#pwab` |
+| `css/finanzas.css` | `.modal-overlay`, `#presupuestoModal` (z-index:300), `#bannerPerfilCompleto`, `.banner-perfil-*`, `#rDisp`, `.r-sec-header`, `.r-disp-label`, `#rProgreso`, `#rAhorro`, `#resumenCats` |
+| `css/presupuesto.css` | `.modal-text-input`, `.cfg-modal-row-mt`, `.modal-hint` |
+
+### Decisiones
+- `display:none` se mantiene inline — es el estado inicial que JS controla con `element.style.display = 'flex'/'none'`. Moverlo a CSS requeriría cambiar la lógica de toggle en todos los JS.
+- `.modal-overlay` unifica el estilo de los 4 modales que tenían el mismo bloque de 7 propiedades repetido. `#presupuestoModal` sobreescribe `z-index` a 300 (vs 310 de los otros).
+- Probado localmente con Live Server en `localhost:5500` antes de subir a `main`.
 
 ---
 

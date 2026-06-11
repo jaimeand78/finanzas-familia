@@ -119,3 +119,25 @@
   margin-top: .5rem; padding: .4rem 0; width: 100%; cursor: pointer;
   font-family: var(--font);
 }
+
+/* ── OVERLAY ONBOARDING HOGAR ── */
+#hogarScreen {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 200;
+  align-items: center; justify-content: center;
+  padding: 1rem;
+}
+#hogarScreen .login-card { text-align: left; gap: .75rem; }
+.login-logo            { text-align: center; }
+.hogar-title           { text-align: center; font-size: 1.2rem; }
+.hogar-sub             { text-align: center; color: var(--color-muted); font-size: .9rem; }
+.hogar-btns            { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
+.hogar-radio-group     { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+.hogar-step-title      { font-size: 1.2rem; margin-bottom: 1rem; }
+.btn-hogar-primary     { background: var(--color-primary); color: #fff; border: none; font-weight: 600; width: 100%; }
+.paso-conf             { text-align: center; }
+.paso-conf-emoji       { font-size: 2.5rem; margin-bottom: .5rem; }
+.paso-conf-title       { font-size: 1.1rem; }
+.paso-conf-sub         { color: var(--color-muted); font-size: .9rem; margin: .5rem 0; }
+.paso-conf-hint        { font-size: .75rem; color: var(--color-muted); margin-bottom: .75rem; }
