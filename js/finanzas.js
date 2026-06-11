@@ -117,8 +117,7 @@ function defD() {
         { label:'Intereses Cesantías', value:0, budget:0, fixed:true, months:[0] },
         { label:'Cesantías',           value:0, budget:0, fixed:true, months:[1] },
         { label:'Prima Junio',         value:0, budget:0, fixed:true, months:[5] },
-        { label:'Prima Diciembre',     value:0, budget:0, fixed:true, months:[11]},
-        { label:'Otros',               value:0, budget:0, fixed:false            }
+        { label:'Prima Diciembre',     value:0, budget:0, fixed:true, months:[11]}
       ]}
     ]
   };

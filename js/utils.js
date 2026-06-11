@@ -303,8 +303,7 @@ function migrateCategories(data) {
         { label:'Intereses Cesantías', fixed:true, months:[0]  },
         { label:'Cesantías',           fixed:true, months:[1]  },
         { label:'Prima Junio',         fixed:true, months:[5]  },
-        { label:'Prima Diciembre',     fixed:true, months:[11] },
-        { label:'Otros',               fixed:false             }
+        { label:'Prima Diciembre',     fixed:true, months:[11] }
       ]
     },
     'Vivienda': {
