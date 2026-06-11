@@ -55,6 +55,7 @@
 | fix: A3 — filtro C3 aplicado en Config y Semáforo ✅ | |
 | fix: C2 _soloHogar huérfano eliminado de _tpl15 ✅ | |
 | fix: C5 textos — Registren y desglosas ✅ | |
+| feat: Servicio Doméstico — Intereses Cesantías, Cesantías, Prima + C4 Otros ✅ | |
 
 ---
 
@@ -678,12 +679,50 @@ Sesión de validación en producción y resolución de problemas específicos de
 | C1 — ~150 líneas muertas finanzas.js | 🔲 Post-piloto |
 | C2 — vKey(), raw(), _soloHogar | ✅ _soloHogar resuelto · vKey() y raw() post-piloto |
 | C3 — cleanDuplicates/applyFixedYear | 🔲 Post-piloto |
-| C4 — 'Otros' en defD() Servicio Doméstico | 🔲 Post-piloto |
+| C4 — 'Otros' en defD() Servicio Doméstico | ✅ Resuelto — Fase 32 |
 | C5 — Textos | ✅ Resuelto |
 | C6 — Manifest / viewport | 🔲 Post-piloto |
 | D1–D4 — Docs | 🔲 Post-piloto |
 
 **🚀 Todos los críticos resueltos — piloto puede arrancar.**
+
+---
+
+## Fase 32 — Servicio Doméstico: prestaciones sociales específicas (Junio 2026)
+
+**Contexto:** Pre-piloto. Se agregan los ítems de obligaciones laborales anuales para empleada doméstica, reemplazando el ítem genérico "Prestaciones" (que se mantiene para EPS/ARL) y eliminando "Otros" (C4 de auditoría).
+
+### Commit
+```
+feat: Servicio Domestico — Intereses Cesantias, Cesantias, Prima + fix Prestaciones fixed:true + C4 Otros
+```
+
+### Cambios — DA-10: los tres artefactos modificados simultáneamente
+
+**`defD()` en `finanzas.js`**
+- `Prestaciones`: corregido de `fixed:false` → `fixed:true` (EPS + ARL son costo fijo mensual)
+- Agregados 3 ítems con `months[]`:
+  - `Intereses Cesantías` — `months:[0]` (enero)
+  - `Cesantías` — `months:[1]` (febrero)
+  - `Prima` — `months:[5,11]` (junio y diciembre)
+- Eliminado `Otros` (violaba DA-10)
+
+**`DAILY_ITEMS` en `utils.js`**
+- Agregados `'Intereses Cesantías'`, `'Cesantías'`, `'Prima'`
+- `'Otros'` se conserva (DA-10: DAILY_ITEMS siempre tiene Otros por categoría)
+
+**`migrateCategories()` en `utils.js`**
+- `ensure`: agregados los 3 ítems nuevos con `months[]` — hogares existentes los reciben al cargar
+- `remove`: agregado `'Otros'` — se limpia de datos guardados en Firebase al cargar
+
+### Estructura final Servicio Doméstico
+| Ítem | Tipo | Mes |
+|------|------|-----|
+| Salario | fixed mensual | — |
+| Prestaciones | fixed mensual | — |
+| Intereses Cesantías | fixed anual | Enero |
+| Cesantías | fixed anual | Febrero |
+| Prima | fixed semestral | Junio + Diciembre |
 
 ---
 
