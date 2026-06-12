@@ -28,7 +28,7 @@ window.trackEvent = trackEvent;
 window.metricasPiloto = async function() {
   const snap = await db.ref('metricas/eventos').once('value');
   const eventos = [];
-  snap.forEach(ch => eventos.push(ch.val()));
+  snap.forEach(ch => { eventos.push(ch.val()); });
 
   const hace7d = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
