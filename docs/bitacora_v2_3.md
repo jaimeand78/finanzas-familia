@@ -964,6 +964,16 @@ Según el modelo de colaboración (producto_v2_3.md §7), solo el miembro 1 (cre
 
 `metricas/eventos/{pushId}` solo contiene `tipo`, `timestamp`, `hogar` (código), `uid`. Nunca montos, categorías, ítems, notas, ingresos, presupuestos, emails ni nombres.
 
+### Bug #43 — `metricasPiloto()` solo contaba 1 evento (Junio 2026)
+
+**Causa:** `snap.forEach(ch => eventos.push(ch.val()))` — `Array.push()` retorna la nueva longitud (número truthy). El `forEach` de Firebase Realtime Database detiene la iteración si el callback retorna un valor truthy. Resultado: solo se procesaba el primer evento del nodo.
+
+**Fix:** `snap.forEach(ch => { eventos.push(ch.val()); });` — callback sin retorno.
+
+**Validado en producción:** smoke test con hogar SNBDPA — `gastosRegistrados: 4`, `usuariosActivos7d: 1` tras el fix.
+
+**Archivos:** `telemetria.js`
+
 ### Próxima sesión
 
 - Ejecutar `await window.metricasPiloto()` cada lunes durante el piloto.
