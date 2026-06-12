@@ -47,7 +47,17 @@
     "pl":     { ".read": "false", ".write": "false" },
     "daily":  { ".read": "false", ".write": "false" },
     "viaje":  { ".read": "false", ".write": "false" },
-    "hist":   { ".read": "false", ".write": "false" }
+    "hist":   { ".read": "false", ".write": "false" },
+
+    "metricas": {
+      "eventos": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "$pushId": {
+          ".validate": "newData.hasChildren(['tipo','timestamp']) && newData.child('tipo').isString() && newData.child('timestamp').isNumber()"
+        }
+      }
+    }
 
   }
 }

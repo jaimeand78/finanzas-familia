@@ -909,3 +909,66 @@ refactor: mover inline styles a CSS — solo display:none queda inline
 ---
 
 *Organiza2 — Bitácora v2.5 | Junio 2026*
+
+---
+
+## Fase 34 — Telemetría de Piloto v2.3 (Junio 2026)
+
+**Contexto:** Antes de arrancar el piloto, se implementa una capa mínima de telemetría para responder preguntas de producto sin crear una plataforma de analítica ni depender de herramientas de terceros (no Google Analytics, Mixpanel, Amplitude, Firebase Analytics).
+
+### Commits
+| Commit | Descripción |
+|--------|-------------|
+| — | feat: telemetría piloto — trackEvent + metricasPiloto (Fase 34) |
+| — | docs: Fase 34 + DA-19 + reglas Firebase metricas/eventos |
+
+### Diseño
+
+Módulo aislado `js/telemetria.js`, independiente del resto del sistema:
+
+- `trackEvent(tipo)` — función pública única. Escribe en `metricas/eventos/{pushId}` solo `{ tipo, timestamp, hogar, uid }`. Maneja errores silenciosamente (`.catch`/`try-catch`) — si Firebase falla, la app sigue funcionando normal.
+- `window.metricasPiloto()` — función administrativa, solo consola. Lee `metricas/eventos` y devuelve `{ hogaresCreados, miembrosUnidos, onboardingCompletado, gastosRegistrados, usuariosActivos7d, hogaresCon2MiembrosActivos }`.
+
+**Sin dashboard separado** — todo dentro de Organiza2, mismo repo, mismo deploy. Consulta semanal vía consola del navegador.
+
+### Las 6 métricas oficiales
+
+| Evento | Pregunta |
+|--------|----------|
+| `hogar_creado` | ¿La gente acepta probar Organiza2? |
+| `hogar_unido` | ¿Existe colaboración real dentro del hogar? |
+| `onboarding_completado` | ¿El onboarding tiene fricción aceptable? |
+| `gasto_registrado` | ¿La app entra en la rutina diaria? |
+| `usuario_activo` | ¿Los usuarios vuelven? (máx. 1×día×uid, via localStorage) |
+| (calculada) `hogaresCon2MiembrosActivos` | ¿Ambos miembros usan la app? — derivada de `usuario_activo` + `hogar` + `uid`, no es un evento propio |
+
+### Puntos de integración
+
+| Archivo | Cambio |
+|---------|--------|
+| `telemetria.js` | **Nuevo.** `trackEvent()`, `window.metricasPiloto()` |
+| `hogar.js` | `trackEvent('hogar_creado')` al final de `crearHogar()`; `trackEvent('hogar_unido')` al final de `unirseHogar()` (solo en unión nueva, no si `yaEraMiembro`) |
+| `presupuesto.js` | `trackEvent('onboarding_completado')` en `guardarPresupuestoBase()`, solo si `!esFlujoParcial` (excluye `_soloFlags`, `_soloTipo`, `_soloMeta`) |
+| `daily.js` | `trackEvent('gasto_registrado')` tras `db.ref(dayKey...).push(entry)` exitoso |
+| `app.js` | `trackEvent('usuario_activo')` en `onHogarReady()`, gateado por `localStorage['usuario_activo_YYYYMMDD']` |
+| `index.html` | `<script src="js/telemetria.js">` cargado después de `auth.js`, antes de `hogar.js` |
+| `firebase-rules.json` | Nuevo nodo `metricas/eventos` — `.read`/`.write: auth != null`, `.validate` exige `tipo` (string) y `timestamp` (number) |
+
+### Decisión: `onboarding_completado` — 1 vez por hogar, no por uid
+
+Según el modelo de colaboración (producto_v2_3.md §7), solo el miembro 1 (creador del hogar) ejecuta el onboarding completo y llama `guardarPresupuestoBase()` con `!esFlujoParcial`. El miembro 2 ve el banner de confirmación y, si ajusta algo, pasa por Config — que usa los flujos `_soloFlags`/`_soloTipo`/`_soloMeta`, ya excluidos del evento. Por lo tanto:
+
+> `onboarding_completado` ≈ hogares que completaron el setup inicial — no se duplica por pareja.
+
+### Privacidad
+
+`metricas/eventos/{pushId}` solo contiene `tipo`, `timestamp`, `hogar` (código), `uid`. Nunca montos, categorías, ítems, notas, ingresos, presupuestos, emails ni nombres.
+
+### Próxima sesión
+
+- Ejecutar `await window.metricasPiloto()` cada lunes durante el piloto.
+- Si se necesita ver evolución temporal o compartir métricas con Anny, considerar `admin.html` simple (mismo repo, mismo Firebase, sin nuevo deploy) — `metricasPiloto()` ya tiene la lógica de lectura lista para reusar.
+
+---
+
+*Organiza2 — Bitácora v2.5 | Junio 2026*

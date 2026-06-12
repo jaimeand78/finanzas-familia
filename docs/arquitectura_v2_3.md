@@ -56,6 +56,7 @@ organiza2/hogar/
 │   ├── daily.js              → subDaily, submitDaily, renderDailyList, syncDailyMonth
 │   ├── analisis.js           → renderSemaforo, renderTendencia, renderHormiga, renderQuienPago
 │   ├── ui.js                 → go(), goAn(), toast(), setSS(), updateDayLabel()
+│   ├── telemetria.js         → trackEvent(), window.metricasPiloto() (Fase 34)
 │   └── app.js                → punto de entrada, onUserReady, onHogarReady, appLista
 ├── css/
 │   ├── base.css              → variables, reset, topbar, chip
@@ -214,7 +215,16 @@ function calcPresupuestoBase(item, mesActual) {
     "pl":    { ".read": "false", ".write": "false" },
     "daily": { ".read": "false", ".write": "false" },
     "viaje": { ".read": "false", ".write": "false" },
-    "hist":  { ".read": "false", ".write": "false" }
+    "hist":  { ".read": "false", ".write": "false" },
+    "metricas": {
+      "eventos": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "$pushId": {
+          ".validate": "newData.hasChildren(['tipo','timestamp']) && newData.child('tipo').isString() && newData.child('timestamp').isNumber()"
+        }
+      }
+    }
   }
 }
 ```
@@ -229,6 +239,7 @@ function calcPresupuestoBase(item, mesActual) {
 | `hogares/$codigo/perfil` | Hereda de `$codigo` | Hogar nuevo o miembro |
 | `hogares/$codigo/pl/daily/hist` | Hereda de `$codigo` | Solo miembros |
 | `pl/daily/viaje/hist` (raíz, v1) | Bloqueado | Bloqueado |
+| `metricas/eventos` | Cualquier auth (lectura admin vía consola) | Cualquier auth (trackEvent) |
 
 ---
 
@@ -255,6 +266,7 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-16 | Config solo muestra configuración — no gastos reales del mes | ✅ Implementado |
 | DA-17 | Siempre pedir archivo actual antes de modificarlo — ver REGLAS_IA.md | ✅ Regla activa |
 | DA-18 | Config es vista de configuración anual — nunca filtrar ítems de fecha fija (`months[]`) por el mes actual. Siempre mostrar `budget` real con badge del mes | ✅ Implementado |
+| DA-19 | Telemetría del piloto: módulo aislado `telemetria.js`, función única `trackEvent(tipo)`, nodo `metricas/eventos`. Solo 6 métricas oficiales, sin datos sensibles (montos, categorías, nombres, emails) | ✅ Implementado |
 
 ---
 
