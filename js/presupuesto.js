@@ -532,6 +532,7 @@ window.guardarPresupuestoBase = async function() {
     } catch(e) { console.error('guardarPresupuestoBase:', e); }
   }
   if (!esFlujoParcial) save();
+  if (!esFlujoParcial && typeof trackEvent === 'function') trackEvent('onboarding_completado');
   cerrarOnboarding();
   toast('✅ Guardado');
   if (typeof renderAll === 'function') renderAll();

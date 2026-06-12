@@ -197,6 +197,7 @@ window.submitDaily = async function() {
     await db.ref(dayKey(dailyDate)).push(entry);
     setSS('ok');
     toast('✅ Gasto registrado');
+    if (typeof trackEvent === 'function') trackEvent('gasto_registrado');
     if (typeof logH === 'function') logH('expense', note || itemName, amt, cat);
     refreshDaily();
   } catch(e) {

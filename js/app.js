@@ -37,6 +37,15 @@ async function onHogarReady() {
     } catch(e) { console.warn('parche nombre miembro:', e); }
   }
   if (typeof arrancarFinanzas === 'function') arrancarFinanzas();
+  // Telemetría piloto: usuario activo, máximo 1 vez por día (Fase 34)
+  if (typeof trackEvent === 'function') {
+    const hoy = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const key = `usuario_activo_${hoy}`;
+    if (!localStorage.getItem(key)) {
+      trackEvent('usuario_activo');
+      localStorage.setItem(key, '1');
+    }
+  }
   // Verificar banner para miembro 2 (no bloquea el arranque)
   if (typeof verificarBannerMiembro2 === 'function') {
     verificarBannerMiembro2().catch(e => console.warn('banner check:', e));

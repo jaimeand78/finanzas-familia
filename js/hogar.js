@@ -33,6 +33,7 @@ async function crearHogar(uid, nombre, tipo) {
   updates[`hogares/${codigoHogar}/perfil`]          = { _init: true };
   updates[`usuarios/${uid}/codigoHogar`]            = codigoHogar;
   await db.ref().update(updates);
+  if (typeof trackEvent === 'function') trackEvent('hogar_creado');
   return codigoHogar;
 }
 
@@ -50,6 +51,7 @@ async function unirseHogar(uid, codigoHogar) {
   const emailMiembro  = (window.CURRENT_USER && window.CURRENT_USER.email)  || '';
   await db.ref(`hogares/${codigo}/miembros/${uid}`).set({ rol: 'miembro', nombre: nombreMiembro, email: emailMiembro });
   await db.ref(`usuarios/${uid}/codigoHogar`).set(codigo);
+  if (typeof trackEvent === 'function') trackEvent('hogar_unido');
   return { ok: true, meta: snap.val() };
 }
 
