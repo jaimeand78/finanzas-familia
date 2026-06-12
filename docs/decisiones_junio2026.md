@@ -252,5 +252,55 @@ El presupuesto base usa ítems **agrupados**, no el detalle del registro diario:
 
 ---
 
+## 11. Planeador Familiar — Ideas conceptuales (sin implementar)
+
+**Estado:** Exploración de diseño durante el piloto v2.3. Ningún código pendiente — solo para revisar más adelante en v3.0. No viola la regla de validación porque no hay implementación.
+
+**Contexto que originó la sesión:** ejemplos reales de la vida de Jaime/Anny donde la información no llega a tiempo a la pareja:
+- Cita pediátrica avisada con 8 días de anticipación → el día llega y hay choque con otro compromiso (nadie se acordó a tiempo)
+- Nota en el cuaderno del colegio ("enviar dinero en 2 días para actividad") → un miembro la lee pero no se la comunica al otro → no se envía
+- Meta anual tipo "viaje a Europa" → tiene múltiples etapas (pasajes, alojamiento, transporte, presupuesto) que se extienden por meses
+
+**Diagnóstico:** el problema no es falta de calendario (ya existen Gmail, Outlook, calendario compartido). El problema es que la información vive en la cabeza de una sola persona, no hay responsable claro, y el aviso llega el mismo día — no con anticipación.
+
+**Núcleo de valor propuesto:** ambos miembros ven lo mismo, hay un responsable explícito (o "sin asignar" como señal de alerta), y el aviso llega con anticipación configurable — no el día del evento.
+
+**Diferenciador frente a herramientas existentes (TimeTree, Cozi, FamilyWall, etc.):**
+- Esas apps son calendarios familiares aislados — no están conectadas al hábito diario que la pareja ya construye en Organiza2 (registro de gastos en Tab Hoy)
+- La conexión Planeador ↔ Finanzas (compromisos que generan gastos, metas de ahorro con etapas) es algo que las apps de calendario familiar no ofrecen — ese es el ángulo defendible
+
+**Modelo conceptual propuesto (dos tipos, mismo objeto base):**
+
+1. **Compromiso** — unidad base: cita, tarea, pago con plazo
+   - Campos: título, tipo (evento/tarea/recordatorio), fecha, responsable (uid | "ambos" | sin asignar), recurrente (bool/frecuencia), `gastoAsociado` opcional (categoría + monto), estado (pendiente/hecho)
+   - Un Compromiso con `gastoAsociado` sugiere registrar el gasto en Tab Hoy al marcarse como hecho — no escribe directo en `daily/` (respeta DA-1)
+
+2. **Meta/Proyecto** — agrupador de Compromisos con una meta de ahorro asociada (ej. viaje a Europa: pasajes, alojamiento, transporte como Compromisos con `metaId` común + meta de ahorro continua conectada a categoría Ahorro de Presupuesto Base)
+
+**Modelo de datos tentativo:**
+```
+hogares/[codigoHogar]/planeador/
+   compromisos/[id]/
+       titulo
+       tipo: "evento" | "tarea" | "recordatorio"
+       fecha
+       responsable: uid | "ambos" | null
+       recurrente: bool / frecuencia
+       gastoAsociado: { categoria, monto } | null
+       metaId: string | null
+       estado: "pendiente" | "hecho"
+   metas/[id]/
+       nombre
+       ahorroObjetivo
+       fechaObjetivo
+```
+
+**Pendiente para revisión futura:**
+- Validar con el piloto si las familias ya usan algún calendario/app compartido y si les funciona
+- Diseño de pantalla principal del Planeador (no bocetado aún)
+- Mecanismo de "anticipación configurable" — cuántos días antes, por tipo de compromiso
+
+---
+
 *Documento generado en sesión de diseño — Junio 2026*
 *Próximo paso: implementación del onboarding Etapa E*
