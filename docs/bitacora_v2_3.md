@@ -982,3 +982,50 @@ Según el modelo de colaboración (producto_v2_3.md §7), solo el miembro 1 (cre
 ---
 
 *Organiza2 — Bitácora v2.5 | Junio 2026*
+
+---
+
+## Fase 35 — Editar registros del día (Junio 2026)
+
+### Contexto
+
+Las familias piloto pueden registrar un gasto con categoría o ítem equivocados (selección rápida en móvil). Antes solo existía borrar y volver a registrar desde cero. Se diseñó un mockup interactivo (aprobado por Jaime y Anny) y se implementó edición in-place.
+
+### Diseño aprobado
+
+- **Acceso:** tocar la fila completa del gasto en Tab Hoy abre el modal de edición. El botón ✕ existente sigue borrando directo, sin abrir el modal (`stopPropagation`).
+- **Campos editables:** valor, categoría, ítem, nota.
+- **No editables:** fecha/hora, "quién pagó" (`who`) — se mantiene el registro original.
+
+### Implementación
+
+`js/daily.js`:
+- `dailyItemsCache` — array en memoria con los gastos del día actual, poblado en `renderDailyData()`, usado para resolver `id → item` al abrir el modal.
+- `renderDailyList()` — cada `.ditem` ahora tiene `onclick="editDaily(id)"`; el botón de borrar usa `event.stopPropagation()`.
+- `editDaily(id)` — abre `#dailyEditModal`, prellena valor/categoría/ítem/nota desde `dailyItemsCache`.
+- `populateEditCatSel()` / `populateEditItemSel()` — mismas reglas de filtrado por flags (`tieneEmpleada`, `tieneEducacion`, `tieneSeguros`, `tieneVehiculo`) que el formulario de registro (DA-10). Si la categoría/ítem guardado ya no está en el catálogo activo (registro antiguo o flags cambiados), se inserta igual al inicio de la lista para no perder el dato.
+- `onEditCatChange()` / `onEditItemChange()` / `updateEditNoteRequired()` — recarga de ítems al cambiar categoría y nota obligatoria si ítem = "Otros" (misma regla que registro nuevo).
+- `guardarModalEditDaily()` — `db.ref(dayKey + '/' + id).update({amount, category, item, note})`. Si está offline, encola con `oqAdd({type:'update', ...})`.
+
+`js/offline.js`:
+- `syncOfflineQueue()` — agregado soporte para operaciones `type:'update'` (`db.ref(path).update(data)`), antes solo existían `push` y `set`.
+
+`index.html`:
+- Nuevo modal `#dailyEditModal` — mismo patrón visual que `#cfgIngExtraModal` (`cfg-modal-inner`, `cfg-modal-row`, `modal-text-input`, `onb-iw`).
+
+`css/finanzas.css`:
+- `.ditem { cursor: pointer; }` — indica que la fila es interactiva.
+- `.ditem.pending { cursor: default; }` — los registros en estado optimista (sin id real) no son clicables.
+
+### Archivos modificados
+
+`js/daily.js`, `js/offline.js`, `index.html`, `css/finanzas.css`
+
+### Commit sugerido
+
+`feat: editar registros diarios (categoría, ítem, valor, nota) — Fase 35`
+
+### Pendiente / notas
+
+- No se tocó `syncDailyMonth()` — al editar, `refreshDaily()` + `syncDailyMonth()` recalculan totales correctamente porque leen de Firebase tras el `update`.
+- Si en el futuro se permite editar "quién pagó", revisar impacto en "¿Quién pagó?" (Fase 30, lógica de balance proporcional a ingresos).

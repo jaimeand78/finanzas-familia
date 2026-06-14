@@ -33,10 +33,13 @@ function subDaily() {
   });
 }
 
+let dailyItemsCache = [];
+
 function renderDailyData(path, data) {
   if (path !== dailyRefPath) return;
   const items = Object.keys(data || {}).map(id => ({ id, ...data[id] }));
   items.sort((a, b) => new Date(b.ts || 0) - new Date(a.ts || 0));
+  dailyItemsCache = items;
   renderDailyList(items);
 }
 
@@ -234,17 +237,144 @@ function renderDailyList(items) {
     const label   = item.item && item.item !== item.category
       ? item.item + (item.note ? ' — ' + item.note : '')
       : (item.note || item.category);
-    return `<div class="ditem">
+    return `<div class="ditem" onclick="editDaily('${item.id}')">
       <div class="ditem-icon">${icon}</div>
       <div class="ditem-info">
         <div class="ditem-note">${label}</div>
         <div class="ditem-cat">${item.category} · ${item.who || '?'} · ${time}</div>
       </div>
       <div class="ditem-amt">${fmt(item.amount)}</div>
-      <button class="ditem-del" onclick="delDaily('${item.id}')">&#215;</button>
+      <button class="ditem-del" onclick="event.stopPropagation();delDaily('${item.id}')">&#215;</button>
     </div>`;
   }).join('');
 }
+
+// ── EDITAR GASTO ──────────────────────────────────────────────────────────────
+// Modal: valor, categoría, ítem, nota. Fecha/hora y "quién" no son editables.
+
+let editingDailyId = null;
+
+window.editDaily = function(id) {
+  const item = dailyItemsCache.find(i => i.id === id);
+  if (!item) return;
+  editingDailyId = id;
+
+  document.getElementById('deAmt').value = item.amount || '';
+  populateEditCatSel(item.category);
+  populateEditItemSel(item.category, item.item);
+  document.getElementById('deNote').value = item.note || '';
+
+  document.getElementById('dailyEditModal').style.display = 'flex';
+};
+
+function populateEditCatSel(selectedCat) {
+  const catSel = document.getElementById('deCat');
+  if (!catSel) return;
+
+  const flags = (typeof getPerfilFlags === 'function') ? getPerfilFlags() : {};
+  const cats = Object.keys(DAILY_ITEMS).filter(c => {
+    if (!flags.tieneEmpleada  && c.includes('Servicio Doméstico')) return false;
+    if (!flags.tieneEducacion && c.includes('Educación'))          return false;
+    if (!flags.tieneSeguros   && c.includes('Seguros'))            return false;
+    return true;
+  });
+
+  // Si la categoría guardada ya no está en el catálogo activo, igual se muestra
+  // para no perder el dato (caso de registros antiguos o flags cambiados)
+  if (selectedCat && !cats.includes(selectedCat)) cats.unshift(selectedCat);
+
+  catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  catSel.value = selectedCat || cats[0];
+}
+
+function populateEditItemSel(cat, selectedItem) {
+  const itemSel = document.getElementById('deItem');
+  if (!itemSel) return;
+
+  const flags = (typeof getPerfilFlags === 'function') ? getPerfilFlags() : {};
+  const ITEMS_VEHICULO = ['Cuota Crédito / Leasing','Combustible','Peajes','Parqueaderos','Mantenimiento Vehículo','SOAT','Seguro Vehículo','Impuestos Vehículo'];
+
+  let items = DAILY_ITEMS[cat] || [];
+  if (!flags.tieneVehiculo && cat.includes('Transporte')) {
+    items = items.filter(it => !ITEMS_VEHICULO.includes(it));
+  }
+
+  // Si el ítem guardado no está en el catálogo activo, igual se muestra
+  if (selectedItem && !items.includes(selectedItem)) items = [selectedItem, ...items];
+
+  itemSel.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
+  itemSel.value = selectedItem || items[0];
+  updateEditNoteRequired();
+}
+
+window.onEditCatChange = function() {
+  const cat = document.getElementById('deCat').value;
+  populateEditItemSel(cat, null);
+};
+
+window.onEditItemChange = function() {
+  updateEditNoteRequired();
+};
+
+function updateEditNoteRequired() {
+  const itemSel = document.getElementById('deItem');
+  const noteEl  = document.getElementById('deNote');
+  const hintEl  = document.getElementById('deNoteHint');
+  if (!itemSel || !noteEl) return;
+  const isOtros = itemSel.value === 'Otros';
+  noteEl.placeholder = isOtros ? '¿Qué fue? (obligatorio)' : 'Nota (opcional)';
+  if (hintEl) {
+    hintEl.style.display = isOtros ? 'block' : 'none';
+    hintEl.textContent   = isOtros ? '⚠️ Agrega una nota para poder analizarlo después' : '';
+  }
+}
+
+window.cerrarModalEditDaily = function() {
+  document.getElementById('dailyEditModal').style.display = 'none';
+  editingDailyId = null;
+};
+
+window.guardarModalEditDaily = async function() {
+  if (!editingDailyId) return;
+
+  const amt     = parseFloat(document.getElementById('deAmt').value) || 0;
+  const cat     = document.getElementById('deCat').value;
+  const itemVal = document.getElementById('deItem').value;
+  const note    = document.getElementById('deNote').value.trim();
+
+  if (!amt) { toast('Ingresa un monto'); return; }
+  if (itemVal === 'Otros' && !note) {
+    toast('⚠️ Escribe una nota para continuar');
+    document.getElementById('deNote').focus();
+    return;
+  }
+
+  const updates = { amount: amt, category: cat, item: itemVal, note: note || '' };
+  const path = dayKey(dailyDate) + '/' + editingDailyId;
+
+  cerrarModalEditDaily();
+
+  if (!navigator.onLine) {
+    oqAdd({ type:'update', path, data:updates });
+    updateOfflineUI();
+    toast('💾 Guardado offline');
+    return;
+  }
+
+  setSS('wait');
+  try {
+    await db.ref(path).update(updates);
+    setSS('ok');
+    toast('✅ Gasto actualizado');
+    refreshDaily();
+    syncDailyMonth();
+  } catch(e) {
+    console.error('guardarModalEditDaily:', e);
+    oqAdd({ type:'update', path, data:updates });
+    updateOfflineUI();
+    toast('💾 Guardado offline');
+  }
+};
 
 // ── SYNC TOTALES CON MES — DA-1 ───────────────────────────────────────────────
 // Los gastos diarios NUNCA se escriben en el nodo mensual.

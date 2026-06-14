@@ -65,8 +65,9 @@ async function syncOfflineQueue() {
   const failed = [];
   for (const item of q) {
     try {
-      if      (item.type === 'push') await db.ref(item.path).push(item.data);
-      else if (item.type === 'set')  await db.ref(item.path).set(item.data);
+      if      (item.type === 'push')   await db.ref(item.path).push(item.data);
+      else if (item.type === 'set')    await db.ref(item.path).set(item.data);
+      else if (item.type === 'update') await db.ref(item.path).update(item.data);
     } catch(e) {
       console.error('syncOfflineQueue item failed:', e);
       failed.push(item);

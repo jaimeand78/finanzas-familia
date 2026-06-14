@@ -175,7 +175,7 @@ body { padding-bottom: 80px; }
 
 /* Ítem de gasto diario */
 .ditem { display: flex; align-items: center; gap: .5rem; padding: .6rem 0;
-  border-bottom: 1px solid #f5f3ee; }
+  border-bottom: 1px solid #f5f3ee; cursor: pointer; }
 .ditem:last-child { border-bottom: none; }
 .ditem-icon { font-size: 1.1rem; }
 .ditem-info { flex: 1; min-width: 0; }
@@ -186,7 +186,7 @@ body { padding-bottom: 80px; }
 .ditem-del  { background: none; border: none; color: #ddd; font-size: .85rem;
   cursor: pointer; padding: .2rem .3rem; border-radius: 4px; }
 .ditem-del:hover { color: var(--color-error); }
-.ditem.pending { opacity: .55; }
+.ditem.pending { opacity: .55; cursor: default; }
 
 /* ── ANÁLISIS ────────────────────────────────────────────────────────────────── */
 
