@@ -92,20 +92,20 @@ Eliminados `logH()` en `finanzas.js`, llamada a `logH` en `daily.js` y función 
 > Regla aplicable: tras eliminar, barrer CSS, JS, variables globales y referencias cruzadas.
 
 ### C1 — ~150 líneas muertas en `finanzas.js`
-`renderExpSecs` y su familia (`addInc`, `delInc`, `updInc`, `togFxInc`, `addCat`, `addItem`, `delItem`, `delCat`, `updExp`, `togFx`) referencian IDs que ya no existen en `index.html` (`expSecs`, `incRows`, `niLbl`, `ncLbl` — verificado por grep). Además `recalc()` y `renderAll()` las llaman cuando `curTab === 'c'`. Riesgo latente: `updExp` ejecuta `logH` por keystroke si alguien reactiva ese HTML.
-**Acción:** eliminar funciones + llamadas en `recalc()`/`renderAll()`. Verificar que Config sigue funcionando vía `renderConfigPresupuesto`/`renderIngresosConfig`. Actualizar la referencia a `renderExpSecs` en `arquitectura_v2_3.md` §5.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 40)
+Eliminadas funciones `addInc`, `delInc`, `updInc`, `togFxInc`, `addCat`, `addItem`, `delItem`, `delCat`, `updExp`, `togFx` y `renderExpSecs`. Eliminadas sus llamadas en `recalc()` y `renderAll()`. Actualizado comentario de encabezado.
 
 ### C2 — Huérfanos puntuales
-- `vKey()` en `firebase-paths.js` (nodo `viaje` v1) — sin usos.
-- `raw()` en `utils.js` — sin usos.
-- `_soloHogar` en `_tpl15` (`presupuesto.js:169`) — Fase 29 lo reemplazó por `_soloTipo`; ya nada lo setea.
-**Acción:** eliminar los tres (y la mención a `vKey` en el header de `firebase-paths.js`).
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 40)
+Eliminados `vKey()` en `firebase-paths.js` y `raw()` en `utils.js`. `_soloHogar` ya había sido eliminado en sesión anterior.
 
 ### C3 — `cleanDuplicates` y `applyFixedYear` sin punto de entrada en UI
-Son `window.*` sin botón. **Decidir:** si son herramientas de consola intencionales → documentarlas en arquitectura; si no → eliminar.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 40)
+Eliminadas ambas funciones de `finanzas.js`. Eran herramientas de migración v1→v2 ya innecesarias.
 
 ### C4 — `defD()` Servicio Doméstico incluye ítem `'Otros'`
-Rompe la regla DA-10 ("`DAILY_ITEMS` tiene Otros en cada categoría; `defD()` no"). **Acción:** quitar `{ label:'Otros', ... }` de Servicio Doméstico en `defD()` (`finanzas.js`). No requiere cambio en `migrateCategories` (no lo "ensure").
+**Estado:** ✅ Resuelto — sesión anterior
+Verificado en código: `Otros` no existe en Servicio Doméstico de `defD()`. Ya fue eliminado.
 
 ### C5 — Textos
 **Estado:** ✅ Resuelto — Junio 2026
@@ -113,8 +113,9 @@ Rompe la regla DA-10 ("`DAILY_ITEMS` tiene Otros en cada categoría; `defD()` no
 - "desglosás" → "desglosas" corregido en `presupuesto.js` `_tpl4`.
 
 ### C6 — Manifest y viewport
-- `manifest.json`: declara `sizes: "1254x1254"` para `icono-181.png`; mismo archivo para `any` y `maskable` (maskable requiere margen de seguridad ~20%). Corregir sizes reales y generar variante maskable.
-- `index.html`: `maximum-scale=1.0` bloquea zoom (accesibilidad). Evaluar quitarlo.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 40)
+- `manifest.json`: `sizes` corregido a `181x181` (valor real del archivo).
+- `index.html`: eliminado `maximum-scale=1.0` del viewport — zoom habilitado.
 
 ---
 
@@ -154,7 +155,7 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | 5 | C5 — Textos Registren / desglosas | ✅ Resuelto | Limpieza |
 | — | **🚀 Piloto activo** | | |
 | 6 | D5 — Pendientes pre-piloto | ✅ Resuelto | Operativo |
-| 7 | C1–C4, C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
+| 7 | C1–C4, C6 — Fase de limpieza | ✅ Resuelto | Limpieza |
 | 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
 | 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
 | 10 | B2 — Documentar limitación save() | ✅ Documentado | Docs |

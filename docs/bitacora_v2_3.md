@@ -1145,3 +1145,39 @@ Al actualizar archivos del shell (CSS, JS), incrementar `CACHE_NAME` en `sw.js` 
 ```
 feat: service worker PWA — cache-first shell, network-only Firebase — Fase 39
 ```
+
+---
+
+## Fase 40 — Limpieza general C1 C2 C3 C6 (Junio 2026)
+
+Sesión de limpieza de código huérfano identificado en auditoría. Un solo commit agrupa todos los cambios.
+
+### Cambios por hallazgo
+
+| Hallazgo | Cambio |
+|----------|--------|
+| C1 — Funciones muertas `finanzas.js` | Eliminadas `renderExpSecs`, `addInc`, `delInc`, `updInc`, `togFxInc`, `addCat`, `addItem`, `delItem`, `delCat`, `updExp`, `togFx` y sus llamadas en `recalc()`/`renderAll()` |
+| C2 — Huérfanos | Eliminadas `vKey()` en `firebase-paths.js` y `raw()` en `utils.js` |
+| C3 — Herramientas de migración | Eliminadas `applyFixedYear` y `cleanDuplicates` de `finanzas.js` |
+| C4 — `Otros` en `defD()` | Ya resuelto en sesión anterior — verificado |
+| C6 — Manifest y viewport | `manifest.json`: sizes corregido a `181x181`; `index.html`: eliminado `maximum-scale=1.0` |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `finanzas.js` | C1 + C3 — ~150 líneas eliminadas |
+| `firebase-paths.js` | C2 — `vKey()` eliminada, header actualizado |
+| `utils.js` | C2 — `raw()` eliminada |
+| `manifest.json` | C6 — sizes corregido |
+| `index.html` | C6 — viewport sin maximum-scale |
+
+### ⚠️ CACHE_NAME debe incrementarse
+
+Este commit modifica `finanzas.js`, `firebase-paths.js`, `utils.js` e `index.html` — todos en el SHELL del SW. Incrementar `CACHE_NAME` en `sw.js` a `organiza2-v2-4`.
+
+### Commit
+
+```
+refactor: limpieza C1 C2 C3 C6 — funciones huérfanas y manifest — Fase 40
+```
