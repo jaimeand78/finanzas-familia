@@ -19,8 +19,15 @@
 </head>
 <body>
 
+  <!-- ── PANTALLA DE VERIFICACIÓN DE SESIÓN ── -->
+  <!-- Visible por defecto. Se oculta cuando Firebase resuelve el estado auth. -->
+  <!-- Evita el parpadeo de login en iOS PWA cuando hay sesión persistida (Bug #45). -->
+  <div id="checkingScreen" class="checking-screen">
+    <img src="./logo.png" alt="Organiza2" style="width:72px; opacity:0.5;">
+  </div>
+
   <!-- ── PANTALLA DE LOGIN ── -->
-  <div id="loginScreen">
+  <div id="loginScreen" style="display:none;">
     <div class="login-card">
       <div class="login-hero">
         <img src="./logo.png" alt="Organiza2"/>

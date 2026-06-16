@@ -141,3 +141,12 @@
 .paso-conf-title       { font-size: 1.1rem; }
 .paso-conf-sub         { color: var(--color-muted); font-size: .9rem; margin: .5rem 0; }
 .paso-conf-hint        { font-size: .75rem; color: var(--color-muted); margin-bottom: .75rem; }
+
+/* ── Pantalla de verificación de sesión (Bug #45 — Fase 41) ── */
+.checking-screen {
+  position: fixed; inset: 0;
+  display: flex;
+  align-items: center; justify-content: center;
+  background: var(--color-bg, #F5F3EE);
+  z-index: 9999;
+}
