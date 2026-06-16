@@ -1044,6 +1044,8 @@ Sesión de verificación y documentación. Los tres hallazgos críticos de `audi
 | A2 — Educación en Pareja/Soltero | `eduFlag` forzado a `false` si `tipoHogar !== 'familia'` en `presupuesto.js`. |
 | A3 — Filtro C3 en Config y Análisis | Opción A implementada: `filtrarCategoriasPorPerfil()` aplicado en `renderConfigPresupuesto`, `abrirModalCategoria` y Semáforo de Análisis. |
 | B4 — Archivos en Fuentes | `finanzas.css` y `REGLAS_IA.md` confirmados en proyecto Claude. |
+| C5 — Textos | "Regístren" → "Registren" y "desglosás" → "desglosas" corregidos en `presupuesto.js`. |
+| D5 — Pendientes pre-piloto | Restauración de ingresos SNBDPA: decisión tomada de borrar presupuesto y conservar solo `daily/`; hogar reconfigurado desde la app. Verificación E2E de C3: hecha en producción. |
 
 ### Archivos modificados
 

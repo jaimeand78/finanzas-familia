@@ -137,7 +137,10 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 `pl/` usa mes `0–11` (índice JS) y `daily/` usa `mm` `01–12` (string padded). Funciona, pero es trampa para bugs futuros. **Acción:** nota explícita en `arquitectura_v2_3.md` §3.
 
 ### D5 — Pendientes pre-piloto sin marcar
-La restauración de ingresos de SNBDPA y la verificación E2E de C3 figuran como "antes de lanzar" sin estado. **Acción:** marcar hecho/pendiente en bitácora.
+**Estado:** ✅ Resuelto — Junio 2026
+
+- **Restauración de ingresos SNBDPA** → no aplica. Decisión tomada: borrar presupuesto base, conservar solo `daily/`. SNBDPA reconfigurado desde la app antes del piloto.
+- **Verificación E2E de C3** → hecha. Filtro de perfil verificado de punta a punta en producción. Piloto activo.
 
 ---
 
@@ -151,7 +154,7 @@ La restauración de ingresos de SNBDPA y la verificación E2E de C3 figuran como
 | 4 | B4 — finanzas.css y REGLAS_IA.md en Fuentes | ✅ Resuelto | Operativo |
 | 5 | C5 — Textos Registren / desglosas | ✅ Resuelto | Limpieza |
 | — | **🚀 Piloto activo** | | |
-| 6 | D5 — Cerrar pendientes en bitácora | 🔲 Pendiente | Operativo |
+| 6 | D5 — Pendientes pre-piloto | ✅ Resuelto | Operativo |
 | 7 | C1–C4, C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
 | 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
 | 9 | B1, B2, B3, B5 | 🔲 Post-piloto | Mejora |
