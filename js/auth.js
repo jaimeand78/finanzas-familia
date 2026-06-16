@@ -7,20 +7,53 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+// Clave que Firebase SDK compat v9 usa para persistir la sesión en localStorage.
+// Patrón: firebase:authUser:[apiKey]:[appName]
+var _FB_LS_KEY = 'firebase:authUser:AIzaSyCHWDJfmr2ok_xw-w1FE1tvNV5j5j5VEzc:[fp]';
+
 // Oculta la pantalla de verificación inicial una vez que Firebase resolvió el estado.
 function _hideChecking() {
   var el = document.getElementById('checkingScreen');
   if (el) el.style.display = 'none';
 }
 
+// Lee la sesión persistida de localStorage (fallback offline iOS).
+// Firebase SDK escribe el usuario serializado en _FB_LS_KEY tras cada login exitoso.
+function _getPersistedUser() {
+  try {
+    var raw = localStorage.getItem(_FB_LS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
 function initLogin() {
   // Firebase Auth con LOCAL persistence guarda la sesión en IndexedDB.
-  // En iOS PWA (Safari standalone), la restauración de IndexedDB puede tomar
-  // 300–800ms. Durante ese tiempo, onAuthStateChanged aún no ha disparado.
-  // El loginScreen estaba visible por defecto → causaba parpadeo aunque hubiera sesión.
-  // Solución: mostrar #checkingScreen (neutro) hasta que Firebase resuelva.
-  // Solo entonces decidir: onLoginSuccess (hay sesión) o showLoginScreen (no hay).
+  // En iOS PWA offline (Safari standalone), onAuthStateChanged NO dispara
+  // porque el SDK no puede validar el token sin red — incluso con sesión persistida.
+  // Solución: timeout de 4s. Si Firebase no resuelve, leer localStorage como fallback.
+  // Si existe sesión previa → arrancar offline. Si no → mostrar login.
+  var resolved = false;
+
+  var offlineTimer = setTimeout(function() {
+    if (resolved) return;
+    resolved = true;
+    _hideChecking();
+    var persisted = _getPersistedUser();
+    if (persisted && persisted.uid) {
+      // Hay sesión previa — arrancar en modo offline con datos del localStorage
+      console.warn('[auth] Firebase timeout offline — usando sesión persistida');
+      onLoginSuccess(persisted);
+    } else {
+      showLoginScreen();
+    }
+  }, 4000);
+
   auth.onAuthStateChanged(function(firebaseUser) {
+    if (resolved) return;
+    resolved = true;
+    clearTimeout(offlineTimer);
     _hideChecking();
     if (firebaseUser) {
       onLoginSuccess(firebaseUser);
