@@ -1181,3 +1181,72 @@ Este commit modifica `finanzas.js`, `firebase-paths.js`, `utils.js` e `index.htm
 ```
 refactor: limpieza C1 C2 C3 C6 — funciones huérfanas y manifest — Fase 40
 ```
+
+---
+
+## Fase 41 — Bug #45: Restauración Auth Offline iOS PWA (Junio 2026)
+
+### Problema
+
+En iPhone con PWA instalada: cerrar completamente la app → activar modo avión → abrir Organiza2 → aparecía pantalla de Login aunque hubiera sesión válida persistida. Al presionar "Entrar con Google" no ocurría nada. Al reintentar: error `auth/cancelled-popup-request`.
+
+Comportamiento secundario: incluso estando online, al abrir la PWA se veía un parpadeo del Login antes de entrar al hogar.
+
+### Diagnóstico — Causa raíz confirmada
+
+Combinación de tres factores documentados:
+
+| Factor | Descripción |
+|--------|-------------|
+| **A — HTML** | `#loginScreen` era visible por defecto en el HTML. Firebase tarda 300–800ms en restaurar la sesión de `IndexedDB`. Durante ese tiempo el login ya era visible, aunque hubiera sesión. |
+| **B — Firebase SDK v9** | `onAuthStateChanged` siempre emite `null` primero al arrancar — comportamiento esperado y documentado, no un bug. En iOS PWA (Safari standalone), la latencia de `IndexedDB` es mayor que en Chrome/Android. |
+| **C — iOS PWA offline** | `signInWithPopup` no puede completarse offline. Al reintentar, Firebase lanza `auth/cancelled-popup-request` por popup doble pendiente. |
+
+Hipótesis evaluadas:
+- ❌ A — Race condition `setPersistence` / `onAuthStateChanged`: descartada. `setPersistence` en v9 compat es sincrónico.
+- ✅ B — Safari PWA tarda más en restaurar sesión local: confirmada.
+- ✅ C — `onAuthStateChanged` devuelve `null` antes de resolver usuario persistido: confirmada, comportamiento esperado.
+- ✅ D — Limitación `signInWithPopup` en iOS offline: confirmada.
+
+### Solución aplicada — cambios mínimos
+
+**`index.html`:**
+- `#loginScreen` pasa a `display:none` por defecto.
+- Nuevo `#checkingScreen` visible por defecto: muestra el logo con opacidad mientras Firebase resuelve. Se oculta cuando `onAuthStateChanged` dispara (con o sin sesión).
+
+**`js/auth.js`:**
+- Nueva función `_hideChecking()`: oculta `#checkingScreen`.
+- `initLogin()`: llama `_hideChecking()` antes de decidir entre `onLoginSuccess` o `showLoginScreen`. La lógica de `onAuthStateChanged` no cambia.
+- `loginWithGoogle()`: bloquea el intento si `!navigator.onLine` con mensaje claro. Ignora silenciosamente `auth/cancelled-popup-request` (doble tap iOS).
+
+**`css/login.css`:**
+- Nueva clase `.checking-screen`: `position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background: var(--color-bg); z-index:9999`.
+
+### Validación esperada por caso
+
+| Caso | Resultado esperado |
+|------|--------------------|
+| A — Online, cerrar y abrir | Sin parpadeo de login. `#checkingScreen` visible ~300ms, luego entra al hogar. |
+| B — Offline, cerrar con sesión activa | Entra al hogar sin mostrar login. Firebase restaura sesión de `IndexedDB`. |
+| C — Usuario nuevo | `#checkingScreen` breve → Login normal. |
+| D — Logout, cerrar, abrir | `#checkingScreen` breve → Login normal. |
+| E — Android Chrome PWA | Sin regresiones. `#checkingScreen` imperceptible (~100ms). |
+| F — Chrome Desktop | Sin regresiones. |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `index.html` | `#loginScreen` oculto por defecto + nuevo `#checkingScreen` |
+| `js/auth.js` | `_hideChecking()` nueva + `initLogin()` + `loginWithGoogle()` |
+| `css/login.css` | Clase `.checking-screen` nueva al final |
+
+### ⚠️ CACHE_NAME debe incrementarse
+
+Este commit modifica `index.html`, `js/auth.js` y `css/login.css` — todos en el SHELL del SW. Incrementar `CACHE_NAME` en `sw.js` de `organiza2-v2-4` → `organiza2-v2-5`.
+
+### Commit
+
+```
+fix: restauración auth offline iOS PWA — checkingScreen y popup guard — Fase 41
+```
