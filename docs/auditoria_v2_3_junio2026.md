@@ -71,8 +71,8 @@ Se identifican **3 hallazgos críticos pre-piloto**, **5 medios**, **6 de limpie
 **Criterio:** el total de un mes pasado coincide entre Semáforo y Tendencia.
 
 ### B2 — `save()` hace `set` completo del nodo mensual (last-write-wins)
-**Estado:** 🔲 Documentar · **Archivos:** `finanzas.js` · `arquitectura_v2_3.md`
-Con dos miembros editando Config a la vez, el debounce de 800ms + `set` completo puede pisar cambios del otro. Tolerable para el piloto. **Acción mínima:** documentarlo como limitación conocida en arquitectura. **Acción futura:** migrar a `update()` por ítem o por categoría.
+**Estado:** ✅ Documentado — Junio 2026
+Limitación registrada en `arquitectura_v2_3.md` §10. Tolerable para el piloto. Solución futura: migrar a `update()` por ítem.
 
 ### B3 — PWA sin service worker
 **Estado:** 🔲 Post-piloto · **Archivos:** nuevo `sw.js` + registro en `index.html`
@@ -158,7 +158,8 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | 7 | C1–C4, C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
 | 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
 | 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
-| 10 | B1, B2, B3 | 🔲 Post-piloto | Mejora |
+| 10 | B2 — Documentar limitación save() | ✅ Documentado | Docs |
+| 11 | B1, B3 | 🔲 Post-piloto | Mejora |
 
 ---
 

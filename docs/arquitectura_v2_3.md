@@ -48,7 +48,7 @@ organiza2/hogar/
 │   ├── config.js             → Firebase init, db + auth globales
 │   ├── utils.js              → fmt, canonicalLabel, planItems, DAILY_ITEMS, MONTHS, COLORS, ICONS
 │   ├── offline.js            → Cola offline, syncOfflineQueue
-│   ├── firebase-paths.js     → dKey(), dayKey(), hKey() por codigoHogar
+│   ├── firebase-paths.js     → dKey(), dayKey() por codigoHogar
 │   ├── auth.js               → initLogin, loginWithGoogle, signOutUser
 │   ├── hogar.js              → crearHogar, unirseHogar, loadHogar, onboarding UI
 │   ├── finanzas.js           → subMonth, save, recalc, renderResumen (solo rojos/amarillos), renderExpSecs, defD
@@ -111,7 +111,6 @@ organiza2-a09ef (Realtime Database)
         │                   ├── item: "Frutas y verduras"
         │                   ├── note: ""
         │                   └── who: "Jaime"
-        └── hist/                       ← historial de cambios
 ```
 
 ---
@@ -270,13 +269,25 @@ function calcPresupuestoBase(item, mesActual) {
 
 ---
 
-## 10. Migración Anny1130 — v1 → v2.0
+## 10. Limitaciones Conocidas
+
+### save() — last-write-wins en edición concurrente (B2)
+
+`save()` en `finanzas.js` hace un `set` completo del nodo mensual `pl/[año]/[mes]/`. Si dos miembros del hogar editan el presupuesto en Config simultáneamente, el último en guardar pisa los cambios del primero (debounce de 800ms no es suficiente para cubrir este escenario).
+
+**Impacto real:** muy bajo. Config lo configura típicamente una sola persona. Para que ocurra el conflicto ambos miembros deben estar en Config al mismo tiempo editando campos distintos.
+
+**Solución futura:** migrar `save()` a `update()` por ítem o por categoría en lugar de `set` completo del objeto.
+
+---
+
+## 11. Migración Anny1130 — v1 → v2.0
 
 **Estado:** ✅ Ejecutada. Los datos de `pl/Anny1130/2026/` fueron migrados a `hogares/SNBDPA/pl/2026/`.
 
 ---
 
-## 11. PWA
+## 12. PWA
 
 ```json
 {
