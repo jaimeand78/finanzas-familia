@@ -66,9 +66,8 @@ Se identifican **3 hallazgos críticos pre-piloto**, **5 medios**, **6 de limpie
 ## 🟡 MEDIOS — decidir o programar post-piloto temprano
 
 ### B1 — Semáforo de meses pasados ignora los gastos diarios
-**Estado:** 🔲 Pendiente · **Archivos:** `analisis.js`
-`renderSemaforo()` pasa `{}` como totals cuando `curMx ≠ curM`. El gasto histórico se subestima — inconsistente con Tendencia, que sí suma daily. **Fix:** en la rama del mes distinto, cargar también `daily/{y}/{mm}`, normalizar la categoría con `.replace(/^\S+\s/, '')` + `CAT_RENAMES` (igual que `syncDailyMonth`) y pasar esos totals.
-**Criterio:** el total de un mes pasado coincide entre Semáforo y Tendencia.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 38)
+Bloque `else` de `renderSemaforo()` reemplazado: ahora carga `pl/` y `daily/` en paralelo con `Promise.all`, acumula los gastos daily por categoría (normalizando sin emoji con `.replace(/^\S+\s/, '')` + `CAT_RENAMES`) y los pasa como `totals` a `_renderSemaforoConData`. Consistente con `renderTendencia`.
 
 ### B2 — `save()` hace `set` completo del nodo mensual (last-write-wins)
 **Estado:** ✅ Documentado — Junio 2026
@@ -159,7 +158,8 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
 | 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
 | 10 | B2 — Documentar limitación save() | ✅ Documentado | Docs |
-| 11 | B1, B3 | 🔲 Post-piloto | Mejora |
+| 11 | B1 — Semáforo histórico incluye daily | ✅ Resuelto | Mejora |
+| 12 | B3 | 🔲 Post-piloto | Mejora |
 
 ---
 

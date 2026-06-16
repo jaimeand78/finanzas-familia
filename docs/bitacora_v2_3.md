@@ -1083,3 +1083,33 @@ Purgar manualmente el nodo `hogares/SNBDPA/hist` desde la consola Firebase (dato
 ```
 fix: eliminar logH hKey y nodo hist huérfano — Fase 37
 ```
+
+---
+
+## Fase 38 — Fix B1: Semáforo histórico incluye gastos diarios (Junio 2026)
+
+**Contexto:** `renderSemaforo()` en `analisis.js` pasaba `{}` como totals al ver meses históricos, subestimando el gasto real. `renderTendencia` ya cargaba `daily/` correctamente — el Semáforo no.
+
+### Cambio
+
+Bloque `else` de `renderSemaforo()` reemplazado. Antes:
+```javascript
+db.ref(dKey(curYx, curMx)).once('value').then(snap => {
+  const d = snap.val() || { income:[], categories:[] };
+  _renderSemaforoConData(sem, d, {});  // totals vacío
+});
+```
+
+Ahora: carga `pl/` y `daily/` en paralelo con `Promise.all`, acumula gastos daily por categoría normalizando sin emoji (`.replace(/^\S+\s/, '')` + `CAT_RENAMES`) y los pasa como `totals`.
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `analisis.js` | Bloque `else` de `renderSemaforo()` — carga daily histórico |
+
+### Commit
+
+```
+fix: semáforo histórico incluye gastos daily — Fase 38
+```
