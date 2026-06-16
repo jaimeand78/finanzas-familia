@@ -39,9 +39,24 @@ function renderSemaforo() {
   if (mismomes) {
     _renderSemaforoConData(sem, D, dailyTotals);
   } else {
-    db.ref(dKey(curYx, curMx)).once('value').then(snap => {
-      const d = snap.val() || { income:[], categories:[] };
-      _renderSemaforoConData(sem, d, {});
+    const mm = String(curMx + 1).padStart(2, '0');
+    Promise.all([
+      db.ref(dKey(curYx, curMx)).once('value'),
+      db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curYx}/${mm}`).once('value')
+    ]).then(([snapMes, snapDaily]) => {
+      const d = snapMes.val() || { income:[], categories:[] };
+      // Acumular gastos daily por categoría (sin emoji, igual que syncDailyMonth)
+      const totals = {};
+      snapDaily.forEach(daySnap => {
+        daySnap.forEach(item => {
+          const v = item.val();
+          if (!v.amount) return;
+          const rawCat = (v.category || '').replace(/^\S+\s/, '');
+          const cat = CAT_RENAMES[rawCat] || rawCat;
+          totals[cat] = (totals[cat] || 0) + v.amount;
+        });
+      });
+      _renderSemaforoConData(sem, d, totals);
     });
   }
 }
