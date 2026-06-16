@@ -83,8 +83,8 @@ Hay manifest pero no SW: la app instalada no abre sin conexión; la cola offline
 Ambos archivos confirmados en proyecto Claude (Fuentes).
 
 ### B5 — Nodo `hist` crece sin límite y nadie lo lee
-**Estado:** 🔲 Decisión requerida · **Archivos:** `finanzas.js` (`logH`), `firebase-paths.js` (`hKey`)
-`logH()` escribe en cada gasto; no existe ningún lector en el código. **Decidir:** (a) eliminar `logH`/`hKey` y el nodo, o (b) declararlo log de auditoría en arquitectura y definir política de retención.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 37)
+Eliminados `logH()` en `finanzas.js`, llamada a `logH` en `daily.js` y función `hKey()` en `firebase-paths.js`. El nodo `hist/` en Firebase puede purgarse manualmente desde la consola.
 
 ---
 
@@ -157,7 +157,8 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | 6 | D5 — Pendientes pre-piloto | ✅ Resuelto | Operativo |
 | 7 | C1–C4, C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
 | 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
-| 9 | B1, B2, B3, B5 | 🔲 Post-piloto | Mejora |
+| 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
+| 10 | B1, B2, B3 | 🔲 Post-piloto | Mejora |
 
 ---
 

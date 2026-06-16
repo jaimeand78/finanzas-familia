@@ -1059,3 +1059,27 @@ Sesión de verificación y documentación. Los tres hallazgos críticos de `audi
 ```
 docs: cierre hallazgos críticos auditoría A1 A2 A3 — Fase 36
 ```
+
+---
+
+## Fase 37 — Eliminación de logH / hKey / nodo hist (Junio 2026)
+
+**Contexto:** El nodo `hist/` acumulaba un log de cada gasto registrado pero ningún módulo lo leía. La Tendencia y el Semáforo histórico leen de `pl/` y `daily/` directamente. Decisión: eliminar.
+
+### Cambios
+
+| Archivo | Cambio |
+|---------|--------|
+| `finanzas.js` | Eliminada función `logH()` y su llamada en `updExp` |
+| `daily.js` | Eliminada llamada a `logH` tras push exitoso; actualizado comentario de encabezado |
+| `firebase-paths.js` | Eliminada función `hKey()`; actualizado header con nota histórica |
+
+### Pendiente operativo
+
+Purgar manualmente el nodo `hogares/SNBDPA/hist` desde la consola Firebase (datos huérfanos, no afecta la app).
+
+### Commit
+
+```
+fix: eliminar logH hKey y nodo hist huérfano — Fase 37
+```
