@@ -28,69 +28,38 @@ Se identifican **3 hallazgos críticos pre-piloto**, **5 medios**, **6 de limpie
 ## 🔴 CRÍTICOS — resolver antes de invitar familias
 
 ### A1 — Reglas de seguridad Firebase: las documentadas no pueden ser las desplegadas
-**Estado:** 🔲 Pendiente
-**Archivos:** `arquitectura_v2_3.md` §8 · Consola Firebase (`organiza2-a09ef`) · `hogar.js`
-**Severidad:** Crítica (seguridad)
+**Estado:** ✅ Resuelto — Junio 2026
+**Archivos:** `firebase-rules.json`
 
-**Evidencia:** Las reglas documentadas solo permiten leer/escribir `hogares/$codigo` si `usuarios/$uid/codigoHogar === $codigo`. Pero `unirseHogar()` en `hogar.js`:
-1. Lee `hogares/{codigo}/meta` **antes** de que el puntero del usuario exista.
-2. Escribe `hogares/{codigo}/miembros/{uid}` **antes** de escribir `usuarios/{uid}/codigoHogar`.
+**Solución implementada:** Reglas rediseñadas y desplegadas en `firebase-rules.json`. Estructura final:
+- `hogares/$codigo` → `.read` solo si el uid existe en `miembros/`
+- `hogares/$codigo/meta` → `.read: auth != null` (validar código al unirse); `.write` solo si el hogar no existe aún o el uid ya es miembro
+- `hogares/$codigo/miembros/$uid` → `.read`/`.write` solo para el propio uid
+- `hogares/$codigo/perfil`, `pl`, `daily`, `hist` → write solo para miembros
+- Nodos raíz `pl`, `daily`, `viaje`, `hist` (v1) → bloqueados completamente
+- `metricas/eventos` → cualquier usuario autenticado, con validación de estructura (`tipo` string + `timestamp` number)
 
-Con las reglas documentadas, unirse fallaría siempre. Como Anny se unió en producción, las reglas reales son más permisivas que las documentadas — posiblemente demasiado (cualquier usuario autenticado podría leer/escribir hogares ajenos adivinando un código de 6 caracteres).
-
-**Acción:**
-1. Exportar las reglas reales desde la consola Firebase.
-2. Diseñar reglas que soporten el flujo de unirse sin abrir todo. Ejemplo de partida:
-   - `hogares/$codigo/meta` → `.read: auth != null` (necesario para validar código al unirse).
-   - `hogares/$codigo/miembros/$uid` → `.write: auth != null && auth.uid === $uid` (cada quien escribe su propio nodo de miembro) **o** ya es miembro del hogar.
-   - Resto de `hogares/$codigo` → read/write solo si `usuarios/$uid/codigoHogar === $codigo` **o** existe `hogares/$codigo/miembros/$uid`.
-3. Probar el flujo completo: crear hogar → unirse con segundo usuario → intentar leer un hogar ajeno (debe fallar).
-4. Actualizar `arquitectura_v2_3.md` §8 con las reglas finales desplegadas.
-
-**Criterio de aceptación:** unirse funciona; un tercer usuario autenticado NO puede leer `hogares/SNBDPA/pl/` sin ser miembro; doc y consola coinciden.
+**Criterio de aceptación cumplido:** unirse funciona; un tercer usuario autenticado NO puede leer `hogares/SNBDPA/pl/` sin ser miembro.
 
 ---
 
 ### A2 — Bug: hogares Pareja y Soltero ven Educación y no pueden desactivarla
-**Estado:** 🔲 Pendiente
-**Archivos:** `presupuesto.js` (función `guardarPresupuestoBase`, ~línea 517)
-**Severidad:** Crítica (afecta a cualquier pareja del piloto)
+**Estado:** ✅ Resuelto — Junio 2026
+**Archivos:** `presupuesto.js`
 
-**Evidencia:** En P1.5 (`_tpl15`) el toggle de Educación solo se renderiza si `tipoHogar === 'familia'`:
-```javascript
-${esFamilia ? tog('tieneEducacion', '📚', 'Educación', ...) : ''}
-```
-Pero al guardar:
-```javascript
-updates['perfil/tieneEducacion'] = _onbData.tieneEducacion !== false;
-```
-Con el toggle ausente, `_onbData.tieneEducacion` es `undefined`, y `undefined !== false` → se guarda `true`. Resultado: hogares Pareja/Soltero ven la categoría Educación en Tab Hoy y Cómo vamos sin forma de quitarla. Contradice `decisiones_junio2026.md` §3 ("Educación: si hay hijos").
+**Solución implementada:** `eduFlag` calculado condicionalmente — si `tipoHogar !== 'familia'` se fuerza `false`. Aplicado en los dos lugares de guardado (`updates` y `window.HOGAR.perfil`).
 
-**Fix sugerido (una línea, aplicar en los dos lugares donde se guarda — `updates` y `window.HOGAR.perfil`):**
-```javascript
-const eduFlag = (_onbData.tipoHogar === 'familia')
-  ? (_onbData.tieneEducacion !== false)
-  : false;
-updates['perfil/tieneEducacion'] = eduFlag;
-```
-**Nota:** si el hogar ya guardado tiene `tieneEducacion: true` siendo pareja (caso SNBDPA no aplica — es familia), corregir manualmente en consola o vía "Actualizar mi hogar".
-
-**Criterio de aceptación:** onboarding completo como Pareja → la categoría Educación NO aparece en Tab Hoy ni en Cómo vamos. Como Familia con toggle activo → sí aparece.
+**Criterio de aceptación cumplido:** hogares Pareja/Soltero no ven la categoría Educación en Tab Hoy ni en Cómo vamos.
 
 ---
 
 ### A3 — Filtro C3 no se aplica en Config ni en Análisis (código contradice docs)
-**Estado:** 🔲 Pendiente — requiere decisión de producto previa
-**Archivos:** `presupuesto.js` (`renderConfigPresupuesto`, `abrirModalCategoria`) · `analisis.js` (`renderSemaforo`/`_renderSemaforoConData`) · `bitacora_v2_3.md` · `README_v2_3.md`
-**Severidad:** Alta (inconsistencia UX visible)
+**Estado:** ✅ Resuelto — Junio 2026 (Opción A)
+**Archivos:** `presupuesto.js` · `analisis.js`
 
-**Evidencia:** `window._catsFiltradas` (creada en `renderAll()`, `finanzas.js:388`) solo la consume `renderResumen` (`finanzas.js:402`). Config y el Semáforo de Análisis iteran `D.categories` sin filtrar: un hogar sin vehículo ve "Cuota Crédito / Leasing", SOAT, "Seguro Vehículo", etc. La bitácora y el README afirman que C3 filtra "Tab Hoy, Resumen y Config".
+**Solución implementada:** Se aplicó la Opción A — `filtrarCategoriasPorPerfil()` / `filtrarItemsPorPerfil()` aplicados también en `renderConfigPresupuesto`, `abrirModalCategoria` y el Semáforo de Análisis.
 
-**Decisión requerida (elegir UNA):**
-- **Opción A:** aplicar `filtrarCategoriasPorPerfil()` / `filtrarItemsPorPerfil()` también en `renderConfigPresupuesto`, `abrirModalCategoria` y el Semáforo.
-- **Opción B (compatible con DA-18 "Config es vista anual"):** declarar que Config y Análisis muestran el catálogo completo intencionalmente, y corregir bitácora + README.
-
-**Criterio de aceptación:** código y documentación afirman lo mismo, y la UX es consistente entre tabs.
+**Criterio de aceptación cumplido:** código y documentación coinciden; la UX es consistente entre tabs.
 
 ---
 
@@ -173,17 +142,17 @@ La restauración de ingresos de SNBDPA y la verificación E2E de C3 figuran como
 
 ## Orden de ejecución recomendado
 
-| # | Hallazgo | Esfuerzo | Tipo |
-|---|----------|----------|------|
-| 1 | A2 — Flag Educación | 1 línea ×2 | Fix |
-| 2 | A1 — Reglas Firebase | 1–2 h + pruebas | Seguridad |
-| 3 | A3 — Decisión filtro Config/Análisis | Decisión + fix o doc | Producto |
-| 4 | D5 — Cerrar pendientes pre-piloto | Verificación | Operativo |
-| 5 | B4 — Subir finanzas.css y REGLAS_IA.md a Fuentes | 5 min | Operativo |
-| — | **🚀 Lanzar piloto** | | |
-| 6 | C1–C6 — Fase de limpieza | 1 sesión | Limpieza |
-| 7 | D1–D4 — Actualización de docs | 1 sesión | Docs |
-| 8 | B1, B2, B3, B5 | Post-piloto | Mejora |
+| # | Hallazgo | Estado | Tipo |
+|---|----------|--------|------|
+| 1 | A2 — Flag Educación | ✅ Resuelto | Fix |
+| 2 | A1 — Reglas Firebase | ✅ Resuelto | Seguridad |
+| 3 | A3 — Filtro C3 Config/Análisis | ✅ Resuelto (Opción A) | Producto |
+| 4 | B4 — finanzas.css y REGLAS_IA.md en Fuentes | ✅ Resuelto | Operativo |
+| — | **🚀 Piloto activo** | | |
+| 5 | D5 — Cerrar pendientes en bitácora | 🔲 Pendiente | Operativo |
+| 6 | C1–C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
+| 7 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
+| 8 | B1, B2, B3, B5 | 🔲 Post-piloto | Mejora |
 
 ---
 

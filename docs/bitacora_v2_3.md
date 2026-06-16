@@ -1029,3 +1029,31 @@ Las familias piloto pueden registrar un gasto con categoría o ítem equivocados
 
 - No se tocó `syncDailyMonth()` — al editar, `refreshDaily()` + `syncDailyMonth()` recalculan totales correctamente porque leen de Firebase tras el `update`.
 - Si en el futuro se permite editar "quién pagó", revisar impacto en "¿Quién pagó?" (Fase 30, lógica de balance proporcional a ingresos).
+
+---
+
+## Fase 36 — Cierre de hallazgos críticos de auditoría (Junio 2026)
+
+Sesión de verificación y documentación. Los tres hallazgos críticos de `auditoria_v2_3_junio2026.md` estaban resueltos en código pero sin marcar en la auditoría ni registrar en bitácora.
+
+### Hallazgos cerrados
+
+| Hallazgo | Resolución |
+|----------|-----------|
+| A1 — Reglas Firebase | `firebase-rules.json` rediseñado y desplegado. `meta` abierta a lectura para autenticados (flujo de unirse); resto del hogar restringido a miembros. Nodos raíz v1 bloqueados. Nodo `metricas/eventos` con validación de estructura. |
+| A2 — Educación en Pareja/Soltero | `eduFlag` forzado a `false` si `tipoHogar !== 'familia'` en `presupuesto.js`. |
+| A3 — Filtro C3 en Config y Análisis | Opción A implementada: `filtrarCategoriasPorPerfil()` aplicado en `renderConfigPresupuesto`, `abrirModalCategoria` y Semáforo de Análisis. |
+| B4 — Archivos en Fuentes | `finanzas.css` y `REGLAS_IA.md` confirmados en proyecto Claude. |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `auditoria_v2_3_junio2026.md` | A1, A2, A3 marcados ✅; tabla de orden de ejecución actualizada con estados reales |
+| `bitacora_v2_3.md` | Este registro (Fase 36) |
+
+### Commit
+
+```
+docs: cierre hallazgos críticos auditoría A1 A2 A3 — Fase 36
+```
