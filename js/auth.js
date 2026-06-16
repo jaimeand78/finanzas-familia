@@ -86,9 +86,15 @@ function loginWithGoogle() {
 }
 
 function signOutUser() {
-  auth.signOut().catch(function(err) {
-    console.error('Error logout:', err.message);
-  });
+  auth.signOut()
+    .then(function() {
+      // Navegar al login directamente — no depender de onAuthStateChanged
+      // porque el guard 'resolved' bloquea las llamadas posteriores al arranque.
+      showLoginScreen();
+    })
+    .catch(function(err) {
+      console.error('Error logout:', err.message);
+    });
 }
 
 function onLoginSuccess(firebaseUser) {
