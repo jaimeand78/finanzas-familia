@@ -10,6 +10,11 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 // Clave que Firebase SDK compat v9 usa para persistir la sesión en localStorage.
 var _FB_LS_KEY = 'firebase:authUser:AIzaSyCHWDJfmr2ok_xw-w1FE1tvNV5j5j5VEzc:[fp]';
 
+// Detecta si la app corre como PWA instalada en iOS.
+function _isIOSPWA() {
+  return !!navigator.standalone;
+}
+
 // Oculta la pantalla de verificación inicial.
 function _hideChecking() {
   var el = document.getElementById('checkingScreen');
@@ -23,7 +28,6 @@ function _hideOffline() {
 }
 
 // Indica si existía sesión previa en localStorage (solo para decidir el mensaje offline).
-// NO se usa para autenticar — solo para saber si el usuario ya había iniciado sesión.
 function _hadPreviousSession() {
   try {
     var raw = localStorage.getItem(_FB_LS_KEY);
@@ -36,12 +40,10 @@ function _hadPreviousSession() {
 }
 
 function initLogin() {
-  // Firebase Auth con LOCAL persistence guarda la sesión en IndexedDB.
-  // En iOS PWA offline (Safari standalone), onAuthStateChanged NO dispara
-  // porque el SDK necesita red para validar el token JWT (expira cada 1h).
-  //
-  // IMPORTANTE: el guard 'resolved' solo cancela el timeout — nunca bloquea
-  // onAuthStateChanged, que debe seguir activo para capturar login y logout.
+  // En iOS PWA offline, onAuthStateChanged no dispara sin red.
+  // Timeout de 4s: si Firebase no resuelve → pantalla offline o login.
+  // IMPORTANTE: initialResolved solo cancela el timeout.
+  // onAuthStateChanged siempre ejecuta para capturar login y logout.
   var initialResolved = false;
 
   var offlineTimer = setTimeout(function() {
@@ -56,13 +58,11 @@ function initLogin() {
   }, 4000);
 
   auth.onAuthStateChanged(function(firebaseUser) {
-    // Siempre cancelar el timeout si aún no disparó
     if (!initialResolved) {
       initialResolved = true;
       clearTimeout(offlineTimer);
       _hideChecking();
     }
-    // Este bloque siempre ejecuta — para login, logout y cambios de sesión
     if (firebaseUser) {
       _hideOffline();
       onLoginSuccess(firebaseUser);
@@ -70,27 +70,42 @@ function initLogin() {
       showLoginScreen();
     }
   });
+
+  // En iOS PWA, signInWithRedirect regresa a la app y getRedirectResult
+  // captura el resultado. Esto evita el problema de popup doble en standalone.
+  if (_isIOSPWA()) {
+    auth.getRedirectResult().catch(function(err) {
+      if (err.code && err.code !== 'auth/no-auth-event') {
+        console.error('Error redirect result:', err.message);
+        showLoginError(err.message);
+      }
+    });
+  }
 }
 
-// Pantalla de espera offline — aparece cuando hay sesión previa pero no hay red.
+// Pantalla offline — sesión previa sin red.
 function _showOfflineScreen() {
   var el = document.getElementById('offlineScreen');
   if (el) el.style.display = 'flex';
 }
 
 function loginWithGoogle() {
-  // En iOS PWA offline, signInWithPopup falla silenciosamente.
-  // Al reintentar, Firebase lanza auth/cancelled-popup-request.
   if (!navigator.onLine) {
     showLoginError('Sin conexión a internet. Conéctate e intenta de nuevo.');
     return;
   }
-  auth.signInWithPopup(provider)
-    .catch(function(err) {
-      if (err.code === 'auth/cancelled-popup-request') return;
-      console.error('Error login Google:', err.message);
-      showLoginError(err.message);
-    });
+  // iOS PWA: usar redirect para evitar problemas de popup en standalone.
+  // Safari normal y Android: popup funciona correctamente.
+  if (_isIOSPWA()) {
+    auth.signInWithRedirect(provider);
+  } else {
+    auth.signInWithPopup(provider)
+      .catch(function(err) {
+        if (err.code === 'auth/cancelled-popup-request') return;
+        console.error('Error login Google:', err.message);
+        showLoginError(err.message);
+      });
+  }
 }
 
 function signOutUser() {
