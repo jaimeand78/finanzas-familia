@@ -79,8 +79,8 @@ Con dos miembros editando Config a la vez, el debounce de 800ms + `set` completo
 Hay manifest pero no SW: la app instalada no abre sin conexión; la cola offline solo funciona si la página ya estaba cargada. **Acción:** SW con cache-first del shell (HTML/CSS/JS/logo) y network para Firebase.
 
 ### B4 — `finanzas.css` y `REGLAS_IA.md` ausentes de Fuentes
-**Estado:** 🔲 Pendiente (acción del usuario)
-`index.html` referencia `css/finanzas.css` y el Contexto Maestro exige validar contra `REGLAS_IA.md`, pero ninguno está en el proyecto Claude. Riesgo clase Bugs #15–17 (generar código contra versiones invisibles). **Acción:** subir ambos archivos a Fuentes.
+**Estado:** ✅ Resuelto — Junio 2026
+Ambos archivos confirmados en proyecto Claude (Fuentes).
 
 ### B5 — Nodo `hist` crece sin límite y nadie lo lee
 **Estado:** 🔲 Decisión requerida · **Archivos:** `finanzas.js` (`logH`), `firebase-paths.js` (`hKey`)
@@ -109,8 +109,9 @@ Son `window.*` sin botón. **Decidir:** si son herramientas de consola intencion
 Rompe la regla DA-10 ("`DAILY_ITEMS` tiene Otros en cada categoría; `defD()` no"). **Acción:** quitar `{ label:'Otros', ... }` de Servicio Doméstico en `defD()` (`finanzas.js`). No requiere cambio en `migrateCategories` (no lo "ensure").
 
 ### C5 — Textos
-- `presupuesto.js` `_tplResumen`: "**Regístren**" → "Registren" (sobra la tilde).
-- `presupuesto.js` `_tpl4`: "lo **desglosás** en Config" → voseo; la app usa tuteo. Cambiar a "lo desglosas en Config".
+**Estado:** ✅ Resuelto — Junio 2026
+- "Regístren" → "Registren" corregido en `presupuesto.js` `_tplResumen`.
+- "desglosás" → "desglosas" corregido en `presupuesto.js` `_tpl4`.
 
 ### C6 — Manifest y viewport
 - `manifest.json`: declara `sizes: "1254x1254"` para `icono-181.png`; mismo archivo para `any` y `maskable` (maskable requiere margen de seguridad ~20%). Corregir sizes reales y generar variante maskable.
@@ -148,11 +149,12 @@ La restauración de ingresos de SNBDPA y la verificación E2E de C3 figuran como
 | 2 | A1 — Reglas Firebase | ✅ Resuelto | Seguridad |
 | 3 | A3 — Filtro C3 Config/Análisis | ✅ Resuelto (Opción A) | Producto |
 | 4 | B4 — finanzas.css y REGLAS_IA.md en Fuentes | ✅ Resuelto | Operativo |
+| 5 | C5 — Textos Registren / desglosas | ✅ Resuelto | Limpieza |
 | — | **🚀 Piloto activo** | | |
-| 5 | D5 — Cerrar pendientes en bitácora | 🔲 Pendiente | Operativo |
-| 6 | C1–C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
-| 7 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
-| 8 | B1, B2, B3, B5 | 🔲 Post-piloto | Mejora |
+| 6 | D5 — Cerrar pendientes en bitácora | 🔲 Pendiente | Operativo |
+| 7 | C1–C4, C6 — Fase de limpieza | 🔲 Post-piloto | Limpieza |
+| 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
+| 9 | B1, B2, B3, B5 | 🔲 Post-piloto | Mejora |
 
 ---
 
