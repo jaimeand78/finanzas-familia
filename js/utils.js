@@ -122,10 +122,6 @@ function fmt(n) {
   return '$' + Math.round(n || 0).toLocaleString('es-CO');
 }
 
-function raw(id) {
-  return parseFloat(document.getElementById(id)?.value) || 0;
-}
-
 // ── ÍTEMS DE CATEGORÍA ────────────────────────────────────────────────────────
 
 // DA-2: planItems() es la única forma correcta de obtener ítems de una categoría

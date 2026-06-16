@@ -1,5 +1,5 @@
 // js/finanzas.js
-// Responsabilidad: presupuesto mensual — subMonth, save, recalc, renderResumen, renderExpSecs.
+// Responsabilidad: presupuesto mensual — subMonth, save, recalc, renderResumen, defD.
 // Depende de: config.js (db), utils.js, offline.js, firebase-paths.js, ui.js
 
 // ── ESTADO ────────────────────────────────────────────────────────────────────
@@ -277,80 +277,6 @@ window.chM = function(d) {
   subMonth();
 };
 
-// ── INGRESOS ──────────────────────────────────────────────────────────────────
-
-window.addInc   = function() {
-  const l = document.getElementById('niLbl').value.trim();
-  if (!l) return;
-  D.income.push({ label:l, value:0, fixed:false, by:user });
-  document.getElementById('niLbl').value = '';
-  renderAll(); save();
-};
-window.delInc   = function(i) { D.income.splice(i, 1); renderAll(); save(); };
-window.updInc   = function(i, v) { D.income[i].value = parseFloat(v) || 0; D.income[i].by = user; recalc(); save(); };
-window.togFxInc = function(i) { D.income[i].fixed = !D.income[i].fixed; renderAll(); save(); toast(D.income[i].fixed ? '🔒 Fijo' : '🔓 Desmarcado'); };
-
-// ── CATEGORÍAS Y GASTOS ───────────────────────────────────────────────────────
-
-window.addCat  = function() {
-  const l = document.getElementById('ncLbl').value.trim();
-  if (!l) return;
-  D.categories.push({ name:l, items:[{ label:l, value:0, budget:0, fixed:false }] });
-  document.getElementById('ncLbl').value = '';
-  renderAll(); save();
-};
-window.addItem = function(ci) {
-  const l = document.getElementById('ni' + ci).value.trim();
-  if (!l) return;
-  D.categories[ci].items.push({ label:l, value:0, budget:0, fixed:false, by:user });
-  document.getElementById('ni' + ci).value = '';
-  renderAll(); save();
-};
-window.delItem = function(ci, ri) { D.categories[ci].items.splice(ri, 1); renderAll(); save(); };
-window.delCat  = function(ci) { D.categories.splice(ci, 1); renderAll(); save(); };
-
-window.updExp = function(ci, ri, v) {
-  const item = D.categories[ci].items[ri];
-  if (item.months && !item.months.includes(curM)) {
-    toast('⚠️ Solo aplica en: ' + item.months.map(x => MSHORT[x]).join(', ')); return;
-  }
-  const val = parseFloat(v) || 0;
-  item.value = val; item.by = user;
-  recalc(); save();
-};
-
-window.togFx = function(ci, ri) {
-  D.categories[ci].items[ri].fixed = !D.categories[ci].items[ri].fixed;
-  renderAll(); save();
-  toast(D.categories[ci].items[ri].fixed ? '🔒 Gasto fijo' : '🔓 Desmarcado');
-};
-
-window.applyFixedYear = async function() {
-  if (!confirm('¿Copiar ítems fijos 🔒 a todos los meses de ' + curY + ' que aún no tienen datos?')) return;
-  let applied = 0, skipped = 0;
-  for (let m = 0; m < 12; m++) {
-    if (m === curM) { skipped++; continue; }
-    try {
-      const snap = await db.ref(dKey(curY, m)).once('value');
-      if (snap.val()) { skipped++; continue; }
-      const nd = defD();
-      nd.income     = D.income.map(r => ({ ...r, value: r.fixed ? r.value : 0 }));
-      nd.categories = D.categories.map(cat => ({ ...cat, items: planItems(cat).map(item => {
-        const ok = !item.months || item.months.includes(m);
-        return { ...item, value: (item.fixed && ok) ? item.value : 0 };
-      })}));
-      await db.ref(dKey(curY, m)).set(nd); applied++;
-    } catch(e) { console.error(e); }
-  }
-  toast('✅ Aplicado a ' + applied + ' meses · ' + skipped + ' omitidos');
-};
-
-window.cleanDuplicates = async function() {
-  if (!D.categories) return;
-  D.categories = D.categories.map(cat => ({ ...cat, name: canonicalLabel(cat.name || ''), items: normalizeCategoryItems(cat) }));
-  renderAll(); save(); toast('🧹 Duplicados limpiados');
-};
-
 // ── RECALC ────────────────────────────────────────────────────────────────────
 
 function recalc() {
@@ -373,7 +299,6 @@ function recalc() {
   cls('rDisp',  'r-disp-val ' + (avail >= 0 ? 'g' : 'r'));
 
   if (curTab === 'm') renderResumen();
-  if (curTab === 'c') renderExpSecs();
 }
 
 // ── RENDER ALL ────────────────────────────────────────────────────────────────
@@ -388,7 +313,6 @@ function renderAll() {
   recalc();
   if (curTab === 'd' && typeof populateCatSel === 'function') populateCatSel();
   if (curTab === 'm' && typeof renderResumen   === 'function') renderResumen();
-  if (curTab === 'c' && typeof renderExpSecs   === 'function') renderExpSecs();
 }
 
 // ── RENDER RESUMEN — tab 📊 ───────────────────────────────────────────────────
@@ -566,59 +490,4 @@ window.toggleResCat = function(el) {
   if (chevron) chevron.textContent = open ? '▼' : '▲';
 };
 
-// ── RENDER EXP SECS — edición en tab Config ───────────────────────────────────
-
-function renderExpSecs() {
-  const incEl = document.getElementById('incRows');
-  if (incEl) incEl.innerHTML = D.income.map((r, i) => `
-    <div class="row">
-      <span class="rl">${r.label}</span>
-      <span class="lock ${r.fixed ? 'on' : ''}" onclick="togFxInc(${i})">🔒</span>
-      <input class="inp ${r.fixed ? 'fx' : ''}" type="text" inputmode="decimal" value="${r.value || ''}" placeholder="0" oninput="updInc(${i},this.value)"/>
-      <button class="del" onclick="delInc(${i})">&#215;</button>
-    </div>`).join('');
-
-  const expEl = document.getElementById('expSecs');
-  if (expEl) expEl.innerHTML = D.categories.map((cat, ci) => {
-    const items    = planItems(cat);
-    const cHormiga = dailyTotals[cat.name] || 0;
-    const cAct     = items.reduce((s, r) => s + (r.value || 0), 0) + cHormiga;
-    const cBud     = items.reduce((s, r) => s + (r.budget || 0), 0);
-    const fc       = items.filter(r => r.fixed).length;
-    const cpct     = cBud > 0 ? Math.round((cAct / cBud) * 100) : 0;
-    const bcol     = cBud > 0 && cAct > cBud ? '#D85A30' : cpct > 85 ? '#BA7517' : '#1D9E75';
-    return `<div class="sec">
-      <div class="sec-hdr">
-        <span class="sec-title">${cat.name}${fc > 0 ? `<span class="fbadge">${fc}🔒</span>` : ''}</span>
-        <span style="display:flex;align-items:center;gap:.4rem;">
-          ${cBud > 0 ? `<span style="font-size:.75rem;color:#9b9b97;font-family:'DM Mono',monospace;">/${fmt(cBud)}</span>` : ''}
-          <span class="sec-val">${fmt(cAct)}</span>
-          <button class="cdel" onclick="delCat(${ci})">✕</button>
-        </span>
-      </div>
-      ${cBud > 0 ? `<div class="cp"><div class="cpm"><span>${cpct}% del presupuesto</span><span>${fmt(cBud - cAct)} disponible</span></div><div class="cpb"><div class="cpf" style="width:${Math.min(cpct, 100)}%;background:${bcol};"></div></div></div>` : ''}
-      ${items.map((r, ri) => {
-        const ms       = r.months ? r.months.map(x => MSHORT[x]).join('/') : null;
-        const inactive = r.months && !r.months.includes(curM);
-        return `<div class="row" style="${inactive ? 'opacity:.35;' : ''}">
-          <span class="rl">${r.label}${ms ? `<span class="mbadge">${ms}</span>` : ''}</span>
-          <span class="lock ${r.fixed ? 'on' : ''}" onclick="togFx(${ci},${ri})">🔒</span>
-          <span style="font-size:.7rem;color:#9b9b97;font-family:'DM Mono',monospace;min-width:52px;text-align:right;flex-shrink:0;">${r.budget > 0 ? fmt(r.budget) : ''}</span>
-          <input class="inp ${r.fixed ? 'fx' : ''} ${r.budget > 0 && (r.value || 0) > r.budget ? 'ov' : ''}" type="text" inputmode="decimal" value="${r.value || ''}" placeholder="0" ${inactive ? 'disabled' : ''} oninput="updExp(${ci},${ri},this.value)"/>
-          <button class="del" onclick="delItem(${ci},${ri})">&#215;</button>
-        </div>`;
-      }).join('')}
-      ${cHormiga > 0 ? `<div class="row" style="opacity:.7;">
-        <span class="rl">🐜 Gastos del día</span>
-        <span class="lock"></span>
-        <span style="font-size:.7rem;color:#9b9b97;font-family:'DM Mono',monospace;min-width:52px;text-align:right;flex-shrink:0;"></span>
-        <span class="inp" style="background:#FEF9E7;line-height:1.8;text-align:right;">${fmt(cHormiga)}</span>
-        <span style="width:26px;"></span>
-      </div>` : ''}
-      <div class="add-row">
-        <input type="text" id="ni${ci}" placeholder="Nuevo ítem..."/>
-        <button class="btn-add" onclick="addItem(${ci})">+ Ítem</button>
-      </div>
-    </div>`;
-  }).join('');
-}
+// ── FIN finanzas.js ───────────────────────────────────────────────────────────
