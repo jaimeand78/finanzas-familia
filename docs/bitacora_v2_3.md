@@ -1113,3 +1113,35 @@ Ahora: carga `pl/` y `daily/` en paralelo con `Promise.all`, acumula gastos dail
 ```
 fix: semáforo histórico incluye gastos daily — Fase 38
 ```
+
+---
+
+## Fase 39 — Service Worker PWA (Junio 2026)
+
+**Contexto:** La app tenía manifest pero no SW. Instalada como PWA no abría sin conexión. La cola offline de `offline.js` solo funcionaba si la página ya estaba cargada.
+
+### Diseño
+
+- **Cache-first:** shell completo — `index.html`, 4 CSS, 13 JS propios, `logo.png`, `manifest.json`
+- **Network-only:** Firebase CDN y Realtime Database (`gstatic.com`, `googleapis.com`, `firebasedatabase.app`, etc.) — nunca cachear
+- **Fallback sin red:** devuelve `index.html` desde cache para cualquier ruta no cacheada
+- **Versión de cache:** `organiza2-v2-3` — al cambiar, el activate limpia versiones anteriores
+
+El SW complementa `offline.js` — no lo reemplaza. `offline.js` maneja la cola de gastos; el SW permite que la app abra aunque no haya red.
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `sw.js` | **Nuevo.** Service worker con cache-first + network-only para Firebase |
+| `index.html` | Registro del SW al evento `load` |
+
+### Nota para el futuro
+
+Al actualizar archivos del shell (CSS, JS), incrementar `CACHE_NAME` en `sw.js` (ej. `organiza2-v2-4`) para que los usuarios reciban la versión nueva.
+
+### Commit
+
+```
+feat: service worker PWA — cache-first shell, network-only Firebase — Fase 39
+```

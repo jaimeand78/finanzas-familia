@@ -74,8 +74,8 @@ Bloque `else` de `renderSemaforo()` reemplazado: ahora carga `pl/` y `daily/` en
 Limitación registrada en `arquitectura_v2_3.md` §10. Tolerable para el piloto. Solución futura: migrar a `update()` por ítem.
 
 ### B3 — PWA sin service worker
-**Estado:** 🔲 Post-piloto · **Archivos:** nuevo `sw.js` + registro en `index.html`
-Hay manifest pero no SW: la app instalada no abre sin conexión; la cola offline solo funciona si la página ya estaba cargada. **Acción:** SW con cache-first del shell (HTML/CSS/JS/logo) y network para Firebase.
+**Estado:** ✅ Resuelto — Junio 2026 (Fase 39)
+Creado `sw.js` en raíz del repo. Estrategia: cache-first para el shell (index.html, CSS, JS propios, logo, manifest); network-only para Firebase CDN y Realtime Database. Registrado en `index.html` al evento `load`. La cola offline de `offline.js` sigue manejando gastos sin conexión — el SW complementa abriendo la app aunque no haya red.
 
 ### B4 — `finanzas.css` y `REGLAS_IA.md` ausentes de Fuentes
 **Estado:** ✅ Resuelto — Junio 2026
@@ -159,7 +159,7 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
 | 10 | B2 — Documentar limitación save() | ✅ Documentado | Docs |
 | 11 | B1 — Semáforo histórico incluye daily | ✅ Resuelto | Mejora |
-| 12 | B3 | 🔲 Post-piloto | Mejora |
+| 12 | B3 — Service worker PWA | ✅ Resuelto | Mejora |
 
 ---
 
