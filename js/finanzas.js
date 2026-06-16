@@ -267,10 +267,6 @@ function save() {
   }, 800);
 }
 
-function logH(type, desc, amt, cat) {
-  db.ref(hKey()).push({ user: user || '?', type, description: desc, amount: amt || 0, category: cat || '', ts: new Date().toISOString() });
-}
-
 // ── NAVEGACIÓN MES ────────────────────────────────────────────────────────────
 
 window.chM = function(d) {
@@ -321,7 +317,6 @@ window.updExp = function(ci, ri, v) {
   const val = parseFloat(v) || 0;
   item.value = val; item.by = user;
   recalc(); save();
-  if (val > 0) logH('expense', 'Registró: ' + item.label, val, D.categories[ci].name);
 };
 
 window.togFx = function(ci, ri) {

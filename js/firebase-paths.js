@@ -1,18 +1,15 @@
 // js/firebase-paths.js
 // Responsabilidad: paths centralizados de Firebase.
 // Depende de: window.HOGAR (cargado por hogar.js antes de arrancar)
-// Expone: dKey(), dayKey(), hKey(), vKey()
+// Expone: dKey(), dayKey(), vKey()
 //
 // ⚠️  Este módulo reemplaza las funciones dKey/dayKey/hKey/vKey
 //     del monolito v1 que usaban FBK='Anny1130'.
 //     Ahora usan window.HOGAR.codigoHogar como raíz.
+//     hKey() eliminado en Fase 37 — nodo hist huérfano, nadie lo leía.
 
 function dKey(y, m) {
   return `hogares/${window.HOGAR.codigoHogar}/pl/${y}/${m}`;
-}
-
-function hKey() {
-  return `hogares/${window.HOGAR.codigoHogar}/hist`;
 }
 
 function dayKey(d) {

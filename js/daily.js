@@ -2,7 +2,7 @@
 // Responsabilidad: registro de gastos diarios — tab Hoy.
 // Depende de: config.js (db), utils.js (DAILY_ITEMS, ICONS, fmt),
 //             offline.js, firebase-paths.js,
-//             finanzas.js (D, curY, curM, user, dailyTotals, logH)
+//             finanzas.js (D, curY, curM, user, dailyTotals)
 // v2.0 — selector usa DAILY_ITEMS (categoría + ítem detallado)
 //        nota obligatoria cuando ítem = "Otros"
 
@@ -201,7 +201,6 @@ window.submitDaily = async function() {
     setSS('ok');
     toast('✅ Gasto registrado');
     if (typeof trackEvent === 'function') trackEvent('gasto_registrado');
-    if (typeof logH === 'function') logH('expense', note || itemName, amt, cat);
     refreshDaily();
   } catch(e) {
     console.error('submitDaily:', e);
