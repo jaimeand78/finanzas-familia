@@ -434,5 +434,15 @@
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
 
+  <!-- Service Worker — Fase 39 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .catch(err => console.warn('SW registro fallido:', err));
+      });
+    }
+  </script>
+
 </body>
 </html>
