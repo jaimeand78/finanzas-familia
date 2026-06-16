@@ -16,6 +16,12 @@ function _hideChecking() {
   if (el) el.style.display = 'none';
 }
 
+// Oculta la pantalla offline.
+function _hideOffline() {
+  var el = document.getElementById('offlineScreen');
+  if (el) el.style.display = 'none';
+}
+
 // Indica si existía sesión previa en localStorage (solo para decidir el mensaje offline).
 // NO se usa para autenticar — solo para saber si el usuario ya había iniciado sesión.
 function _hadPreviousSession() {
@@ -33,15 +39,14 @@ function initLogin() {
   // Firebase Auth con LOCAL persistence guarda la sesión en IndexedDB.
   // En iOS PWA offline (Safari standalone), onAuthStateChanged NO dispara
   // porque el SDK necesita red para validar el token JWT (expira cada 1h).
-  // Estrategia:
-  //   - Online: Firebase resuelve normalmente en <1s → onAuthStateChanged dispara.
-  //   - Offline con sesión previa: timeout 4s → mostrar pantalla offline amigable.
-  //   - Offline sin sesión: timeout 4s → mostrar login (igual que hoy).
-  var resolved = false;
+  //
+  // IMPORTANTE: el guard 'resolved' solo cancela el timeout — nunca bloquea
+  // onAuthStateChanged, que debe seguir activo para capturar login y logout.
+  var initialResolved = false;
 
   var offlineTimer = setTimeout(function() {
-    if (resolved) return;
-    resolved = true;
+    if (initialResolved) return;
+    initialResolved = true;
     _hideChecking();
     if (_hadPreviousSession()) {
       _showOfflineScreen();
@@ -51,11 +56,15 @@ function initLogin() {
   }, 4000);
 
   auth.onAuthStateChanged(function(firebaseUser) {
-    if (resolved) return;
-    resolved = true;
-    clearTimeout(offlineTimer);
-    _hideChecking();
+    // Siempre cancelar el timeout si aún no disparó
+    if (!initialResolved) {
+      initialResolved = true;
+      clearTimeout(offlineTimer);
+      _hideChecking();
+    }
+    // Este bloque siempre ejecuta — para login, logout y cambios de sesión
     if (firebaseUser) {
+      _hideOffline();
       onLoginSuccess(firebaseUser);
     } else {
       showLoginScreen();
@@ -64,7 +73,6 @@ function initLogin() {
 }
 
 // Pantalla de espera offline — aparece cuando hay sesión previa pero no hay red.
-// No intenta autenticar — solo pide conectarse.
 function _showOfflineScreen() {
   var el = document.getElementById('offlineScreen');
   if (el) el.style.display = 'flex';
@@ -87,14 +95,10 @@ function loginWithGoogle() {
 
 function signOutUser() {
   auth.signOut()
-    .then(function() {
-      // Navegar al login directamente — no depender de onAuthStateChanged
-      // porque el guard 'resolved' bloquea las llamadas posteriores al arranque.
-      showLoginScreen();
-    })
     .catch(function(err) {
       console.error('Error logout:', err.message);
     });
+  // onAuthStateChanged captura el null y llama showLoginScreen()
 }
 
 function onLoginSuccess(firebaseUser) {
