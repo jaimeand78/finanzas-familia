@@ -8,43 +8,43 @@ const provider = new firebase.auth.GoogleAuthProvider();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // Clave que Firebase SDK compat v9 usa para persistir la sesión en localStorage.
-// Patrón: firebase:authUser:[apiKey]:[appName]
 var _FB_LS_KEY = 'firebase:authUser:AIzaSyCHWDJfmr2ok_xw-w1FE1tvNV5j5j5VEzc:[fp]';
 
-// Oculta la pantalla de verificación inicial una vez que Firebase resolvió el estado.
+// Oculta la pantalla de verificación inicial.
 function _hideChecking() {
   var el = document.getElementById('checkingScreen');
   if (el) el.style.display = 'none';
 }
 
-// Lee la sesión persistida de localStorage (fallback offline iOS).
-// Firebase SDK escribe el usuario serializado en _FB_LS_KEY tras cada login exitoso.
-function _getPersistedUser() {
+// Indica si existía sesión previa en localStorage (solo para decidir el mensaje offline).
+// NO se usa para autenticar — solo para saber si el usuario ya había iniciado sesión.
+function _hadPreviousSession() {
   try {
     var raw = localStorage.getItem(_FB_LS_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return false;
+    var obj = JSON.parse(raw);
+    return !!(obj && obj.uid);
   } catch(e) {
-    return null;
+    return false;
   }
 }
 
 function initLogin() {
   // Firebase Auth con LOCAL persistence guarda la sesión en IndexedDB.
   // En iOS PWA offline (Safari standalone), onAuthStateChanged NO dispara
-  // porque el SDK no puede validar el token sin red — incluso con sesión persistida.
-  // Solución: timeout de 4s. Si Firebase no resuelve, leer localStorage como fallback.
-  // Si existe sesión previa → arrancar offline. Si no → mostrar login.
+  // porque el SDK necesita red para validar el token JWT (expira cada 1h).
+  // Estrategia:
+  //   - Online: Firebase resuelve normalmente en <1s → onAuthStateChanged dispara.
+  //   - Offline con sesión previa: timeout 4s → mostrar pantalla offline amigable.
+  //   - Offline sin sesión: timeout 4s → mostrar login (igual que hoy).
   var resolved = false;
 
   var offlineTimer = setTimeout(function() {
     if (resolved) return;
     resolved = true;
     _hideChecking();
-    var persisted = _getPersistedUser();
-    if (persisted && persisted.uid) {
-      // Hay sesión previa — arrancar en modo offline con datos del localStorage
-      console.warn('[auth] Firebase timeout offline — usando sesión persistida');
-      onLoginSuccess(persisted);
+    if (_hadPreviousSession()) {
+      _showOfflineScreen();
     } else {
       showLoginScreen();
     }
@@ -63,17 +63,23 @@ function initLogin() {
   });
 }
 
+// Pantalla de espera offline — aparece cuando hay sesión previa pero no hay red.
+// No intenta autenticar — solo pide conectarse.
+function _showOfflineScreen() {
+  var el = document.getElementById('offlineScreen');
+  if (el) el.style.display = 'flex';
+}
+
 function loginWithGoogle() {
   // En iOS PWA offline, signInWithPopup falla silenciosamente.
-  // Al reintentar, Firebase lanza auth/cancelled-popup-request porque el popup
-  // anterior sigue "pendiente". Solución: bloquear el intento si no hay conexión.
+  // Al reintentar, Firebase lanza auth/cancelled-popup-request.
   if (!navigator.onLine) {
     showLoginError('Sin conexión a internet. Conéctate e intenta de nuevo.');
     return;
   }
   auth.signInWithPopup(provider)
     .catch(function(err) {
-      if (err.code === 'auth/cancelled-popup-request') return; // ignorar doble tap iOS
+      if (err.code === 'auth/cancelled-popup-request') return;
       console.error('Error login Google:', err.message);
       showLoginError(err.message);
     });
