@@ -1,6 +1,6 @@
-# 📋 Organiza2 — Documento de Producto v2.5
+# 📋 Organiza2 — Documento de Producto v2.3
 
-> Junio 2026 — Actualizado con Etapa E completa y rediseños de UX
+> Junio 2026 — Actualizado con Fases 25–41 · Piloto activo
 
 ---
 
@@ -82,12 +82,12 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
        │            │            │
        ▼            ▼            ▼
  💰 Finanzas   📋 Planeador  🍽️ Alimentación
- (v2.2 ✅)    (v3.0 🔲)     (v4.0 🔲)
+ (v2.3 ✅)    (v3.0 🔲)     (v4.0 🔲)
 ```
 
 ---
 
-## 7. Módulo Finanzas — Estado v2.5
+## 7. Módulo Finanzas — Estado v2.3
 
 ### Tabs
 
@@ -98,7 +98,7 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
 | 📈 Análisis | Semáforo histórico, tendencia, hormiga, balance por miembro | Solo lectura |
 | ⚙️ Config | Info hogar + Presupuesto Base | Configuración |
 
-### Tab Análisis — Sub-tabs v2.5
+### Tab Análisis — Sub-tabs v2.3
 
 | Sub-tab | Propósito |
 |---------|-----------|
@@ -113,7 +113,7 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
 - Veredicto: *"Están nivelados"* / *"Jaime pagó $X más de lo esperado"*
 - Desglose por categoría con barras dobles por miembro
 
-### Tab Cómo vamos — Diseño v2.5
+### Tab Cómo vamos — Diseño v2.3
 
 El tab responde una sola pregunta: **¿cómo vamos?** Diseñado para el usuario no técnico — una ama de casa debe entenderlo de primera vista, sin fricción.
 
@@ -125,11 +125,12 @@ El tab responde una sola pregunta: **¿cómo vamos?** Diseñado para el usuario 
 
 **Principio de diseño:** Una mamá mira colores, no números. Si todo está verde, respira. Si hay rojo, se enfoca ahí.
 
-### Presupuesto Base — Onboarding 5 pantallas
+### Presupuesto Base — Onboarding 6 pantallas
 
 | Pantalla | Pregunta | Saltable |
 |----------|---------|---------|
-| P1 | ¿Cómo es su hogar? (Soltero/Pareja/Familia/Mixto) | No |
+| P1 | ¿Cómo es su hogar? (Soltero/Pareja/Familia) | No |
+| P1.5 | Perfil del hogar — Vehículo, Servicio Doméstico, Educación, Seguros | Sí |
 | P2 | ¿Cuál es su mayor reto? | Sí |
 | P3 | ¿Con cuánto cuentan este mes? | Sí |
 | P4 | Lo que sí o sí hay que pagar | Sí |
@@ -172,9 +173,11 @@ Lenguaje conversacional, no financiero. *"Lo que sí o sí hay que pagar"* en lu
 
 ## 9. ⛔ Regla de Validación
 
-**No se desarrollará el Planeador ni la Alimentación hasta que Finanzas v2.0 haya sido validado con familias reales.**
+**No se desarrollará el Planeador ni la Alimentación hasta que Finanzas v2.3 haya sido validado con familias reales durante al menos 4 semanas.**
 
-El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de hogar correcto, presupuesto base con valor real, transparencia en pareja funcional, registro diario suficientemente rápido.
+El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo de hogar correcto, presupuesto base con valor real, transparencia en pareja funcional, registro diario suficientemente rápido.
+
+> **Estado actual:** Piloto activo — Junio 2026. Canal de feedback: WhatsApp "Organiza2 · Piloto Familias". URL: `bit.ly/Organiza2`.
 
 ---
 
@@ -185,22 +188,32 @@ El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de 
 | **v2.0** | Auditoría · Redefinición de visión · Documentación | ✅ |
 | **v2.1** | Login Google · Hogar · Invitación · Migración Anny1130 · Finanzas modular | ✅ |
 | **v2.2** | Presupuesto Base · Onboarding · Resumen rediseñado · Login con logo | ✅ |
-| **v2.3** | Piloto 5-10 familias · Feedback real | 🔲 Siguiente |
+| **v2.3** | Piloto 5–10 familias · Feedback real | 🔄 En curso |
 | **v3.0** | Planeador MVP | 🔲 |
 | **v4.0** | Alimentación | 🔲 |
 | **v5.0** | Monetización · PSE/Nequi · Planes freemium | 🔲 |
 
 ---
 
-## 11. Antes del Piloto — Estado
+## 11. Estado del Piloto v2.3
 
-✅ Todos los pendientes resueltos. El piloto puede arrancar.
+✅ Piloto activo desde Junio 2026.
 
 | Item | Estado | Fase |
 |------|--------|------|
-| Rediseño tab Config | ✅ Resuelto | Fases 17, 18, 24 |
-| Tab Análisis — afinar | ✅ Resuelto | Fase 19 |
-| Fix iOS decimal | ✅ Resuelto | Fase 19 |
+| Rediseño tab Config | ✅ | Fases 17, 18, 24 |
+| Tab Análisis — afinar | ✅ | Fase 19 |
+| Fix iOS decimal | ✅ | Fase 19 |
+| Identidad de marca Organiza2 | ✅ | Fase 25 |
+| Catálogo unificado defD / DAILY_ITEMS | ✅ | Fase 27 |
+| Onboarding P1.5 — perfil del hogar | ✅ | Fase 24 |
+| Tab "Cómo vamos" rediseñado | ✅ | Fase 30 |
+| Sub-tab "¿Quién pagó?" | ✅ | Fase 30 |
+| Reglas de seguridad Firebase | ✅ | Fase 31 |
+| Telemetría piloto (6 métricas) | ✅ | Fase 34 |
+| Edición de registros diarios | ✅ | Fase 35 |
+| Service Worker PWA | ✅ | Fase 39 |
+| Limpieza código huérfano | ✅ | Fase 40 |
 
 ---
 
@@ -223,4 +236,4 @@ El piloto con 5-10 familias debe confirmar: onboarding sin fricción, modelo de 
 
 ---
 
-*Organiza2 — Documento de Producto v2.5 | Junio 2026*
+*Organiza2 — Documento de Producto v2.3 | Junio 2026*
