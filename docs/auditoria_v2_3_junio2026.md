@@ -122,19 +122,23 @@ Verificado en código: `Otros` no existe en Servicio Doméstico de `defD()`. Ya 
 ## 📄 DOCUMENTACIÓN — consistencia
 
 ### D1 — `arquitectura_v2_3.md` desactualizada
-- DA-7 figura "Pendiente" pero está implementada como `getPerfilFlags()` + `filtrarCategoriasPorPerfil()` (`getCapabilidades` no existe en el código). **Decidir:** renombrar la función a `getCapabilidades` o actualizar la DA con el nombre real.
-- Tabla de DAs llega a DA-18; faltan DA-19, DA-20 y DA-21 (existen en Contexto Maestro y bitácora).
-- §4 dice tab "Resumen"; hoy es "Cómo vamos".
-- §8 reglas de seguridad → ver A1.
+**Estado:** ✅ Resuelto — Junio 2026
+- DA-7 actualizada con nombre real `filtrarCategoriasPorPerfil()` + `filtrarItemsPorPerfil()`.
+- DA-19, DA-20 y DA-21 agregadas a la tabla de DAs.
+- §4 corregido: "Resumen" → "Cómo vamos".
+- §3 nota de convención de claves `pl/` (mes 0–11) vs `daily/` (mes 01–12) agregada (D4).
 
 ### D2 — `decisiones_junio2026.md` parcialmente superado
-Dice 10 categorías (hoy 11: Servicio Doméstico es categoría propia, no ítem de Vivienda) y onboarding de "5 pantallas" (hoy 6 con P1.5). **Acción:** agregar encabezado: *"⚠️ Documento parcialmente histórico — para el estado vigente ver CONTEXTO_MAESTRO y bitácora Fases 15+"*.
+**Estado:** ✅ Resuelto — Junio 2026
+Agregado encabezado de advertencia: *"⚠️ Documento parcialmente histórico — para el estado vigente ver CONTEXTO_MAESTRO y bitácora Fases 15+"*.
 
 ### D3 — Higiene de `bitacora_v2_3.md`
-Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los archivos se llaman `v2_3` pero los headers internos dicen "v2.5". **Acción:** reordenar fases antes de "Próxima Sesión" y unificar la convención de versión (decidir: nombre de archivo o header).
+**Estado:** ✅ Resuelto — Junio 2026
+Headers unificados a v2.3. Sección "9. Próxima Sesión" renombrada a histórica. Resumen Ejecutivo actualizado con piloto activo. Marcadores de pie de página duplicados eliminados.
 
 ### D4 — Convención de claves no documentada
-`pl/` usa mes `0–11` (índice JS) y `daily/` usa `mm` `01–12` (string padded). Funciona, pero es trampa para bugs futuros. **Acción:** nota explícita en `arquitectura_v2_3.md` §3.
+**Estado:** ✅ Resuelto — Junio 2026 (junto con D1)
+Nota agregada en `arquitectura_v2_3.md` §3: `pl/` usa mes `0–11` (índice JS); `daily/` usa mes `01–12` (string con cero a la izquierda).
 
 ### D5 — Pendientes pre-piloto sin marcar
 **Estado:** ✅ Resuelto — Junio 2026
@@ -156,7 +160,7 @@ Las Fases 28–30 quedaron después de la sección "9. Próxima Sesión". Los ar
 | — | **🚀 Piloto activo** | | |
 | 6 | D5 — Pendientes pre-piloto | ✅ Resuelto | Operativo |
 | 7 | C1–C4, C6 — Fase de limpieza | ✅ Resuelto | Limpieza |
-| 8 | D1–D4 — Actualización de docs | 🔲 Post-piloto | Docs |
+| 8 | D1–D4 — Actualización de docs | ✅ Resuelto — Junio 2026 | Docs |
 | 9 | B5 — Nodo hist eliminado | ✅ Resuelto | Limpieza |
 | 10 | B2 — Documentar limitación save() | ✅ Documentado | Docs |
 | 11 | B1 — Semáforo histórico incluye daily | ✅ Resuelto | Mejora |
