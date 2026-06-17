@@ -32,6 +32,7 @@ Todos los módulos, pantallas, categorías, presupuestos, recordatorios y funcio
 | Hosting | GitHub Pages | Gratuito, deploy automático desde `main` |
 | PWA | manifest.json + meta tags Apple | Instalable en iPhone y Android |
 | Offline | localStorage queue + `navigator.onLine` | Gastos sin conexión → sync automático |
+| SW | `sw.js` cache-first shell, network-only Firebase | App abre sin red; cache invalida con `CACHE_NAME` |
 
 **⛔ No usar:** React, Vue, Angular, npm, webpack, ni ningún build tool.
 
@@ -113,6 +114,12 @@ organiza2-a09ef (Realtime Database)
         │                   └── who: "Jaime"
 ```
 
+
+> ⚠️ **Convención de claves de tiempo (DA-4):**
+> - `pl/` usa mes `0–11` (índice JS, ej: enero = 0)
+> - `daily/` usa mes `01–12` (string con cero a la izquierda, ej: enero = "01")
+> Ambas convenciones coexisten correctamente — no unificar sin migración de datos.
+
 ---
 
 ## 4. Tabs de la App
@@ -120,7 +127,7 @@ organiza2-a09ef (Realtime Database)
 | Tab | ID | Función | Tipo |
 |-----|-----|---------|------|
 | 💰 Hoy | `pd` | Registro de gastos diarios | Escritura |
-| 📊 Resumen | `pm` | Estado del mes — semáforo por categoría | Solo lectura (DA-14) |
+| 📊 Cómo vamos | `pm` | Estado del mes — semáforo por categoría | Solo lectura (DA-14) |
 | 📈 Análisis | `px` | Semáforo histórico, tendencia, hormiga | Solo lectura |
 | ⚙️ Config | `pc` | Info hogar + Presupuesto Base | Configuración (DA-16) |
 
@@ -253,9 +260,9 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-4 | Firebase SDK compat v9.23.0 | ✅ |
 | DA-5 | Google Login antes de separar JS en módulos | ✅ Implementado |
 | DA-6 | Código de hogar = 6 caracteres alfanuméricos uppercase | ✅ Implementado |
-| DA-7 | `getCapabilidades(perfil)` controla toda la UX — pendiente implementar | 🔲 Pendiente |
+| DA-7 | Perfil controla toda la UX — implementado como `filtrarCategoriasPorPerfil()` + `filtrarItemsPorPerfil()` en `presupuesto.js` y `analisis.js` | ✅ Implementado |
 | DA-8 | `calcPresupuestoBase(item, mes)` — única función de provisión mensual | ✅ Implementado |
-| DA-9 | Perfil progresivo — app sugiere completar contextualmente | 🔲 Pendiente |
+| DA-9 | Perfil progresivo — flags `tieneVehiculo`, `tieneEmpleada`, `tieneEducacion`, `tieneSeguros` se configuran en P1.5 del onboarding | ✅ Implementado |
 | DA-10 | Catálogo único: `defD()` y `DAILY_ITEMS` son idénticos — modificar siempre juntos con `migrateCategories` | ✅ Implementado |
 | DA-11 | Ingresos dinámicos desde `buildIncomeFromPerfil()` | ✅ Implementado |
 | DA-12 | Cuota crédito vehículo en Transporte, no en Vivienda | ✅ Implementado |
@@ -266,6 +273,8 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-17 | Siempre pedir archivo actual antes de modificarlo — ver REGLAS_IA.md | ✅ Regla activa |
 | DA-18 | Config es vista de configuración anual — nunca filtrar ítems de fecha fija (`months[]`) por el mes actual. Siempre mostrar `budget` real con badge del mes | ✅ Implementado |
 | DA-19 | Telemetría del piloto: módulo aislado `telemetria.js`, función única `trackEvent(tipo)`, nodo `metricas/eventos`. Solo 6 métricas oficiales, sin datos sensibles (montos, categorías, nombres, emails) | ✅ Implementado |
+| DA-20 | `_soloFlags: true` en `_onbData` indica flujo parcial — nunca llama `_aplicarOnbDataAD()` ni `save()` | ✅ Implementado |
+| DA-21 | Flujos de actualización del hogar: `_soloFlags` (P1.5 — reconfigurar flags), `_soloTipo` (P1 — cambiar tipo hogar), `_soloMeta` (P2 — cambiar meta). Cada flag controla qué pantallas renderizan y qué botón de guardado aparece | ✅ Implementado |
 
 ---
 
