@@ -1,4 +1,4 @@
-# 📓 Organiza2 — Bitácora Técnica v2.5
+# 📓 Organiza2 — Bitácora Técnica v2.3
 
 > Historial completo de desarrollo, decisiones y aprendizajes
 > Abril — Junio 2026
@@ -7,12 +7,13 @@
 
 ## 1. Resumen Ejecutivo
 
-| ✅ Logros | 🔲 Pendientes |
-|-----------|--------------|
-| App PWA en producción | Piloto 5-10 familias |
-| Login Google + Firebase Auth (Etapa A) | Piloto 5-10 familias |
-| Modelo de Hogar + código invitación (Etapa B) | Exportar mes a PDF |
-| Migración datos a hogares/ (Etapa C) | Exportar año a Excel |
+| ✅ Logros | 🔲 Pendientes post-piloto |
+|-----------|--------------------------|
+| App PWA en producción | Exportar mes a PDF |
+| Login Google + Firebase Auth (Etapa A) | Exportar año a Excel |
+| Modelo de Hogar + código invitación (Etapa B) | Feedback in-app con Discord |
+| Migración datos a hogares/ (Etapa C) | Indicador ítems variables por mes |
+| **Piloto activo — Junio 2026 ✅** | Orden categorías por frecuencia |
 | Finanzas v2 arquitectura modular (Etapa D) | |
 | Migración Anny1130 → hogares/SNBDPA/ ✅ | |
 | Etapa E completa ✅ | |
@@ -769,9 +770,11 @@ refactor: mover inline styles a CSS — solo display:none queda inline
 
 ---
 
-## 9. Próxima Sesión
+## 9. Pre-Piloto — Checklist de Lanzamiento *(histórico — piloto activo desde Junio 2026)*
 
-**El piloto v2.3 está listo para lanzar.** No hay bloqueantes técnicos pendientes.
+> ✅ El piloto v2.3 fue lanzado. Esta sección es histórica.
+
+**El piloto v2.3 estaba listo para lanzar.** No había bloqueantes técnicos pendientes.
 
 **Antes de lanzar:**
 - Verificar onboarding completo end-to-end en SNBDPA (post limpieza de pl/)
@@ -908,10 +911,6 @@ refactor: mover inline styles a CSS — solo display:none queda inline
 
 ---
 
-*Organiza2 — Bitácora v2.5 | Junio 2026*
-
----
-
 ## Fase 34 — Telemetría de Piloto v2.3 (Junio 2026)
 
 **Contexto:** Antes de arrancar el piloto, se implementa una capa mínima de telemetría para responder preguntas de producto sin crear una plataforma de analítica ni depender de herramientas de terceros (no Google Analytics, Mixpanel, Amplitude, Firebase Analytics).
@@ -978,10 +977,6 @@ Según el modelo de colaboración (producto_v2_3.md §7), solo el miembro 1 (cre
 
 - Ejecutar `await window.metricasPiloto()` cada lunes durante el piloto.
 - Si se necesita ver evolución temporal o compartir métricas con Anny, considerar `admin.html` simple (mismo repo, mismo Firebase, sin nuevo deploy) — `metricasPiloto()` ya tiene la lógica de lectura lista para reusar.
-
----
-
-*Organiza2 — Bitácora v2.5 | Junio 2026*
 
 ---
 
@@ -1288,3 +1283,7 @@ El Bug #45 (parpadeo de login en iOS PWA offline) es una **limitación real de F
 ```
 revert: restaurar auth al estado Fase40 — revertir Fase41
 ```
+
+---
+
+*Organiza2 — Bitácora v2.3 | Junio 2026*
