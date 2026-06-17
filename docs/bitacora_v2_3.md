@@ -1250,3 +1250,41 @@ Este commit modifica `index.html`, `js/auth.js` y `css/login.css` — todos en e
 ```
 fix: restauración auth offline iOS PWA — checkingScreen y popup guard — Fase 41
 ```
+
+---
+
+## Revert Fase 41 — Restauración al estado Fase 40 (Junio 2026)
+
+### Motivo
+
+Los cambios de Fase 41 (Fase 41 → 41f) introdujeron bugs progresivos en la autenticación:
+
+- **Fase 41b:** fallback de `localStorage` pasaba objeto plano a `onLoginSuccess` → loop de login.
+- **Fase 41c:** guard `resolved = true` bloqueaba `onAuthStateChanged` permanentemente → login y logout dejaban de funcionar tras el primer disparo.
+- **Fase 41d–41e:** parches sobre los bugs anteriores sin resolver la causa raíz.
+- **Fase 41f:** `signInWithRedirect` en iOS PWA mostraba "Connecting to the app" y no completaba el flujo.
+
+La autenticación (login, logout, sesión persistida) funcionaba perfectamente antes de Fase 41. El Bug #45 era un parpadeo cosmético de ~500ms que no justificaba el riesgo de romper la autenticación.
+
+### Decisión
+
+Revertir `js/auth.js`, `index.html`, `css/login.css` y `sw.js` al estado del commit `0494b89` (Fase 40).
+
+### Aprendizaje
+
+El Bug #45 (parpadeo de login en iOS PWA offline) es una **limitación real de Firebase Auth en Safari standalone**: `onAuthStateChanged` requiere red para validar el token JWT. No tiene solución limpia sin cambiar la arquitectura de autenticación. Queda documentado como limitación conocida — no como bug a corregir.
+
+### Archivos revertidos
+
+| Archivo | Estado |
+|---------|--------|
+| `js/auth.js` | Restaurado al estado Fase 40 |
+| `index.html` | Restaurado al estado Fase 40 |
+| `css/login.css` | Restaurado al estado Fase 40 |
+| `sw.js` | Restaurado a `organiza2-v2-4` |
+
+### Commit
+
+```
+revert: restaurar auth al estado Fase40 — revertir Fase41
+```
