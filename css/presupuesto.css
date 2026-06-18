@@ -244,7 +244,7 @@
   padding-top: .6rem; margin-top: .4rem;
   border-top: 0.5px solid var(--color-border);
 }
-.cfg-bud-footer-row { display: flex; justify-content: space-between; align-items: center; }
+.cfg-bud-footer-row { display: flex; justify-content: space-between; align-items: center; font-size: .78rem; }
 .cfg-bud-total { font-size: .78rem; color: var(--color-muted); }
 .cfg-bud-mes { color: var(--color-success, #0F6E56); }
 .cfg-reconf-btn { border: none; background: none; cursor: pointer; font-size: .75rem; color: var(--color-muted); }
