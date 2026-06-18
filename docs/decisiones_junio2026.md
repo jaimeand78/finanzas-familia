@@ -22,7 +22,7 @@
 **Dos niveles de detalle, no uno:**
 
 | Nivel | Dónde | Para qué |
-|-------|-------|---------|
+|-------|-------|---------| 
 | **Agrupado** | Presupuesto base | Planear — simple, pocas líneas |
 | **Detallado** | Registro diario | Entender — ítems específicos para tomar decisiones |
 
@@ -184,7 +184,7 @@ El presupuesto base usa ítems **agrupados**, no el detalle del registro diario:
 ### Flujo definitivo — 5 pantallas + resumen
 
 | Pantalla | Contenido | Saltable |
-|----------|-----------|---------|
+|----------|-----------|---------| 
 | 1. ¿Cómo es su hogar? | Soltero / Pareja / Familia / Mixto | No — define personalización |
 | 2. ¿Cuál es su mayor reto? | 4 opciones de dolor principal | Sí — "Prefiero no decir" |
 | 3. ¿Con cuánto cuentan? | Ingreso fijo + Ingreso adicional opcional | Sí |
@@ -243,7 +243,7 @@ El presupuesto base usa ítems **agrupados**, no el detalle del registro diario:
 ## 10. Decisiones técnicas derivadas
 
 | Decisión | Detalle |
-|----------|---------|
+|----------|---------| 
 | `calcPresupuestoBase(item, mes)` | Función canónica — única que calcula provisión mensual por frecuencia |
 | `defD()` | Ingresos dinámicos desde `perfil.miembros` — nunca hardcodeados con nombres |
 | Ítems con `frecuencia` | `mensual` (default) · `bimestral` · `trimestral` · `semestral` · `anual` |
@@ -258,49 +258,116 @@ El presupuesto base usa ítems **agrupados**, no el detalle del registro diario:
 
 **Estado:** Exploración de diseño durante el piloto v2.3. Ningún código pendiente — solo para revisar más adelante en v3.0. No viola la regla de validación porque no hay implementación.
 
-**Contexto que originó la sesión:** ejemplos reales de la vida de Jaime/Anny donde la información no llega a tiempo a la pareja:
-- Cita pediátrica avisada con 8 días de anticipación → el día llega y hay choque con otro compromiso (nadie se acordó a tiempo)
-- Nota en el cuaderno del colegio ("enviar dinero en 2 días para actividad") → un miembro la lee pero no se la comunica al otro → no se envía
-- Meta anual tipo "viaje a Europa" → tiene múltiples etapas (pasajes, alojamiento, transporte, presupuesto) que se extienden por meses
+---
 
-**Diagnóstico:** el problema no es falta de calendario (ya existen Gmail, Outlook, calendario compartido). El problema es que la información vive en la cabeza de una sola persona, no hay responsable claro, y el aviso llega el mismo día — no con anticipación.
+### Casos reales que originaron el modelo
 
-**Núcleo de valor propuesto:** ambos miembros ven lo mismo, hay un responsable explícito (o "sin asignar" como señal de alerta), y el aviso llega con anticipación configurable — no el día del evento.
+Todos son situaciones reales del hogar Ibarra Masso (Jaime + Anny):
 
-**Diferenciador frente a herramientas existentes (TimeTree, Cozi, FamilyWall, etc.):**
-- Esas apps son calendarios familiares aislados — no están conectadas al hábito diario que la pareja ya construye en Organiza2 (registro de gastos en Tab Hoy)
-- La conexión Planeador ↔ Finanzas (compromisos que generan gastos, metas de ahorro con etapas) es algo que las apps de calendario familiar no ofrecen — ese es el ángulo defendible
+1. **Cita pediátrica** — Anny avisa con 8 días de anticipación, Jaime se olvida, el día llega y tiene conflicto de trabajo. Nadie coordinó con tiempo.
+2. **Pago actividad del colegio** — Jaime lee la nota en el cuaderno de María José, no le avisa a Anny, llega el día y no se envió el dinero porque ninguno se acordó.
+3. **Viaje a Europa** — meta anual con múltiples etapas (pasajes, alojamiento, transporte, presupuesto acumulado). No es un compromiso puntual sino un proyecto con sub-pasos y ahorro asociado.
+4. **Mensaje del jardín por WhatsApp** — el jardín avisa lonchera temática o vestimenta especial, uno lo ve en WhatsApp pero no hace nada, llega el día y ya pasó. La información ya existe, el problema es que se pierde en el scroll.
+5. **Terapia familiar sin pagar** — compromiso con gasto asociado que quedó sin ejecutar 15 días hasta que llamaron a cobrar. Nadie lo registró en Finanzas, nadie tomó ownership.
+6. **Servicios públicos** — recurrentes y predecibles → quedan en Finanzas, NO en el Planeador. Define la frontera entre módulos.
 
-**Modelo conceptual propuesto (dos tipos, mismo objeto base):**
+---
 
-1. **Compromiso** — unidad base: cita, tarea, pago con plazo
-   - Campos: título, tipo (evento/tarea/recordatorio), fecha, responsable (uid | "ambos" | sin asignar), recurrente (bool/frecuencia), `gastoAsociado` opcional (categoría + monto), estado (pendiente/hecho)
-   - Un Compromiso con `gastoAsociado` sugiere registrar el gasto en Tab Hoy al marcarse como hecho — no escribe directo en `daily/` (respeta DA-1)
+### Diagnóstico
 
-2. **Meta/Proyecto** — agrupador de Compromisos con una meta de ahorro asociada (ej. viaje a Europa: pasajes, alojamiento, transporte como Compromisos con `metaId` común + meta de ahorro continua conectada a categoría Ahorro de Presupuesto Base)
+El problema no es falta de calendario — Jaime y Anny ya tienen Gmail, Outlook y calendario compartido. El problema es:
+- La información vive en la cabeza de **una sola persona**
+- No hay un **responsable claro** (o nadie lo asumió)
+- El aviso llega **el mismo día**, cuando ya no hay margen para reaccionar
+- Los gastos comprometidos **no tienen seguimiento** hasta que alguien llama a cobrar
 
-**Modelo de datos tentativo:**
+---
+
+### Filosofía de diseño
+
+> **No hay responsable individual — el hogar es el responsable.**
+
+La visibilidad compartida ES la responsabilidad compartida. Ambos miembros ven lo mismo; cualquiera que llegue primero lo resuelve. Esto es radicalmente distinto a apps de tareas (Todoist, Asana) que asignan a una persona — y conecta directamente con el lema *"Organizamos tu vida en pareja"*.
+
+---
+
+### Diferenciador frente a herramientas existentes (TimeTree, Cozi, FamilyWall, etc.)
+
+- Esas apps son calendarios familiares **aislados** — no conectados al hábito diario que la pareja ya construye en Organiza2
+- La conexión Planeador ↔ Finanzas (compromisos que generan gastos, metas con ahorro acumulado) es algo que las apps de calendario familiar no ofrecen — ese es el ángulo defendible
+
+---
+
+### Modelo conceptual: 3 tipos con naturaleza distinta
+
+| Tipo | Ejemplos reales | Fecha | Monto | ¿Se vence? |
+|------|----------------|-------|-------|------------|
+| 🔔 **Recordatorio** | Lonchera jardín, pago actividad colegio | Corta (hoy/mañana/en 2 días) | No | No aplica |
+| 📅 **Compromiso** | Cita pediatra, terapia familiar | Específica | Opcional | Sí — sigue visible hasta cerrarse |
+| 🎯 **Meta** | Viaje a Europa | Horizonte (meses) | Sí (ahorro acumulado) | No — tiene progreso |
+
+**Comportamiento clave del Compromiso vencido:** si llega la fecha y no se marcó como hecho, no desaparece — se vuelve más visible ("⚠️ venció hace X días") hasta que alguien lo resuelva.
+
+**Frontera con Finanzas:** lo recurrente y predecible (servicios públicos, arriendo, mercado) queda en Finanzas. El Planeador es solo para lo puntual e impredecible.
+
+---
+
+### Flujo de entrada rápida (diseño crítico)
+
+El momento de creación ocurre cuando el usuario está en WhatsApp o leyendo el cuaderno del colegio — tiene 10 segundos de atención. El flujo mínimo es:
+
+```
+1. Título (texto libre, teclado ya abierto)
+2. ¿Para cuándo? → un toque:
+   [ Hoy ]  [ Mañana ]  [ En 2 días ]  [ En 1 semana ]  [ Elegir fecha ]
+3. Guardar
+```
+
+El picker de calendario completo solo aparece si el usuario toca "Elegir fecha". El 90% de los casos del jardín se resuelven con "Mañana" o "En 2 días".
+
+---
+
+### Flujo de cierre con gasto asociado (Compromiso)
+
+```
+Usuario abre Organiza2
+→ ve "⚠️ Pagar terapia familiar — venció hace 15 días"
+→ toca → "¿Ya lo pagaste?" → Sí
+→ ¿Registrar el gasto en Tab Hoy? → Sí, $X, categoría Salud
+→ Compromiso cerrado + gasto registrado en daily/
+```
+
+El Planeador **nunca escribe directamente en `daily/`** — sugiere el registro al usuario (respeta DA-1).
+
+---
+
+### Modelo de datos tentativo
+
 ```
 hogares/[codigoHogar]/planeador/
-   compromisos/[id]/
+   items/[id]/
        titulo
-       tipo: "evento" | "tarea" | "recordatorio"
-       fecha
-       responsable: uid | "ambos" | null
-       recurrente: bool / frecuencia
+       tipo: "recordatorio" | "compromiso" | "meta"
+       fecha                          // timestamp
        gastoAsociado: { categoria, monto } | null
-       metaId: string | null
-       estado: "pendiente" | "hecho"
+       metaId: string | null          // solo para sub-compromisos de una Meta
+       estado: "pendiente" | "hecho" | "vencido"
+       creadoPor: uid
+       creadoEn: timestamp
    metas/[id]/
        nombre
        ahorroObjetivo
        fechaObjetivo
 ```
 
-**Pendiente para revisión futura:**
+---
+
+### Pendiente para revisión futura
+
 - Validar con el piloto si las familias ya usan algún calendario/app compartido y si les funciona
 - Diseño de pantalla principal del Planeador (no bocetado aún)
-- Mecanismo de "anticipación configurable" — cuántos días antes, por tipo de compromiso
+- Mecanismo de alertas: dentro de la app al abrir (sin push notifications para v3.0) vs. notificaciones push (post v3.0)
+- Definir cuántos días antes muestra alerta según tipo (Recordatorio: 1 día; Compromiso: 2-3 días; Meta: por etapas)
 
 ---
 
