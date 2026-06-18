@@ -637,7 +637,8 @@ async function renderConfigPresupuesto() {
   // DA-18: Config es vista anual — cargar budget máximo de todos los meses
   // para mostrar el valor real de ítems de fecha fija (SOAT, predial, cesantías, primas)
   const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const budgetAnual = {}; // { 'CatName|ItemLabel': maxBudget }
+  // datosMeses[m] = array de categorías del mes m (con ítems completos)
+  const datosMeses = Array(12).fill(null);
 
   try {
     const snapsMeses = await Promise.all(
@@ -645,9 +646,12 @@ async function renderConfigPresupuesto() {
         db.ref(dKey(curY, m)).once('value')
       )
     );
-    snapsMeses.forEach(snap => {
+    snapsMeses.forEach((snap, m) => {
       const d = snap.val();
       if (!d || !d.categories) return;
+      // Guardar datos completos del mes para cálculos de totales
+      datosMeses[m] = d.categories;
+      // Poblar budgetAnual con el máximo por ítem (para mostrar valores en el acordeón)
       d.categories.forEach(cat => {
         (cat.items || []).forEach(item => {
           const key = `${cat.name}|${item.label}`;
@@ -668,22 +672,18 @@ async function renderConfigPresupuesto() {
   // A3: Config solo muestra las categorías que aplican al perfil del hogar
   const catsVisibles = filtrarCategoriasPorPerfil(D.categories || []);
 
-  // Total mes actual — solo ítems que aplican en curM (DA-8)
-  const totalMes = catsVisibles.reduce((s, cat) =>
-    s + planItems(cat).reduce((cs, r) => {
-      const b = getBudget(cat.name, r.label, r.budget);
-      const item = { ...r, budget: b };
-      return cs + calcPresupuestoBase(item, curM);
-    }, 0), 0);
+  // Total mes actual — suma directa desde el snapshot de curM con ítems reales
+  const _catsMes = datosMeses[curM] ? filtrarCategoriasPorPerfil(datosMeses[curM]) : catsVisibles;
+  const totalMes = _catsMes.reduce((s, cat) =>
+    s + (cat.items || []).reduce((cs, item) =>
+      cs + calcPresupuestoBase(item, curM), 0), 0);
 
-  // Total año — suma real de los 12 meses usando los snapshots ya cargados
+  // Total año — suma real mes a mes desde los snapshots completos
   const totalAnio = Array.from({ length: 12 }, (_, m) => {
-    return catsVisibles.reduce((s, cat) =>
-      s + planItems(cat).reduce((cs, r) => {
-        const b = getBudget(cat.name, r.label, r.budget);
-        const item = { ...r, budget: b };
-        return cs + calcPresupuestoBase(item, m);
-      }, 0), 0);
+    const cats = datosMeses[m] ? filtrarCategoriasPorPerfil(datosMeses[m]) : [];
+    return cats.reduce((s, cat) =>
+      s + (cat.items || []).reduce((cs, item) =>
+        cs + calcPresupuestoBase(item, m), 0), 0);
   }).reduce((a, b) => a + b, 0);
 
   const cats = catsVisibles.map((cat) => {
