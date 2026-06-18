@@ -276,6 +276,8 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-20 | `_soloFlags: true` en `_onbData` indica flujo parcial — nunca llama `_aplicarOnbDataAD()` ni `save()` | ✅ Implementado |
 | DA-21 | Flujos de actualización del hogar: `_soloFlags` (P1.5 — reconfigurar flags), `_soloTipo` (P1 — cambiar tipo hogar), `_soloMeta` (P2 — cambiar meta). Cada flag controla qué pantallas renderizan y qué botón de guardado aparece | ✅ Implementado |
 | DA-22 | `admin.html` es el dashboard de seguimiento del piloto. Standalone, mismo repo y Firebase. Solo lectura — no escribe a Firebase. Protegido por guard de UID hardcodeado. Accesible en `organiza2.github.io/hogar/admin.html` | ✅ Implementado |
+| DA-23 | `calcPresupuestoBase(item, mes)` chequea `months` antes que `frecuencia`. Si el ítem tiene `months[]`, es de fecha fija — aplica solo en esos meses independientemente de `frecuencia`. El presupuesto base vive en un solo nodo Firebase; los demás meses lo proyectan en memoria. | ✅ Implementado |
+| DA-24 | `loadFixed()` busca hacia atrás hasta 12 meses para encontrar el nodo con budgets configurados. El presupuesto no se propaga a los 12 meses en Firebase — vive donde fue configurado (típicamente el mes actual al hacer onboarding). | ✅ Implementado |
 
 ---
 

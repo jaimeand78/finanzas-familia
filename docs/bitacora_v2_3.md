@@ -1356,3 +1356,42 @@ fix: bump cache v2-5 para cargar cambios presupuesto base
 ```
 
 ---
+
+## Fase 44 — Fix cálculo de presupuesto en todos los tabs (Junio 2026)
+
+**Contexto:** Al implementar la Fase 43 (footer con total mes y total año), se descubrió que el bug de cálculo de presupuesto era más profundo — afectaba "Cómo vamos", Análisis y Config. La raíz: `calcPresupuestoBase` chequeaba `frecuencia` antes que `months`, y ningún ítem tenía `frecuencia` guardada en Firebase (todos `undefined`), por lo que todos se trataban como mensuales.
+
+**Bug raíz:** En `calcPresupuestoBase`, el orden de chequeo era incorrecto:
+```js
+// Antes (bug): frecuencia primero → months nunca se evaluaba
+if (frec === 'mensual') return b;
+if (item.months && item.months.length) { ... }
+
+// Después (fix): months primero → fecha fija tiene prioridad
+if (item.months && item.months.length) { ... }
+const frec = item.frecuencia || 'mensual';
+if (frec === 'mensual') return b;
+```
+
+**Bug secundario:** El presupuesto base solo existe en el nodo de junio en Firebase — no se propaga a otros meses. `loadFixed()` solo buscaba el mes inmediatamente anterior, que también estaba vacío.
+
+**Fixes aplicados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `finanzas.js` | `calcPresupuestoBase`: `months` tiene prioridad sobre `frecuencia` |
+| `finanzas.js` | `recalc()`: `tBud` usa `calcPresupuestoBase(r, curM)` |
+| `finanzas.js` | `renderResumen()`: `tBud` y `bud` por categoría usan `calcPresupuestoBase(r, curM)` |
+| `finanzas.js` | `loadFixed()`: busca hacia atrás hasta 12 meses para encontrar mes con budgets |
+| `presupuesto.js` | `tieneBudget` movido post-snapshots, usa `Object.keys(budgetAnual).length > 0` |
+| `presupuesto.js` | `totalMes` y `totalAnio` calculados desde `catsVisibles` con `calcPresupuestoBase` |
+| `analisis.js` | `_renderSemaforoConData` recibe `mes` como parámetro explícito |
+| `analisis.js` | Fallback para meses sin datos en Firebase usa `D` con ingresos fijos respetados (`r.fixed ? r.value : 0`) |
+| `analisis.js` | `tBud` y `bud` por categoría usan `calcPresupuestoBase(r, mes)` |
+| `sw.js` | Bumpeado de v2-9 → v2-13 (múltiples iteraciones por orden incorrecto de commits) |
+
+**Aprendizaje de proceso:** El bump de `sw.js` debe ser siempre el último commit, después de que todos los archivos modificados estén propagados en GitHub Pages. Subir el SW antes congela una versión bugueada en el cache.
+
+**Resultado:** Los tres tabs muestran presupuesto correcto por mes, respetando ítems de fecha fija y proyectando ingresos fijos en meses futuros sin datos.
+
+---

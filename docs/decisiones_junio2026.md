@@ -434,3 +434,27 @@ El picker de calendario completo solo aparece si el usuario toca "Elegir fecha".
 **Archivos modificados:** `presupuesto.js` (cálculo), `presupuesto.css` (estilos footer).
 
 **No se agregan flechas de navegación de mes a Config** — Config es configuración, no consulta histórica (DA-16). El mes actual se indica en la etiqueta del total.
+
+---
+
+## 13. Regla de orden de commits con sw.js
+
+**Problema descubierto (Fase 44):** Al subir el bump de `sw.js` antes que los archivos corregidos, el service worker instalaba el cache con la versión bugueada. Los commits posteriores no tenían efecto porque el SW servía desde cache.
+
+**Regla establecida:** El commit de `sw.js` siempre debe ser el **último**, después de confirmar que todos los archivos modificados ya están en GitHub Pages. El orden correcto es:
+
+1. `git add [archivos modificados]` → `git commit` → `git push`
+2. Esperar 1-2 minutos para propagación en GitHub Pages
+3. `git add sw.js` → `git commit -m "fix: bump cache vX-Y"` → `git push`
+
+---
+
+## 14. calcPresupuestoBase — months tiene prioridad sobre frecuencia
+
+**Problema:** Los ítems de fecha fija (SOAT, predial, cesantías, primas) tienen `frecuencia: undefined` en Firebase. `calcPresupuestoBase` chequeaba `frecuencia` primero y al ser `undefined` asumía `'mensual'`, sumando esos ítems todos los meses.
+
+**Decisión:** `months` siempre tiene prioridad sobre `frecuencia`. Si un ítem tiene `months`, es de fecha fija — independientemente de lo que diga `frecuencia`.
+
+**Alcance del fix:** `finanzas.js` (función), `recalc()`, `renderResumen()`, `analisis.js` (`_renderSemaforoConData`), `presupuesto.js` (footer totales).
+
+**Presupuesto base vive en un solo nodo:** El presupuesto no se propaga a los 12 meses en Firebase — vive en el mes donde fue configurado. Los otros meses lo proyectan en memoria con `calcPresupuestoBase`. `loadFixed()` busca hacia atrás hasta 12 meses para encontrar el nodo con budgets.
