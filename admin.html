@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organiza2 · Piloto Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:        #1D9E75;
+      --green-light:  #E1F5EE;
+      --green-dark:   #085041;
+      --amber:        #BA7517;
+      --amber-light:  #FEF3C7;
+      --amber-dark:   #633806;
+      --red:          #D85A30;
+      --red-light:    #FAECE7;
+      --red-dark:     #712B13;
+      --text:         #1a1a18;
+      --text-muted:   #6b6b66;
+      --border:       rgba(0,0,0,0.1);
+      --bg:           #f8f7f4;
+      --bg-card:      #ffffff;
+      --bg-metric:    #f1efe8;
+      --radius-md:    8px;
+      --radius-lg:    12px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .login-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 340px;
+      width: 100%;
+    }
+    .login-logo { font-size: 2rem; margin-bottom: 1rem; }
+    .login-title { font-size: 18px; font-weight: 500; margin-bottom: 0.5rem; }
+    .login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .login-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 10px 16px;
+      background: var(--bg-card); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); font-size: 14px; font-weight: 500;
+      cursor: pointer; color: var(--text);
+    }
+    .login-btn:hover { background: var(--bg); }
+    .login-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    #loginError { font-size: 13px; color: var(--red); margin-top: 1rem; display: none; }
+
+    /* ── APP ── */
+    #app { display: none; max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; gap: 1rem; }
+    .page-title { font-size: 20px; font-weight: 500; }
+    .page-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-refresh {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; font-size: 13px; font-weight: 500;
+      background: var(--bg-card); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); cursor: pointer; color: var(--text);
+    }
+    .btn-refresh:hover { background: var(--bg); }
+    .btn-refresh svg { width: 15px; height: 15px; transition: transform .4s; }
+    .btn-refresh.loading svg { transform: rotate(360deg); }
+    .last-update { font-size: 12px; color: var(--text-muted); }
+
+    /* ── MÉTRICAS ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .m-card {
+      background: var(--bg-metric);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1rem;
+    }
+    .m-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.3; }
+    .m-val { font-size: 28px; font-weight: 500; line-height: 1; font-family: 'DM Mono', monospace; }
+    .m-sub { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+    .m-green { color: var(--green-dark); }
+    .m-amber { color: var(--amber); }
+    .m-red   { color: var(--red); }
+
+    /* ── SECCIÓN ── */
+    .section {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.25rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .section-title { font-size: 14px; font-weight: 500; margin-bottom: 1rem; }
+
+    /* ── PROGRESO ── */
+    .prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .prog-row:last-child { margin-bottom: 0; }
+    .prog-label { font-size: 13px; color: var(--text-muted); width: 180px; flex-shrink: 0; }
+    .prog-track { flex: 1; background: var(--bg-metric); border-radius: 99px; height: 6px; overflow: hidden; }
+    .prog-fill { height: 6px; border-radius: 99px; background: var(--green); transition: width .4s; }
+    .prog-fill.amber { background: var(--amber); }
+    .prog-val { font-size: 13px; font-weight: 500; width: 36px; text-align: right; font-family: 'DM Mono', monospace; }
+
+    /* ── TABLA SEMANAL ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      font-weight: 500; color: var(--text-muted); text-align: left;
+      padding: 0 8px 10px 0; border-bottom: 0.5px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 8px 10px 0; border-bottom: 0.5px solid var(--border);
+      font-family: 'DM Mono', monospace; font-size: 12px;
+    }
+    td.label-col { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); }
+    tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-block; font-size: 11px; padding: 2px 8px;
+      border-radius: 99px; font-family: 'DM Sans', sans-serif;
+    }
+    .badge-green  { background: var(--green-light);  color: var(--green-dark); }
+    .badge-amber  { background: var(--amber-light);  color: var(--amber-dark); }
+    .badge-gray   { background: var(--bg-metric);    color: var(--text-muted); }
+    .badge-active { background: var(--green);        color: #fff; }
+
+    /* ── EXIT CRITERIA ── */
+    .exit-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 0.5px solid var(--border);
+      font-size: 13px;
+    }
+    .exit-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .exit-icon { width: 18px; text-align: center; flex-shrink: 0; }
+    .exit-text { flex: 1; color: var(--text-muted); }
+    .exit-status { font-weight: 500; white-space: nowrap; }
+    .ok   { color: var(--green-dark); }
+    .pend { color: var(--amber); }
+    .fail { color: var(--red); }
+
+    /* ── LOADING ── */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid var(--border); border-top-color: var(--green);
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-row { padding: 1.5rem 0; text-align: center; color: var(--text-muted); font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🏠</div>
+    <p class="login-title">Organiza2 · Admin</p>
+    <p class="login-sub">Acceso restringido al administrador del piloto</p>
+    <button class="login-btn" onclick="loginGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Entrar con Google
+    </button>
+    <p id="loginError">Sin acceso. Solo el administrador puede entrar.</p>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <div class="page-header">
+    <div>
+      <p class="page-title">Organiza2 · Piloto v2.3</p>
+      <p class="page-meta" id="pageMeta">Cargando...</p>
+    </div>
+    <div class="header-actions">
+      <span class="last-update" id="lastUpdate"></span>
+      <button class="btn-refresh" id="btnRefresh" onclick="cargarDatos()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Métricas globales -->
+  <div class="metrics-grid" id="metricsGrid">
+    <div class="loading-row" style="grid-column:1/-1"><span class="spinner"></span> Cargando métricas...</div>
+  </div>
+
+  <!-- Progreso a criterios -->
+  <div class="section">
+    <p class="section-title">Progreso a criterios de salida</p>
+    <div id="progresoContainer">
+      <div class="loading-row"><span class="spinner"></span></div>
+    </div>
+  </div>
+
+  <!-- Tabla semanal -->
+  <div class="section">
+    <p class="section-title">Evolución semanal</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Semana</th>
+            <th>Hogares</th>
+            <th>Con 2 activos</th>
+            <th>Gastos</th>
+            <th>Usuarios activos</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="weekTableBody">
+          <tr><td colspan="6"><div class="loading-row"><span class="spinner"></span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Exit criteria -->
+  <div class="section">
+    <p class="section-title">Criterios de salida</p>
+    <div id="exitContainer">
+      <div class="loading-row"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────────────────────────
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCHWDJfmr2ok_xw-w1FE1tvNV5j5j5VEzc",
+    authDomain:        "organiza2-a09ef.firebaseapp.com",
+    databaseURL:       "https://organiza2-a09ef-default-rtdb.firebaseio.com",
+    projectId:         "organiza2-a09ef",
+    storageBucket:     "organiza2-a09ef.firebasestorage.app",
+    messagingSenderId: "188270762396",
+    appId:             "1:188270762396:web:be236988bf4f91f2141059"
+  }, 'admin');
+
+  const db   = firebase.database(firebase.app('admin'));
+  const auth = firebase.auth(firebase.app('admin'));
+
+  // UID del administrador del piloto — solo este uid puede entrar
+  const ADMIN_UID = 'N3bFynwCwZPsaYCH2HPMetlJXJP2'; // <-- reemplazar con tu UID real
+
+  // Fecha de inicio del piloto (lunes de la semana 1)
+  const PILOTO_START = new Date('2026-06-15T00:00:00'); // lunes 15 jun
+  const PILOTO_WEEKS = 4;
+
+  // ── AUTH ────────────────────────────────────────────────────────────────────
+  function loginGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(() => {
+      document.getElementById('loginError').style.display = 'block';
+    });
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+      return;
+    }
+    if (ADMIN_UID !== 'TU_UID_AQUI' && user.uid !== ADMIN_UID) {
+      auth.signOut();
+      document.getElementById('loginError').style.display = 'block';
+      return;
+    }
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    cargarDatos();
+  });
+
+  // ── HELPERS DE FECHA ────────────────────────────────────────────────────────
+
+  // Devuelve el lunes de la semana a la que pertenece una fecha
+  function lunesDe(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // 0=dom, 1=lun...
+    const diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  // Número de semana del piloto (1-based). Retorna null si es antes del inicio.
+  function semanaDelPiloto(date) {
+    const inicio = lunesDe(PILOTO_START);
+    const lunes  = lunesDe(date);
+    const diffMs = lunes - inicio;
+    if (diffMs < 0) return null;
+    return Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
+  }
+
+  // Etiqueta "S1 · 16 jun"
+  function etiquetaSemana(n) {
+    const d = new Date(PILOTO_START);
+    d.setDate(d.getDate() + (n - 1) * 7);
+    const dia = d.getDate();
+    const mes = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];
+    return `S${n} · ${dia} ${mes}`;
+  }
+
+  function fmt(n) {
+    return n === 0 || n === undefined ? '—' : String(n);
+  }
+
+  function hoy() {
+    return new Date();
+  }
+
+  // ── CARGA DE DATOS ──────────────────────────────────────────────────────────
+  async function cargarDatos() {
+    const btn = document.getElementById('btnRefresh');
+    btn.classList.add('loading');
+
+    try {
+      const snap = await db.ref('metricas/eventos').once('value');
+      const eventos = [];
+      snap.forEach(ch => { eventos.push(ch.val()); });
+
+      renderTodo(eventos);
+
+      const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('lastUpdate').textContent = `Actualizado ${hora}`;
+    } catch(e) {
+      console.error('Error cargando métricas:', e);
+    } finally {
+      btn.classList.remove('loading');
+    }
+  }
+
+  // ── RENDER PRINCIPAL ────────────────────────────────────────────────────────
+  function renderTodo(eventos) {
+    const porTipo = tipo => eventos.filter(e => e.tipo === tipo);
+    const hace7d  = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    // Métricas globales
+    const hogaresCreados      = porTipo('hogar_creado').length;
+    const miembrosUnidos      = porTipo('hogar_unido').length;
+    const onboardingCompleto  = porTipo('onboarding_completado').length;
+    const gastosTotal         = porTipo('gasto_registrado').length;
+
+    const activos7d = porTipo('usuario_activo').filter(e => e.timestamp >= hace7d);
+    const usuariosActivos7d = new Set(activos7d.map(e => e.uid)).size;
+
+    const todosActivos = porTipo('usuario_activo');
+    const porHogar = {};
+    todosActivos.forEach(e => {
+      if (!e.hogar || !e.uid) return;
+      if (!porHogar[e.hogar]) porHogar[e.hogar] = new Set();
+      porHogar[e.hogar].add(e.uid);
+    });
+    const hogaresCon2 = Object.values(porHogar).filter(s => s.size >= 2).length;
+
+    // Semana actual del piloto
+    const semanaActual = semanaDelPiloto(hoy()) || 1;
+    const semanaActualLabel = `Semana ${Math.min(semanaActual, PILOTO_WEEKS)} de ${PILOTO_WEEKS}`;
+    const fechaFin = new Date(PILOTO_START);
+    fechaFin.setDate(fechaFin.getDate() + PILOTO_WEEKS * 7);
+    document.getElementById('pageMeta').textContent =
+      `${semanaActualLabel} · Piloto hasta ${fechaFin.getDate()} jul 2026`;
+
+    // Colorear hogares con 2 activos
+    const c2 = hogaresCon2 >= 3 ? 'm-green' : hogaresCon2 >= 1 ? 'm-amber' : 'm-red';
+    const cu = usuariosActivos7d >= 4 ? 'm-green' : usuariosActivos7d >= 2 ? 'm-amber' : 'm-red';
+
+    document.getElementById('metricsGrid').innerHTML = `
+      <div class="m-card">
+        <p class="m-label">Hogares creados</p>
+        <p class="m-val">${hogaresCreados}</p>
+        <p class="m-sub">meta: 5–10</p>
+      </div>
+      <div class="m-card">
+        <p class="m-label">Onboarding completo</p>
+        <p class="m-val">${onboardingCompleto}</p>
+        <p class="m-sub">${hogaresCreados > 0 ? Math.round(onboardingCompleto/hogaresCreados*100) : 0}% de hogares</p>
+      </div>
+      <div class="m-card">
+        <p class="m-label">Hogares con 2 activos</p>
+        <p class="m-val ${c2}">${hogaresCon2}</p>
+        <p class="m-sub">${hogaresCreados > 0 ? Math.round(hogaresCon2/hogaresCreados*100) : 0}% del total</p>
+      </div>
+      <div class="m-card">
+        <p class="m-label">Gastos registrados</p>
+        <p class="m-val">${gastosTotal}</p>
+        <p class="m-sub">acumulado piloto</p>
+      </div>
+      <div class="m-card">
+        <p class="m-label">Usuarios activos 7d</p>
+        <p class="m-val ${cu}">${usuariosActivos7d}</p>
+        <p class="m-sub">uids únicos</p>
+      </div>
+    `;
+
+    // Progreso a exit criteria
+    const semPct    = Math.round(Math.min(semanaActual - 1, PILOTO_WEEKS) / PILOTO_WEEKS * 100);
+    const onbPct    = Math.round(Math.min(onboardingCompleto, 3) / 3 * 100);
+    const c2Pct     = Math.round(Math.min(hogaresCon2, 3) / 3 * 100);
+    const gastosS4  = semanaN(eventos, 4);
+    const s4Pct     = semanaActual >= 4 ? Math.round(Math.min(gastosS4.hogaresConGastos, 3) / 3 * 100) : 0;
+
+    document.getElementById('progresoContainer').innerHTML = `
+      <div class="prog-row">
+        <span class="prog-label">Semanas completadas</span>
+        <div class="prog-track"><div class="prog-fill" style="width:${semPct}%"></div></div>
+        <span class="prog-val">${Math.min(semanaActual - 1, PILOTO_WEEKS)}/${PILOTO_WEEKS}</span>
+      </div>
+      <div class="prog-row">
+        <span class="prog-label">Onboarding completo</span>
+        <div class="prog-track"><div class="prog-fill" style="width:${onbPct}%"></div></div>
+        <span class="prog-val">${Math.min(onboardingCompleto, 3)}/3</span>
+      </div>
+      <div class="prog-row">
+        <span class="prog-label">Hogares con 2 activos</span>
+        <div class="prog-track"><div class="prog-fill ${hogaresCon2 < 3 ? 'amber' : ''}" style="width:${c2Pct}%"></div></div>
+        <span class="prog-val">${Math.min(hogaresCon2, 3)}/3</span>
+      </div>
+      <div class="prog-row">
+        <span class="prog-label">Registro sostenido S4</span>
+        <div class="prog-track"><div class="prog-fill" style="width:${s4Pct}%"></div></div>
+        <span class="prog-val">${semanaActual >= 4 ? gastosS4.hogaresConGastos + '/3' : '—'}</span>
+      </div>
+    `;
+
+    // Tabla semanal automática
+    renderTabla(eventos, semanaActual, hogaresCreados, porHogar);
+
+    // Exit criteria
+    const todoBien = semanaActual > PILOTO_WEEKS
+      && onboardingCompleto >= 3
+      && hogaresCon2 >= 3
+      && gastosS4.hogaresConGastos >= 3;
+
+    const okSem  = semanaActual > PILOTO_WEEKS;
+    const okOnb  = onboardingCompleto >= 3;
+    const okC2   = hogaresCon2 >= 3;
+    const okS4   = semanaActual >= 4 && gastosS4.hogaresConGastos >= 3;
+
+    document.getElementById('exitContainer').innerHTML = `
+      <div class="exit-row">
+        <span class="exit-icon">🗓</span>
+        <span class="exit-text">4 semanas de piloto completadas</span>
+        <span class="exit-status ${okSem ? 'ok' : 'pend'}">${okSem ? '✓ completo' : 'semana ' + Math.min(semanaActual, 4) + '/4'}</span>
+      </div>
+      <div class="exit-row">
+        <span class="exit-icon">🏠</span>
+        <span class="exit-text">≥ 3 hogares con onboarding completo</span>
+        <span class="exit-status ${okOnb ? 'ok' : 'pend'}">${okOnb ? '✓ ' + onboardingCompleto : onboardingCompleto + ' de 3'}</span>
+      </div>
+      <div class="exit-row">
+        <span class="exit-icon">👫</span>
+        <span class="exit-text">≥ 3 hogares con ambos miembros activos</span>
+        <span class="exit-status ${okC2 ? 'ok' : 'pend'}">${okC2 ? '✓ ' + hogaresCon2 : hogaresCon2 + ' de 3'}</span>
+      </div>
+      <div class="exit-row">
+        <span class="exit-icon">📊</span>
+        <span class="exit-text">≥ 3 hogares registrando gastos en semana 4</span>
+        <span class="exit-status ${okS4 ? 'ok' : semanaActual < 4 ? 'pend' : 'fail'}">${semanaActual < 4 ? 'por evaluar' : okS4 ? '✓ ' + gastosS4.hogaresConGastos : gastosS4.hogaresConGastos + ' de 3'}</span>
+      </div>
+      <div class="exit-row">
+        <span class="exit-icon">🚦</span>
+        <span class="exit-text">Sin problemas bloqueantes abiertos</span>
+        <span class="exit-status ok">verificar manualmente</span>
+      </div>
+      ${todoBien ? `<div style="margin-top:1rem;padding:.875rem 1rem;background:#E1F5EE;border-radius:8px;font-size:13px;color:#085041;font-weight:500;">
+        ✅ Todos los criterios cumplidos — listo para iniciar diseño del Planeador
+      </div>` : ''}
+    `;
+  }
+
+  // ── DATOS POR SEMANA ────────────────────────────────────────────────────────
+  function semanaN(eventos, n) {
+    const inicio = new Date(PILOTO_START);
+    inicio.setDate(inicio.getDate() + (n - 1) * 7);
+    const fin = new Date(inicio);
+    fin.setDate(fin.getDate() + 7);
+    const tsInicio = inicio.getTime();
+    const tsFin    = fin.getTime();
+
+    const evSem = eventos.filter(e => e.timestamp >= tsInicio && e.timestamp < tsFin);
+    const porTipo = tipo => evSem.filter(e => e.tipo === tipo);
+
+    const gastos   = porTipo('gasto_registrado').length;
+    const activos  = porTipo('usuario_activo');
+    const uids     = new Set(activos.map(e => e.uid)).size;
+
+    // Hogares con actividad en esa semana
+    const hogaresActivos = new Set(activos.filter(e => e.hogar).map(e => e.hogar));
+
+    // Hogares con 2+ activos en esa semana
+    const porHogarSem = {};
+    activos.forEach(e => {
+      if (!e.hogar || !e.uid) return;
+      if (!porHogarSem[e.hogar]) porHogarSem[e.hogar] = new Set();
+      porHogarSem[e.hogar].add(e.uid);
+    });
+    const c2 = Object.values(porHogarSem).filter(s => s.size >= 2).length;
+
+    // Hogares con al menos 1 gasto en esa semana
+    const hogaresConGastos = new Set(
+      evSem.filter(e => e.tipo === 'gasto_registrado' && e.hogar).map(e => e.hogar)
+    ).size;
+
+    return { gastos, uids, c2, hogaresConGastos, tieneData: evSem.length > 0 };
+  }
+
+  function renderTabla(eventos, semanaActual, hogaresTotal, porHogar) {
+    const tbody = document.getElementById('weekTableBody');
+    let html = '';
+
+    for (let n = 1; n <= PILOTO_WEEKS; n++) {
+      const datos = semanaN(eventos, n);
+      const esCurrent = n === semanaActual;
+      const esFutura  = n > semanaActual;
+
+      // Hogares acumulados hasta esta semana (los nuevos hogar_creado hasta fin de semana)
+      const fin = new Date(PILOTO_START);
+      fin.setDate(fin.getDate() + n * 7);
+      const hogaresHastaFin = eventos.filter(e =>
+        e.tipo === 'hogar_creado' && e.timestamp < fin.getTime()
+      ).length;
+
+      let badge;
+      if (esCurrent)      badge = `<span class="badge badge-active">en curso</span>`;
+      else if (esFutura)  badge = `<span class="badge badge-gray">pendiente</span>`;
+      else                badge = `<span class="badge badge-green">completada</span>`;
+
+      html += `<tr>
+        <td class="label-col">${etiquetaSemana(n)}</td>
+        <td>${esFutura ? '—' : hogaresHastaFin}</td>
+        <td>${esFutura ? '—' : datos.c2}</td>
+        <td>${esFutura ? '—' : fmt(datos.gastos)}</td>
+        <td>${esFutura ? '—' : fmt(datos.uids)}</td>
+        <td>${badge}</td>
+      </tr>`;
+    }
+
+    tbody.innerHTML = html;
+  }
+</script>
+</body>
+</html>
