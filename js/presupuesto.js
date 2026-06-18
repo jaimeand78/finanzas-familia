@@ -671,19 +671,21 @@ async function renderConfigPresupuesto() {
   // A3: Config solo muestra las categorías que aplican al perfil del hogar
   const catsVisibles = filtrarCategoriasPorPerfil(D.categories || []);
 
-  // Total mes actual — suma directa desde el snapshot de curM con ítems reales
-  const _catsMes = datosMeses[curM] ? filtrarCategoriasPorPerfil(datosMeses[curM]) : catsVisibles;
-  const totalMes = _catsMes.reduce((s, cat) =>
-    s + (cat.items || []).reduce((cs, item) =>
-      cs + calcPresupuestoBase(item, curM), 0), 0);
+  // Total mes actual — ítems de catsVisibles aplicando calcPresupuestoBase para curM
+  const totalMes = catsVisibles.reduce((s, cat) =>
+    s + planItems(cat).reduce((cs, r) => {
+      const b = getBudget(cat.name, r.label, r.budget);
+      return cs + calcPresupuestoBase({ ...r, budget: b }, curM);
+    }, 0), 0);
 
-  // Total año — suma real mes a mes desde los snapshots completos
-  const totalAnio = Array.from({ length: 12 }, (_, m) => {
-    const cats = datosMeses[m] ? filtrarCategoriasPorPerfil(datosMeses[m]) : [];
-    return cats.reduce((s, cat) =>
-      s + (cat.items || []).reduce((cs, item) =>
-        cs + calcPresupuestoBase(item, m), 0), 0);
-  }).reduce((a, b) => a + b, 0);
+  // Total año — mismos ítems, iterando los 12 meses
+  const totalAnio = Array.from({ length: 12 }, (_, m) =>
+    catsVisibles.reduce((s, cat) =>
+      s + planItems(cat).reduce((cs, r) => {
+        const b = getBudget(cat.name, r.label, r.budget);
+        return cs + calcPresupuestoBase({ ...r, budget: b }, m);
+      }, 0), 0)
+  ).reduce((a, b) => a + b, 0);
 
   const cats = catsVisibles.map((cat) => {
     // ci es el índice en D.categories (no en catsVisibles) — necesario para abrirModalCategoria
