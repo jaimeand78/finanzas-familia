@@ -185,11 +185,12 @@ function buildIncomeFromPerfil(perfil) {
 function calcPresupuestoBase(item, mesActual) {
   const b = item.budget || 0;
   if (!b) return 0;
-  const frec = item.frecuencia || 'mensual';
-  if (frec === 'mensual') return b;
+  // months tiene prioridad — si existe, es un ítem de fecha fija independiente de frecuencia
   if (item.months && item.months.length) {
     return item.months.includes(mesActual) ? b : 0;
   }
+  const frec = item.frecuencia || 'mensual';
+  if (frec === 'mensual') return b;
   const divisores = { bimestral:2, trimestral:3, semestral:6, anual:12 };
   return Math.round(b / (divisores[frec] || 1));
 }
