@@ -1326,3 +1326,31 @@ docs: Fase 42 + DA-22
 ---
 
 *Organiza2 — Bitácora v2.3 | Junio 2026*
+
+## Fase 43 — Fix footer presupuesto base: total mes y total año (Junio 2026)
+
+**Problema:** El footer de "Presupuesto base" en Config mostraba un único total que sumaba el valor máximo anual de cada ítem sin respetar frecuencias ni meses. Ítems de fecha fija (cesantías, SOAT, predial, primas) se sumaban como si ocurrieran todos los meses, inflando el número.
+
+**Solución:** Dos totales en el footer, calculados correctamente con `calcPresupuestoBase` (DA-8):
+
+- **Total mes (ej: jun)** — solo los ítems que aplican en el mes actual
+- **Total año** — suma real de los 12 meses
+
+**Decisión UX:** Se descartó agregar flechas de navegación de mes a Config — Config es configuración, no consulta histórica (DA-16). El mes se indica en la etiqueta del total.
+
+### Archivos
+
+| Archivo | Cambio |
+|---------|--------|
+| `presupuesto.js` | `totalGlobal` reemplazado por `totalMes` (vía `calcPresupuestoBase(item, curM)`) y `totalAnio` (suma de los 12 meses). Footer HTML actualizado. |
+| `presupuesto.css` | `.cfg-bud-footer` en columna con dos filas. Nuevas clases: `.cfg-bud-footer-row`, `.cfg-bud-mes` (verde). |
+
+### Commits
+
+```
+fix: footer presupuesto base muestra total mes y total año correctos
+fix: estilos footer presupuesto base para dos filas
+docs: decisión §12 footer presupuesto base total mes y año
+```
+
+---
