@@ -240,11 +240,13 @@
 
 /* Footer presupuesto */
 .cfg-bud-footer {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; flex-direction: column; gap: .35rem;
   padding-top: .6rem; margin-top: .4rem;
   border-top: 0.5px solid var(--color-border);
 }
-.cfg-bud-total { font-size: .8rem; color: var(--color-muted); }
+.cfg-bud-footer-row { display: flex; justify-content: space-between; align-items: center; }
+.cfg-bud-total { font-size: .78rem; color: var(--color-muted); }
+.cfg-bud-mes { color: var(--color-success, #0F6E56); }
 .cfg-reconf-btn { border: none; background: none; cursor: pointer; font-size: .75rem; color: var(--color-muted); }
 
 /* Cerrar sesión */
