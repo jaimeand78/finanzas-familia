@@ -1344,6 +1344,7 @@ docs: Fase 42 + DA-22
 |---------|--------|
 | `presupuesto.js` | `totalGlobal` reemplazado por `totalMes` (vía `calcPresupuestoBase(item, curM)`) y `totalAnio` (suma de los 12 meses). Footer HTML actualizado. |
 | `presupuesto.css` | `.cfg-bud-footer` en columna con dos filas. Nuevas clases: `.cfg-bud-footer-row`, `.cfg-bud-mes` (verde). |
+| `sw.js` | Bump `CACHE_NAME` `organiza2-v2-4` → `organiza2-v2-5` para forzar recarga del shell. |
 
 ### Commits
 
@@ -1351,6 +1352,7 @@ docs: Fase 42 + DA-22
 fix: footer presupuesto base muestra total mes y total año correctos
 fix: estilos footer presupuesto base para dos filas
 docs: decisión §12 footer presupuesto base total mes y año
+fix: bump cache v2-5 para cargar cambios presupuesto base
 ```
 
 ---
