@@ -214,6 +214,7 @@ El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo d
 | Edición de registros diarios | ✅ | Fase 35 |
 | Service Worker PWA | ✅ | Fase 39 |
 | Limpieza código huérfano | ✅ | Fase 40 |
+| Dashboard admin piloto | ✅ | Fase 42 |
 
 ---
 
