@@ -1286,4 +1286,43 @@ revert: restaurar auth al estado Fase40 — revertir Fase41
 
 ---
 
+## Fase 42 — Dashboard admin piloto (Junio 2026)
+
+**Contexto:** Con el piloto activo se necesitaba una forma de revisar las métricas semanalmente sin interpretar números en consola. Se implementó `admin.html` en la raíz del repo — mismo Firebase, sin nuevo deploy, sin dependencias adicionales.
+
+### Diseño
+
+- Página standalone con login Google propio (Firebase Auth compat)
+- Guard por UID: solo el administrador del piloto puede acceder — cualquier otro uid ve "Sin acceso" y se desloguea automáticamente
+- Lee `metricas/eventos` en tiempo real al abrir y al presionar "Actualizar"
+- **Sin escritura a Firebase** — todo es derivado de los eventos existentes, calculado en cliente
+
+### Contenido del dashboard
+
+| Sección | Descripción |
+|---------|-------------|
+| 5 tarjetas métricas | Hogares creados · Onboarding completo · Hogares con 2 activos · Gastos acumulados · Usuarios activos 7d — con colores semáforo |
+| Barras de progreso | Avance hacia cada exit criterion en tiempo real |
+| Tabla semanal | S1–S4 calculadas automáticamente agrupando eventos por semana ISO (lunes–domingo) — sin entrada manual |
+| Exit criteria | Estado de cada criterio con veredicto ok/pendiente/falla. Banner verde si todos se cumplen. |
+
+### Lógica de semanas
+
+`lunesDe(date)` → lunes de la semana de cualquier fecha. `semanaDelPiloto(date)` → número de semana 1-based desde `PILOTO_START` (2026-06-15). Cada semana agrupa eventos por `timestamp >= tsInicio && timestamp < tsFin`. Los datos de cada columna (hogares, con 2 activos, gastos, usuarios) se calculan sobre el slice de eventos de esa semana.
+
+### Archivos
+
+| Archivo | Cambio |
+|---------|--------|
+| `admin.html` | **Nuevo.** Dashboard completo en un solo archivo — HTML + CSS + JS inline |
+
+### Commit
+
+```
+feat: dashboard admin piloto — admin.html (Fase 42)
+docs: Fase 42 + DA-22
+```
+
+---
+
 *Organiza2 — Bitácora v2.3 | Junio 2026*
