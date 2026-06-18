@@ -621,24 +621,12 @@ async function renderConfigPresupuesto() {
   const el = document.getElementById('budgetConfig');
   if (!el) return;
 
-  // Presupuesto no configurado si no hay ningún budget > 0 en ninguna categoría
-  const tieneBudget = D && D.categories && D.categories.some(cat =>
-    (cat.items || []).some(it => (it.budget || 0) > 0)
-  );
-  if (!tieneBudget) {
-    el.innerHTML = `
-    <p class="cfg-empty">No hay presupuesto configurado todavía.</p>
-    <button class="btn-primary" style="margin-top:.5rem;" onclick="iniciarOnboarding()">
-      Configurar presupuesto base
-    </button>`;
-    return;
-  }
-
   // DA-18: Config es vista anual — cargar budget máximo de todos los meses
   // para mostrar el valor real de ítems de fecha fija (SOAT, predial, cesantías, primas)
   const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   // datosMeses[m] = array de categorías del mes m (con ítems completos)
   const datosMeses = Array(12).fill(null);
+  const budgetAnual = {}; // { 'CatName|ItemLabel': maxBudget }
 
   try {
     const snapsMeses = await Promise.all(
@@ -662,6 +650,17 @@ async function renderConfigPresupuesto() {
     });
   } catch(e) {
     console.warn('renderConfigPresupuesto: no se pudieron cargar todos los meses', e);
+  }
+
+  // Presupuesto no configurado si no hay ningún budget > 0 en ningún mes
+  const tieneBudget = Object.keys(budgetAnual).length > 0;
+  if (!tieneBudget) {
+    el.innerHTML = `
+    <p class="cfg-empty">No hay presupuesto configurado todavía.</p>
+    <button class="btn-primary" style="margin-top:.5rem;" onclick="iniciarOnboarding()">
+      Configurar presupuesto base
+    </button>`;
+    return;
   }
 
   const getBudget = (catName, itemLabel, fallback) => {
