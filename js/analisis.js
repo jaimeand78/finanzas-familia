@@ -44,7 +44,14 @@ function renderSemaforo() {
       db.ref(dKey(curYx, curMx)).once('value'),
       db.ref(`hogares/${window.HOGAR.codigoHogar}/daily/${curYx}/${mm}`).once('value')
     ]).then(([snapMes, snapDaily]) => {
-      const d = snapMes.val() || { income:[], categories:[] };
+      // Si el mes no tiene datos en Firebase, usar D como fuente de budgets con valores en 0
+      const raw = snapMes.val();
+      const d = raw || {
+        income: (window.D && window.D.income) ? window.D.income.map(r => ({ ...r, value: 0 })) : [],
+        categories: (window.D && window.D.categories) ? window.D.categories.map(c => ({
+          ...c, items: (c.items || []).map(r => ({ ...r, value: 0 }))
+        })) : []
+      };
       // Acumular gastos daily por categoría (sin emoji, igual que syncDailyMonth)
       const totals = {};
       snapDaily.forEach(daySnap => {

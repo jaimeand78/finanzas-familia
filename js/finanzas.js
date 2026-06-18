@@ -228,24 +228,34 @@ function subMonth() {
 }
 
 async function loadFixed() {
+  // Buscar hacia atrás hasta 12 meses para encontrar un mes con budgets configurados
   let py = curY, pm = curM - 1;
   if (pm < 0) { pm = 11; py--; }
-  try {
-    const snap = await db.ref(dKey(py, pm)).once('value');
-    const prev = snap.val();
-    const nd = defD();
-    if (prev) {
-      if (prev.income) nd.income = prev.income.map(r => ({ ...r, value: r.fixed ? r.value : 0 }));
-      if (prev.categories) nd.categories = prev.categories.map(c => ({
-        ...c,
-        items: planItems(c).map(r => {
-          const ok = !r.months || r.months.includes(curM);
-          return { ...r, label: canonicalLabel(r.label || ''), value: (r.fixed && ok) ? r.value : 0 };
-        })
-      }));
-    }
-    D = nd;
-  } catch(e) { D = defD(); }
+  let prev = null;
+  for (let i = 0; i < 12; i++) {
+    try {
+      const snap = await db.ref(dKey(py, pm)).once('value');
+      const val = snap.val();
+      if (val && val.categories && val.categories.some(c => (c.items || []).some(r => (r.budget || 0) > 0))) {
+        prev = val;
+        break;
+      }
+    } catch(e) { break; }
+    pm--;
+    if (pm < 0) { pm = 11; py--; }
+  }
+  const nd = defD();
+  if (prev) {
+    if (prev.income) nd.income = prev.income.map(r => ({ ...r, value: r.fixed ? r.value : 0 }));
+    if (prev.categories) nd.categories = prev.categories.map(c => ({
+      ...c,
+      items: planItems(c).map(r => {
+        const ok = !r.months || r.months.includes(curM);
+        return { ...r, label: canonicalLabel(r.label || ''), value: (r.fixed && ok) ? r.value : 0 };
+      })
+    }));
+  }
+  D = nd;
   renderAll();
   if (typeof syncDailyMonth === 'function') syncDailyMonth();
   setSS('ok');
