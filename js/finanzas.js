@@ -286,7 +286,7 @@ function recalc() {
   const tExp = D.categories.reduce((s, c) => {
     return s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
   }, 0);
-  const tBud = D.categories.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
+  const tBud = D.categories.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + calcPresupuestoBase(r, curM), 0), 0);
   const tFix = D.categories.reduce((s, c) => s + planItems(c).filter(r => r.fixed).reduce((ss, r) => ss + (r.value || 0), 0), 0);
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
@@ -328,7 +328,7 @@ function renderResumen() {
   const tExp = cats.reduce((s, c) => {
     return s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
   }, 0);
-  const tBud = cats.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
+  const tBud = cats.reduce((s, c) => s + planItems(c).reduce((ss, r) => ss + calcPresupuestoBase(r, curM), 0), 0);
   const base  = tBud > 0 ? tBud : tInc;
   const avail = base - tExp;
 
@@ -338,7 +338,7 @@ function renderResumen() {
   const catsData = cats.map(c => {
     const items = planItems(c);
     const act   = items.reduce((s, r) => s + (r.value || 0), 0) + (dailyTotals[c.name] || 0);
-    const bud   = items.reduce((s, r) => s + (r.budget || 0), 0);
+    const bud   = items.reduce((s, r) => s + calcPresupuestoBase(r, curM), 0);
     const pct   = bud > 0 ? Math.round((act / bud) * 100) : -1;
     return { name: c.name, act, bud, pct };
   }).filter(c => c.act > 0 || c.bud > 0);

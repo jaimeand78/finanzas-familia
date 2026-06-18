@@ -37,7 +37,7 @@ function renderSemaforo() {
   const mismomes = (curYx === curY && curMx === curM);
 
   if (mismomes) {
-    _renderSemaforoConData(sem, D, dailyTotals);
+    _renderSemaforoConData(sem, D, dailyTotals, curM);
   } else {
     const mm = String(curMx + 1).padStart(2, '0');
     Promise.all([
@@ -56,12 +56,12 @@ function renderSemaforo() {
           totals[cat] = (totals[cat] || 0) + v.amount;
         });
       });
-      _renderSemaforoConData(sem, d, totals);
+      _renderSemaforoConData(sem, d, totals, curMx);
     });
   }
 }
 
-function _renderSemaforoConData(sem, data, totals) {
+function _renderSemaforoConData(sem, data, totals, mes) {
   if (!data.categories) { sem.innerHTML = '<div style="font-size:.85rem;color:#9b9b97;padding:1rem 0;">Sin datos este mes</div>'; return; }
   const tInc = data.income ? data.income.reduce((s, r) => s + (r.value || 0), 0) : 0;
   // A3: aplicar filtro de perfil — mismo comportamiento que renderResumen
@@ -69,12 +69,12 @@ function _renderSemaforoConData(sem, data, totals) {
   const tExp = _catsF.reduce((s, c) =>
     s + planItems(c).reduce((ss, r) => ss + (r.value || 0), 0) + (totals[c.name] || 0), 0);
   const tBud = _catsF.reduce((s, c) =>
-    s + planItems(c).reduce((ss, r) => ss + (r.budget || 0), 0), 0);
+    s + planItems(c).reduce((ss, r) => ss + calcPresupuestoBase(r, mes != null ? mes : curM), 0), 0);
   const avail = (tBud > 0 ? tBud : tInc) - tExp;
 
   const cats = _catsF.map(c => {
     const act = planItems(c).reduce((s, r) => s + (r.value || 0), 0) + (totals[c.name] || 0);
-    const bud = planItems(c).reduce((s, r) => s + (r.budget || 0), 0);
+    const bud = planItems(c).reduce((s, r) => s + calcPresupuestoBase(r, mes != null ? mes : curM), 0);
     return { name: c.name, act, bud };
   }).filter(c => c.act > 0 || c.bud > 0);
 
