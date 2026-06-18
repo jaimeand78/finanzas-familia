@@ -2,7 +2,7 @@
 // Estrategia: cache-first para el shell local, network-only para Firebase
 // Fase 39 — Junio 2026
 
-const CACHE_NAME = 'organiza2-v2-12';
+const CACHE_NAME = 'organiza2-v2-13';
 
 const SHELL = [
   './',
