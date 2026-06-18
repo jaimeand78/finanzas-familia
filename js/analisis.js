@@ -47,8 +47,8 @@ function renderSemaforo() {
       // Si el mes no tiene datos en Firebase, usar D como fuente de budgets con valores en 0
       const raw = snapMes.val();
       const d = raw || {
-        income: (window.D && window.D.income) ? window.D.income.map(r => ({ ...r, value: 0 })) : [],
-        categories: (window.D && window.D.categories) ? window.D.categories.map(c => ({
+        income: (D && D.income) ? D.income.map(r => ({ ...r, value: 0 })) : [],
+        categories: (D && D.categories) ? D.categories.map(c => ({
           ...c, items: (c.items || []).map(r => ({ ...r, value: 0 }))
         })) : []
       };
