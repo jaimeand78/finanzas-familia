@@ -667,11 +667,24 @@ async function renderConfigPresupuesto() {
 
   // A3: Config solo muestra las categorías que aplican al perfil del hogar
   const catsVisibles = filtrarCategoriasPorPerfil(D.categories || []);
-  const totalGlobal = catsVisibles.reduce((s, cat) => {
-    return s + planItems(cat).reduce((cs, r) => {
-      return cs + getBudget(cat.name, r.label, r.budget);
-    }, 0);
-  }, 0);
+
+  // Total mes actual — solo ítems que aplican en curM (DA-8)
+  const totalMes = catsVisibles.reduce((s, cat) =>
+    s + planItems(cat).reduce((cs, r) => {
+      const b = getBudget(cat.name, r.label, r.budget);
+      const item = { ...r, budget: b };
+      return cs + calcPresupuestoBase(item, curM);
+    }, 0), 0);
+
+  // Total año — suma real de los 12 meses usando los snapshots ya cargados
+  const totalAnio = Array.from({ length: 12 }, (_, m) => {
+    return catsVisibles.reduce((s, cat) =>
+      s + planItems(cat).reduce((cs, r) => {
+        const b = getBudget(cat.name, r.label, r.budget);
+        const item = { ...r, budget: b };
+        return cs + calcPresupuestoBase(item, m);
+      }, 0), 0);
+  }).reduce((a, b) => a + b, 0);
 
   const cats = catsVisibles.map((cat) => {
     // ci es el índice en D.categories (no en catsVisibles) — necesario para abrirModalCategoria
@@ -715,7 +728,14 @@ async function renderConfigPresupuesto() {
 
   el.innerHTML = cats + `
   <div class="cfg-bud-footer">
-    <span class="cfg-bud-total">Total: <span class="cfg-mono">${fmt(totalGlobal)}</span></span>
+    <div class="cfg-bud-footer-row">
+      <span class="cfg-bud-total">Total mes (${MESES_CORTO[curM]})</span>
+      <span class="cfg-mono cfg-bud-mes">${fmt(totalMes)}</span>
+    </div>
+    <div class="cfg-bud-footer-row">
+      <span class="cfg-bud-total">Total año</span>
+      <span class="cfg-mono">${fmt(totalAnio)}</span>
+    </div>
   </div>`;
 }
 
