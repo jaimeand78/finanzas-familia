@@ -1395,3 +1395,18 @@ if (frec === 'mensual') return b;
 **Resultado:** Los tres tabs muestran presupuesto correcto por mes, respetando ítems de fecha fija y proyectando ingresos fijos en meses futuros sin datos.
 
 ---
+
+## Fase 45 — Fix visual: tamaño de fuente en totales del presupuesto base (Junio 2026)
+
+**Contexto:** Al revisar el tab Config, se detectó que los valores de "Total mes" y "Total año" en el footer del presupuesto base aparecían con un tamaño de fuente notablemente mayor al resto del tab. El texto de la etiqueta (`.cfg-bud-total`) tenía `font-size: .78rem` correcto, pero el valor numérico (`.cfg-mono`) heredaba el tamaño base del documento por no tener `font-size` propio.
+
+**Fix aplicado:** Se agregó `font-size: .78rem` directamente en `.cfg-bud-footer-row`, para que tanto la etiqueta como el valor hereden el mismo tamaño sin afectar otros usos de `.cfg-mono` en el resto de la app.
+
+| Archivo | Cambio |
+|---------|--------|
+| `presupuesto.css` | `.cfg-bud-footer-row`: agregado `font-size: .78rem` |
+| `sw.js` | Cache bumpeado de v2-13 → v2-14 |
+
+**Aprendizaje de SW:** Esta fase sirvió como prueba intencional del ciclo de actualización de la PWA: hacer push → cerrar la app del multitarea → volver a abrir → verificar que el nuevo SW tome control y el cambio visual se refleje.
+
+---
