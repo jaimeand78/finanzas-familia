@@ -56,7 +56,7 @@ Preguntarse siempre: **¿esto reduce la carga mental del hogar o agrega compleji
 |-------|-------------|
 | `planItems(cat)` | SIEMPRE usar esta función, nunca `cat.items` directamente (DA-2) |
 | `canonicalLabel()` | Aplicar al leer de Firebase, nunca modificar (DA-3) |
-| `calcPresupuestoBase(item, mes)` | Única función para calcular provisión mensual (DA-8) |
+| `calcPresupuestoBase(item, mes)` | Única función para calcular provisión mensual (DA-8). **Nunca usar `r.budget` directamente** — siempre pasar por esta función. Antes de cualquier cambio que toque presupuestos, auditar todos los archivos con `grep -rn "r\.budget"` y corregir los que no la usen. `months[]` tiene prioridad sobre `frecuencia` (DA-23) |
 | `DAILY_ITEMS` | Catálogo del tab Hoy — NUNCA mezclar con `defD()` (DA-10) |
 | Ingresos | Siempre desde `buildIncomeFromPerfil()`, nunca hardcodeados (DA-11) |
 | iOS inputs | `type="text" inputmode="decimal"` en todos los campos de monto |
@@ -88,6 +88,22 @@ refactor: descripción del cambio técnico sin nueva funcionalidad
 
 ---
 
+## Regla de sw.js — Orden de commits obligatorio
+
+El service worker cachea el shell en el momento del install. Si `sw.js` se sube antes que los archivos corregidos, el cache queda con la versión bugueada.
+
+**Orden obligatorio:**
+
+1. `git add [archivos modificados]` → `git commit` → `git push`
+2. Esperar 1-2 minutos para que GitHub Pages propague
+3. Recién entonces: `git add sw.js` → `git commit -m "fix: bump cache vX-Y"` → `git push`
+
+**El bump de `sw.js` es siempre el último commit de cualquier deploy.**
+
+Incrementar `CACHE_NAME` en `sw.js` en cada deploy que modifique archivos del SHELL (HTML, CSS, JS). No es necesario para cambios solo en `docs/`.
+
+---
+
 ## Stack — No cambiar sin consultar
 
 - HTML + CSS + JS Vanilla — **sin frameworks**
@@ -101,11 +117,11 @@ refactor: descripción del cambio técnico sin nueva funcionalidad
 
 ## Contexto del Proyecto
 
-- **App:** [organiza2.github.io/finanzas-familia](https://organiza2.github.io/finanzas-familia)
-- **Repo:** `github.com/organiza2/finanzas-familia`
+- **App:** [organiza2.github.io/hogar](https://organiza2.github.io/hogar)
+- **Repo:** `github.com/organiza2/hogar`
 - **Firebase:** proyecto `organiza2-a09ef`
 - **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros
-- **Estado:** v2.2 completa, preparando piloto v2.3
+- **Estado:** v2.3 — piloto activo con familias
 
 ---
 
