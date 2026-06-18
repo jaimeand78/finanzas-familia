@@ -362,14 +362,75 @@ hogares/[codigoHogar]/planeador/
 
 ---
 
+### Diseño de interfaz (mockups aprobados)
+
+**Integración en la navegación existente — sin tabs nuevos:**
+
+Los 4 tabs principales no cambian. El Planeador se integra como sub-tabs dentro de tabs existentes:
+
+```
+Tab Hoy          →  [ 💸 Gastos ]  [ 📋 Pendientes ]
+Tab Cómo vamos   →  [ 💰 Finanzas ]  [ 📋 Pendientes ]
+```
+
+- Tab Hoy / Gastos → igual que hoy, sin cambios
+- Tab Hoy / Pendientes → formulario de creación rápida (sin lista)
+- Cómo vamos / Finanzas → igual que hoy, sin cambios
+- Cómo vamos / Pendientes → lista del estado del hogar (vencidos + próximos)
+
+Este patrón ya existe en Análisis (sub-tabs Semáforo / Tendencia / Hormiga / ¿Quién pagó?) — el usuario lo conoce.
+
+**Formulario de creación — selector de tipo primero:**
+
+El formulario abre con 3 opciones de tipo. Según la selección, los campos se adaptan:
+
+| Tipo | Color | Campos |
+|------|-------|--------|
+| 🔔 Recordatorio | Verde (#1D9E75) | Título + chips de fecha rápida |
+| 📅 Compromiso | Azul (#378ADD) | Título + chips de fecha + gasto opcional + categoría opcional |
+| 🎯 Meta | Ámbar (#BA7517) | Nombre + monto objetivo + fecha horizonte |
+
+**Chips de fecha rápida** (aplica a Recordatorio y Compromiso):
+```
+[ Hoy ]  [ Mañana ]  [ En 2 días ]  [ En 1 semana ]  [ Elegir fecha ]
+```
+El picker de calendario completo solo aparece si el usuario toca "Elegir fecha".
+
+**Meta:** los sub-pasos NO se crean en el formulario inicial — se agregan después de guardar la meta. El formulario de Meta es intencionalmente simple: nombre + monto + fecha horizonte.
+
+**Vista Cómo vamos / Pendientes — dos secciones:**
+- "Vencidos" (badge naranja con conteo) — compromisos que pasaron su fecha sin cerrarse
+- "Próximos" (badge verde con conteo) — ordenados por fecha más cercana
+
+---
+
 ### Pendiente para revisión futura
 
 - Validar con el piloto si las familias ya usan algún calendario/app compartido y si les funciona
-- Diseño de pantalla principal del Planeador (no bocetado aún)
 - Mecanismo de alertas: dentro de la app al abrir (sin push notifications para v3.0) vs. notificaciones push (post v3.0)
 - Definir cuántos días antes muestra alerta según tipo (Recordatorio: 1 día; Compromiso: 2-3 días; Meta: por etapas)
+- Vista detalle de una Meta con sus sub-pasos y progreso de ahorro (no bocetado aún)
 
 ---
 
 *Documento generado en sesión de diseño — Junio 2026*
 *Próximo paso: implementación del onboarding Etapa E*
+
+---
+
+## 12. Footer presupuesto base — total mes y total año
+
+**Problema identificado (piloto):** El footer de la sección "Presupuesto base" en Config mostraba un único "Total" que sumaba el valor máximo anual de cada ítem, incluyendo ítems de fecha fija (cesantías, SOAT, predial, primas) como si fueran mensuales. El número resultaba inflado e incorrecto.
+
+**Decisión:** Reemplazar el total único por dos líneas:
+
+- **Total mes (ej: jun)** — suma usando `calcPresupuestoBase(item, curM)`, que respeta la frecuencia y el mes de cada ítem. Solo cuenta lo que realmente toca pagar ese mes.
+- **Total año** — suma `calcPresupuestoBase(item, m)` para los 12 meses, reflejando el presupuesto anual real.
+
+**Etiquetas:** "Total mes" y "Total año" — sin repetir la palabra "Presupuesto" que ya aparece en el encabezado de la sección.
+
+**Visual:** Total mes en verde (`--color-success`) como dato principal; total año en gris como referencia.
+
+**Archivos modificados:** `presupuesto.js` (cálculo), `presupuesto.css` (estilos footer).
+
+**No se agregan flechas de navegación de mes a Config** — Config es configuración, no consulta histórica (DA-16). El mes actual se indica en la etiqueta del total.
