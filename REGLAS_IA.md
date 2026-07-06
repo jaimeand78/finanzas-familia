@@ -6,6 +6,20 @@
 
 ---
 
+## Regla de Arbitraje — GitHub
+
+El repositorio `github.com/organiza2/hogar` (rama `main`) es el **árbitro final** del estado real del proyecto: es lo que está desplegado en producción.
+
+- Ante cualquier duda sobre si Fuentes está actualizado, la IA verifica directamente contra el repo:
+  `curl -s https://raw.githubusercontent.com/organiza2/hogar/main/[ruta]` y compara con la copia en Fuentes. Documentación en `docs/` · `README.md` y `REGLAS_IA.md` en la raíz.
+- **Verificación canario:** comparar `CACHE_NAME` de `sw.js` (repo vs Fuentes). Si coinciden, el código en Fuentes muy probablemente está al día.
+- Si Fuentes difiere del repo → **detener el trabajo**, informar la diferencia y pedir actualización de Fuentes antes de continuar.
+- Antes de modificar cualquier archivo de código, esta verificación complementa la Pregunta Inicial Obligatoria: no solo preguntar — comprobar.
+
+**Jerarquía de verdad:** GitHub `main` (estado real) → Fuentes (espejo de trabajo) → instrucciones y memoria.
+
+---
+
 ## Regla de Oro — Archivos
 
 **Antes de modificar cualquier archivo, SIEMPRE:**
@@ -34,8 +48,10 @@
 Antes de proponer cualquier cambio técnico, verificar alineación con:
 
 - `docs/producto_v2_3.md` — visión, módulos, onboarding
-- `docs/arquitectura_v2_3.md` — decisiones arquitecturales DA-0 a DA-17
-- `docs/bitacora_v2_5.md` — historial, bugs resueltos, deuda técnica
+- `docs/arquitectura_v2_3.md` — decisiones arquitecturales DA-0 a DA-25
+- `docs/bitacora_v2_3.md` — historial por fases, bugs resueltos, deuda técnica
+- `docs/decisiones_junio2026.md` — registros de decisión
+- `docs/CONTEXTO_MAESTRO_ORGANIZA2.md` — contexto maestro para IAs
 
 Preguntarse siempre: **¿esto reduce la carga mental del hogar o agrega complejidad?**
 
@@ -56,7 +72,7 @@ Preguntarse siempre: **¿esto reduce la carga mental del hogar o agrega compleji
 |-------|-------------|
 | `planItems(cat)` | SIEMPRE usar esta función, nunca `cat.items` directamente (DA-2) |
 | `canonicalLabel()` | Aplicar al leer de Firebase, nunca modificar (DA-3) |
-| `calcPresupuestoBase(item, mes)` | Única función para calcular provisión mensual (DA-8). **Nunca usar `r.budget` directamente** — siempre pasar por esta función. Antes de cualquier cambio que toque presupuestos, auditar todos los archivos con `grep -rn "r\.budget"` y corregir los que no la usen. `months[]` tiene prioridad sobre `frecuencia` (DA-23) |
+| `calcPresupuestoBase(item, mes)` | Única función para calcular provisión mensual (DA-8) |
 | `DAILY_ITEMS` | Catálogo del tab Hoy — NUNCA mezclar con `defD()` (DA-10) |
 | Ingresos | Siempre desde `buildIncomeFromPerfil()`, nunca hardcodeados (DA-11) |
 | iOS inputs | `type="text" inputmode="decimal"` en todos los campos de monto |
@@ -88,19 +104,12 @@ refactor: descripción del cambio técnico sin nueva funcionalidad
 
 ---
 
-## Regla de sw.js — Orden de commits obligatorio
+## Regla de Service Worker (cache)
 
-El service worker cachea el shell en el momento del install. Si `sw.js` se sube antes que los archivos corregidos, el cache queda con la versión bugueada.
-
-**Orden obligatorio:**
-
-1. `git add [archivos modificados]` → `git commit` → `git push`
-2. Esperar 1-2 minutos para que GitHub Pages propague
-3. Recién entonces: `git add sw.js` → `git commit -m "fix: bump cache vX-Y"` → `git push`
-
-**El bump de `sw.js` es siempre el último commit de cualquier deploy.**
-
-Incrementar `CACHE_NAME` en `sw.js` en cada deploy que modifique archivos del SHELL (HTML, CSS, JS). No es necesario para cambios solo en `docs/`.
+- Todo deploy con cambios en HTML, CSS o JS requiere incrementar `CACHE_NAME` en `sw.js` (ej: `organiza2-v2-14` → `organiza2-v2-15`).
+- Si solo cambian docs o el propio `sw.js`, no se requiere bump.
+- El bump va SIEMPRE en el último commit — después de que los archivos corregidos estén commiteados. Bumpear antes deja la versión con bugs en cache (aprendizaje Fase 44).
+- Verificar tras el bump: `grep "CACHE_NAME" sw.js`.
 
 ---
 
@@ -109,7 +118,7 @@ Incrementar `CACHE_NAME` en `sw.js` en cada deploy que modifique archivos del SH
 - HTML + CSS + JS Vanilla — **sin frameworks**
 - Firebase Realtime Database + Auth (Google)
 - GitHub Pages hosting
-- PWA (sin service worker complejo)
+- PWA con Service Worker (cache-first para shell, network-only para Firebase)
 
 **No usar:** React, Vue, Angular, npm, webpack, ni ningún build tool.
 
@@ -121,8 +130,8 @@ Incrementar `CACHE_NAME` en `sw.js` en cada deploy que modifique archivos del SH
 - **Repo:** `github.com/organiza2/hogar`
 - **Firebase:** proyecto `organiza2-a09ef`
 - **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros
-- **Estado:** v2.3 — piloto activo con familias
+- **Estado:** v2.3 — piloto activo con familias (desde junio 2026)
 
 ---
 
-*Organiza2 — REGLAS_IA.md | Junio 2026*
+*Organiza2 — REGLAS_IA.md | Julio 2026*

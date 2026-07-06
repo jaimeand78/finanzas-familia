@@ -1,7 +1,7 @@
 # 🏗️ Arquitectura Técnica — Organiza2
 
 > Documento de referencia técnica para desarrolladores e IAs que trabajen en el proyecto.
-> Versión 2.5 | Junio 2026
+> Versión 2.6 | Julio 2026
 
 ---
 
@@ -272,12 +272,13 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-16 | Config solo muestra configuración — no gastos reales del mes | ✅ Implementado |
 | DA-17 | Siempre pedir archivo actual antes de modificarlo — ver REGLAS_IA.md | ✅ Regla activa |
 | DA-18 | Config es vista de configuración anual — nunca filtrar ítems de fecha fija (`months[]`) por el mes actual. Siempre mostrar `budget` real con badge del mes | ✅ Implementado |
-| DA-19 | Telemetría del piloto: módulo aislado `telemetria.js`, función única `trackEvent(tipo)`, nodo `metricas/eventos`. Solo 6 métricas oficiales, sin datos sensibles (montos, categorías, nombres, emails) | ✅ Implementado |
+| DA-19 | Ahorro es indicador de primer nivel — posición fija en Resumen, antes del semáforo | ✅ Implementado |
 | DA-20 | `_soloFlags: true` en `_onbData` indica flujo parcial — nunca llama `_aplicarOnbDataAD()` ni `save()` | ✅ Implementado |
 | DA-21 | Flujos de actualización del hogar: `_soloFlags` (P1.5 — reconfigurar flags), `_soloTipo` (P1 — cambiar tipo hogar), `_soloMeta` (P2 — cambiar meta). Cada flag controla qué pantallas renderizan y qué botón de guardado aparece | ✅ Implementado |
 | DA-22 | `admin.html` es el dashboard de seguimiento del piloto. Standalone, mismo repo y Firebase. Solo lectura — no escribe a Firebase. Protegido por guard de UID hardcodeado. Accesible en `organiza2.github.io/hogar/admin.html` | ✅ Implementado |
 | DA-23 | `calcPresupuestoBase(item, mes)` chequea `months` antes que `frecuencia`. Si el ítem tiene `months[]`, es de fecha fija — aplica solo en esos meses independientemente de `frecuencia`. El presupuesto base vive en un solo nodo Firebase; los demás meses lo proyectan en memoria. | ✅ Implementado |
 | DA-24 | `loadFixed()` busca hacia atrás hasta 12 meses para encontrar el nodo con budgets configurados. El presupuesto no se propaga a los 12 meses en Firebase — vive donde fue configurado (típicamente el mes actual al hacer onboarding). | ✅ Implementado |
+| DA-25 | Telemetría del piloto: módulo aislado `telemetria.js`, función única `trackEvent(tipo)`, nodo `metricas/eventos`. Solo 6 métricas oficiales, sin datos sensibles (montos, categorías, nombres, emails). Registrada originalmente como DA-19 — renumerada en Julio 2026 por colisión. | ✅ Implementado |
 
 ---
 

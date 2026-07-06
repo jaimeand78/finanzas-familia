@@ -1,6 +1,6 @@
 # Organiza2 — Contexto Maestro
 
-Versión: Junio 2026
+Versión: Julio 2026
 
 ---
 
@@ -58,6 +58,24 @@ Siempre utilizar el siguiente orden:
 Si existe contradicción:
 
 **Siempre prevalecen los archivos de Fuentes.**
+
+Si existe duda sobre la vigencia de Fuentes:
+
+**El repositorio GitHub `main` es el árbitro final — ver Regla de Arbitraje.**
+
+---
+
+# Regla de Arbitraje — GitHub
+
+El repositorio `github.com/organiza2/hogar` (rama `main`) es el **árbitro final** del estado real del proyecto: es lo que está desplegado en producción.
+
+* Ante cualquier duda sobre si Fuentes está actualizado, verificar directamente contra el repo:
+  `curl -s https://raw.githubusercontent.com/organiza2/hogar/main/[ruta]` y comparar con la copia en Fuentes. Documentación en `docs/` · `README.md` y `REGLAS_IA.md` en la raíz.
+* **Verificación canario:** comparar `CACHE_NAME` de `sw.js` (repo vs Fuentes). Si coinciden, el código en Fuentes muy probablemente está al día.
+* Si Fuentes difiere del repo: **detener el trabajo**, informar la diferencia y solicitar actualización de Fuentes antes de continuar.
+* Antes de modificar cualquier archivo de código, esta verificación complementa la Pregunta Inicial Obligatoria: no solo preguntar — comprobar.
+
+**Jerarquía de verdad:** GitHub `main` (estado real) → Fuentes (espejo de trabajo) → instrucciones y memoria.
 
 ---
 
@@ -192,23 +210,26 @@ Evitar:
 
 # Estado Actual del Proyecto
 
-**Fase actual:** v2.3 — Piloto listo para lanzar
+**Fase actual:** v2.3 — Piloto activo con familias (desde junio 2026)
 
 **Implementado y en producción:**
 * Login Google + Firebase Auth
 * Modelo de Hogar con código de invitación
 * Presupuesto Base con onboarding conversacional (6 pantallas: P1 → P1.5 → P2 → P3 → P4 → P5)
 * P1.5 — flags de perfil: tieneVehiculo, tieneEmpleada, tieneEducacion, tieneSeguros
-* Tab Hoy — registro diario filtrado por perfil del hogar (categorías e ítems según flags)
+* Tab Hoy — registro diario filtrado por perfil del hogar + edición de registros del día (tap en fila → modal)
 * Tab Resumen — solo lectura: disponible · Ingresan/Gastado · Ahorro fijo · semáforo filtrado · ¿Quién ha pagado?
 * Tab Análisis — Semáforo histórico · Tendencia con daily · Hormiga
-* Tab Config — Mi hogar (tipo + Actualizar categorías + Cambiar tipo de hogar) · Ingresos por miembro con adicionales · Presupuesto base · Cerrar sesión
+* Tab Config — Mi hogar (tipo + Actualizar categorías + Cambiar tipo de hogar) · Ingresos por miembro con adicionales · Presupuesto base con footer Total mes / Total año · Cerrar sesión
 * Banner "Completa tu perfil" para hogares existentes sin flags configurados
+* Service Worker — cache-first para shell, network-only para Firebase
+* Telemetría del piloto — `telemetria.js` · `trackEvent(tipo)` · 6 métricas oficiales en `metricas/eventos`
+* `admin.html` — dashboard del piloto: métricas por semana ISO + criterios de salida (DA-22)
 
-**No hay bloqueantes técnicos. El piloto puede arrancar.**
+**Piloto en curso.** Seguimiento de métricas y criterios de salida en `admin.html`. Actualizaciones a familias: push → aviso por WhatsApp → cerrar y reabrir la PWA.
 
 **Módulos futuros:**
-* Planeador — no construir hasta validar Finanzas con familias reales
+* Planeador — no construir hasta cumplir los criterios de salida del piloto
 * Alimentación — no construir todavía
 
 ---
@@ -221,16 +242,28 @@ Evitar:
 | DA-1 | Gastos diarios solo en `daily/` — nunca escribir en nodo mensual |
 | DA-2 | `planItems(cat)` es la única forma de obtener ítems de una categoría |
 | DA-3 | `canonicalLabel()` corrige encodings corruptos — nunca modificar sin revisar migraciones |
+| DA-4 | Firebase SDK compat v9.23.0 |
+| DA-5 | Google Login antes de separar JS en módulos |
+| DA-6 | Código de hogar = 6 caracteres alfanuméricos uppercase |
+| DA-7 | Perfil controla toda la UX — `filtrarCategoriasPorPerfil()` + `filtrarItemsPorPerfil()` |
 | DA-8 | `calcPresupuestoBase(item, mes)` es la única función de provisión mensual |
-| DA-9 | Perfil progresivo — mínimo onboarding es solo tipo de hogar |
-| DA-10 | Dos niveles: `defD()` para presupuesto agrupado · `DAILY_ITEMS` para registro detallado |
+| DA-9 | Perfil progresivo — flags configurados en P1.5 del onboarding |
+| DA-10 | Catálogo único: `defD()` y `DAILY_ITEMS` son idénticos — modificar siempre juntos con `migrateCategories()` |
 | DA-11 | Ingresos generados desde perfil con `buildIncomeFromPerfil()` — nunca hardcodear nombres |
+| DA-12 | Cuota crédito vehículo en Transporte, no en Vivienda |
+| DA-13 | Restaurantes en Entretenimiento y Salidas — eliminado de Alimentación |
 | DA-14 | Tab Resumen es solo lectura — sin inputs |
+| DA-15 | Login con logo oficial `logo.png` |
 | DA-16 | Config solo muestra configuración — no gastos reales del mes |
 | DA-17 | Siempre leer el archivo actual antes de modificarlo |
-| DA-18 | Config muestra budget anual — nunca filtrar ítems de fecha fija por mes actual |
+| DA-18 | Config muestra budget anual — nunca filtrar ítems de fecha fija (`months[]`) por mes actual |
 | DA-19 | Ahorro es indicador de primer nivel — posición fija en Resumen, antes del semáforo |
 | DA-20 | `_soloFlags: true` en `_onbData` indica flujo parcial — nunca llama `_aplicarOnbDataAD()` ni `save()` |
+| DA-21 | Flujos de actualización del hogar: `_soloFlags` · `_soloTipo` · `_soloMeta` — cada flag controla qué pantallas renderizan y qué botón de guardado aparece |
+| DA-22 | `admin.html` — dashboard del piloto: standalone, solo lectura, guard de UID hardcodeado |
+| DA-23 | `calcPresupuestoBase()` chequea `months[]` antes que `frecuencia` — fecha fija tiene prioridad |
+| DA-24 | `loadFixed()` busca hacia atrás hasta 12 meses el nodo con budgets — el presupuesto no se propaga a los 12 meses en Firebase |
+| DA-25 | Telemetría del piloto: `telemetria.js` aislado · `trackEvent(tipo)` · nodo `metricas/eventos` · 6 métricas oficiales · sin datos sensibles |
 
 ---
 
@@ -240,13 +273,17 @@ Respetar siempre:
 
 * `planItems(cat)` — DA-2
 * `canonicalLabel()` — DA-3
-* `calcPresupuestoBase()` — DA-8
-* `DAILY_ITEMS` — DA-10
+* `calcPresupuestoBase()` — DA-8 · nunca acceder a `r.budget` directo · `months[]` tiene prioridad sobre `frecuencia` (DA-23)
+* `loadFixed()` — búsqueda hacia atrás hasta 12 meses (DA-24)
+* `defD()` + `DAILY_ITEMS` + `migrateCategories()` — catálogo único, modificar los tres juntos (DA-10)
 * `buildIncomeFromPerfil()` — DA-11
+* Campo `who` en gastos diarios — poblar desde `HOGAR.miembros[uid].nombre`, nunca desde `displayName` de Google
 
 Nunca reemplazar estas funciones sin revisar documentación y decisiones arquitectónicas.
 
 **Nota crítica sobre `dailyTotals`:** Las claves de `dailyTotals` son nombres de categoría SIN emoji (ej. `'Servicio Doméstico'`), normalizadas en `syncDailyMonth()` con `.replace(/^\S+\s/, '')`. Cualquier función que lea `dailyTotals` debe usar `c.name` sin emoji.
+
+**Regla de Service Worker:** Todo deploy con cambios en HTML, CSS o JS requiere bump de `CACHE_NAME` en `sw.js`, siempre en el último commit (nunca antes de los archivos corregidos). Si solo cambian docs o el propio `sw.js`, no se requiere bump.
 
 ---
 

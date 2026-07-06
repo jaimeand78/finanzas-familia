@@ -921,6 +921,8 @@ refactor: mover inline styles a CSS — solo display:none queda inline
 | — | feat: telemetría piloto — trackEvent + metricasPiloto (Fase 34) |
 | — | docs: Fase 34 + DA-19 + reglas Firebase metricas/eventos |
 
+> **Nota (Julio 2026):** La DA de telemetría se registró originalmente como DA-19, colisionando con la DA-19 de Ahorro. Renumerada a **DA-25** en `arquitectura_v2_3.md`. El registro del commit se conserva tal como ocurrió.
+
 ### Diseño
 
 Módulo aislado `js/telemetria.js`, independiente del resto del sistema:
@@ -1408,5 +1410,30 @@ if (frec === 'mensual') return b;
 | `sw.js` | Cache bumpeado de v2-13 → v2-14 |
 
 **Aprendizaje de SW:** Esta fase sirvió como prueba intencional del ciclo de actualización de la PWA: hacer push → cerrar la app del multitarea → volver a abrir → verificar que el nuevo SW tome control y el cambio visual se refleje.
+
+---
+
+## Fase 46 — Alineación de documentación (Julio 2026)
+
+**Contexto:** Auditoría de consistencia entre las instrucciones del proyecto Claude y la documentación en Fuentes. Se detectaron desactualizaciones acumuladas durante las Fases 34–45.
+
+**Hallazgos resueltos:**
+1. **Colisión DA-19:** la DA de telemetría (Fase 34) reutilizó el número DA-19, ya asignado a "Ahorro es indicador de primer nivel". Decisión: Ahorro conserva DA-19; telemetría renumerada a **DA-25**.
+2. **Nombre del repo:** `REGLAS_IA.md` referenciaba `organiza2/finanzas-familia`. Corregido a `organiza2/hogar` (URL app: `organiza2.github.io/hogar`).
+3. **Regla de Service Worker documentada:** bump de `CACHE_NAME` en cada deploy con cambios HTML/CSS/JS, siempre en el último commit (aprendizaje Fase 44). Agregada a `REGLAS_IA.md`, instrucciones y contexto maestro.
+4. **CONTEXTO_MAESTRO actualizado:** estado "Piloto listo para lanzar" → "Piloto activo"; implementado extendido con Fases 34–45 (telemetría, SW, admin.html, edición de registros); tabla de DAs completa DA-0 a DA-25 con DA-10 en su redacción vigente (catálogo único, tres artefactos).
+5. **Instrucciones del proyecto Claude actualizadas** con los mismos cambios.
+6. **Regla de Arbitraje — GitHub:** el repo `main` es el árbitro final del estado real del proyecto. Ante duda, la IA verifica Fuentes contra `raw.githubusercontent.com/organiza2/hogar/main/` (verificación canario: `CACHE_NAME` de `sw.js`). Jerarquía de verdad: GitHub `main` → Fuentes → instrucciones/memoria. Agregada a `REGLAS_IA.md`, instrucciones del proyecto y contexto maestro.
+7. **README alineado:** DA-10 corregida a su redacción vigente (catálogo único), piloto marcado 🔄 En curso en estado y roadmap, agregados SW/telemetría/admin/edición de registros, y precisada la ubicación de la documentación (proyecto en `docs/` · `README.md` y `REGLAS_IA.md` en la raíz). En `REGLAS_IA.md` se corrigió además la lista de docs de referencia (decía DA-0 a DA-17 y `bitacora_v2_5.md`, archivo inexistente).
+
+| Archivo | Cambio |
+|---------|--------|
+| `arquitectura_v2_3.md` | DA-19 → Ahorro · DA-25 telemetría · versión 2.6 |
+| `bitacora_v2_3.md` | Nota de renumeración en Fase 34 · esta entrada |
+| `REGLAS_IA.md` | Repo/URL corregidos · estado piloto · Regla de Service Worker · Regla de Arbitraje |
+| `CONTEXTO_MAESTRO_ORGANIZA2.md` | Estado actual + tabla DAs completa + Regla de Arbitraje |
+| `README_v2_3.md` | Piloto en curso · DA-10 vigente · SW/telemetría/admin · ubicación docs |
+
+Sin cambios de código — no requiere bump de `sw.js`.
 
 ---
