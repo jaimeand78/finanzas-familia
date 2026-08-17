@@ -192,6 +192,8 @@ window.submitDaily = async function() {
     oqAdd({ type:'push', path:dayKey(dailyDate), data:entry });
     updateOfflineUI();
     toast('💾 Guardado offline');
+    // El gasto se registra igual via cola offline - la telemetria debe contarlo (Fase 46)
+    if (typeof trackEvent === 'function') trackEvent('gasto_registrado');
     return;
   }
 
@@ -207,6 +209,8 @@ window.submitDaily = async function() {
     oqAdd({ type:'push', path:dayKey(dailyDate), data:entry });
     updateOfflineUI();
     toast('💾 Guardado offline');
+    // Mismo caso: el gasto queda en cola y se sincroniza - contarlo (Fase 46)
+    if (typeof trackEvent === 'function') trackEvent('gasto_registrado');
   }
 };
 
