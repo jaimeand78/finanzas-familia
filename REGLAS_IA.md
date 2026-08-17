@@ -18,6 +18,20 @@ El repositorio `github.com/organiza2/hogar` (rama `main`) es el **árbitro final
 
 **Jerarquía de verdad:** GitHub `main` (estado real) → Fuentes (espejo de trabajo) → instrucciones y memoria.
 
+### Acceso al repo — límites y frescura (aprendizaje Fase 47)
+
+`raw.githubusercontent.com` responde **HTTP 429 Too Many Requests** al acceso anónimo. **La cuota pertenece a la IP de salida del entorno de la IA, no al proyecto ni al repo** — se comparte con otros usuarios y puede agotarse por consumo ajeno. Es estocástico: puede ocurrir en cualquier sesión, sin relación con cuánto se haya pedido aquí. **No afecta a `git push` ni al repositorio:** solo bloquea la lectura anónima por HTTP.
+
+| Situación | Regla |
+|-----------|-------|
+| **Aparece un 429** | **No reintentar en bucle** — los reintentos seguidos extienden el bloqueo. Informar al usuario, declarar explícitamente qué quedó sin verificar, y continuar bajo inferencia. Nunca afirmar que se verificó algo que no se pudo descargar. |
+| **Alcance de la verificación** | Verificar los archivos que se van a modificar. El canario de `sw.js` cubre el estado del código sin descargar todo. |
+| **Archivo subido hace menos de 5 minutos** | `raw` cachea con `cache-control: max-age=300` por rama: puede devolver la versión anterior sin error y sin aviso. Pedirlo por **SHA de commit** — ruta inmutable: `raw.githubusercontent.com/organiza2/hogar/<sha>/<ruta>`. Preferible a un sufijo `?cb=`, que no garantiza saltarse el CDN. |
+
+> **Detección:** una respuesta de ~199 bytes que empieza con `429:` no es el archivo. Antes de comparar, **validar el tamaño descargado** — un `diff` contra una página de error reporta "DIFIERE" y provoca una falsa alarma de desincronización que puede detener el trabajo sin motivo.
+
+> **Nota:** no existe conector autenticado de GitHub en el directorio de Claude. Mientras no lo haya, aplican las reglas de arriba. Claude Code, que usa el `git` autenticado de la máquina local, no tiene esta limitación.
+
 ---
 
 ## Regla de Oro — Archivos
