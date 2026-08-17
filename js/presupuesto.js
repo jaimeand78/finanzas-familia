@@ -68,6 +68,8 @@ window.abrirActualizarCategorias = function() {
     tieneEmpleada:  perfil.tieneEmpleada  !== false,
     tieneEducacion: perfil.tieneEducacion !== false,
     tieneSeguros:   perfil.tieneSeguros   !== false,
+    // La respuesta de hijos no se persiste: se infiere del flag de Educación ya guardado.
+    tieneHijos:     perfil.tieneEducacion === true ? true : null,
     _soloFlags:     true
   };
   _onbStep = 15;
@@ -165,8 +167,14 @@ function _tpl15() {
       <div class="onb-toggle-sw${on ? ' on' : ''}" id="sw-${key}"></div>
     </div>`;
   };
-  const esFamilia = d.tipoHogar === 'familia';
-  const esSolo = d._soloFlags;
+  const esFamilia   = d.tipoHogar === 'familia';
+  const esSolo      = d._soloFlags;
+  // "soltero" es el único tipo cuyo subtexto en P1 no aclara si hay hijos
+  // ("Manejo mis finanzas" describe quién opera, no quién vive). Se pregunta explícitamente.
+  const esSoltero   = d.tipoHogar === 'soltero';
+  const hijos       = d.tieneHijos;              // true | false | null (sin responder)
+  const eduVisible  = esFamilia || (esSoltero && hijos === true);
+  const bloqueado   = esSoltero && hijos === null;
   return `
 <div class="onb-page">
   ${esSolo ? `<div class="onb-solo-header">Actualizar mi hogar</div>` : ''}
@@ -174,19 +182,34 @@ function _tpl15() {
     <div class="onb-emoji">🏡</div>
     <h2 class="onb-title">¿Qué ${_tx('quieres','quieren')} presupuestar?</h2>
     <p class="onb-sub">Activa solo lo que aplica a ${_tx('tu hogar','su hogar')}. ${_tx('Puedes','Pueden')} cambiarlo después.</p>
+    ${esSoltero ? `
+    <div class="onb-q">
+      <div class="onb-q-t"><span>🧒</span><span>¿Tienes hijos?</span></div>
+      <div class="onb-q-btns">
+        <button class="${hijos === true  ? 'sel' : ''}" onclick="onbHijos(true)">Sí</button>
+        <button class="${hijos === false ? 'sel' : ''}" onclick="onbHijos(false)">No</button>
+      </div>
+    </div>` : ''}
     <div class="onb-toggle-group">
       ${tog('tieneVehiculo',  '🚗', 'Vehículo',             'Gasolina, seguro, impuestos')}
       ${tog('tieneEmpleada',  '🤝', 'Servicio Doméstico',   'Empleada, niñera')}
-      ${esFamilia ? tog('tieneEducacion', '📚', 'Educación', 'Colegio, universidad, útiles') : ''}
+      ${eduVisible ? tog('tieneEducacion', '📚', 'Educación', 'Colegio, universidad, útiles') : ''}
       ${tog('tieneSeguros',   '🛡️', 'Seguros e Impuestos',  'SOAT, predial, pólizas')}
     </div>
     <p class="onb-toggle-hint">Vivienda, Alimentación y Ahorro siempre activos</p>
   </div>
   <div class="onb-foot">
-    <button class="onb-pri" onclick="onbNext()">${esSolo ? 'Guardar cambios' : 'Continuar →'}</button>
+    <button class="onb-pri" onclick="onbNext()" ${bloqueado ? 'disabled' : ''}>${esSolo ? 'Guardar cambios' : 'Continuar →'}</button>
   </div>
 </div>`;
 }
+
+// Respuesta a "¿Tienes hijos?" — solo aplica al tipo soltero
+window.onbHijos = function(v) {
+  _onbData.tieneHijos = v;
+  if (v === true && _onbData.tieneEducacion === undefined) _onbData.tieneEducacion = true;
+  _renderStep();
+};
 
 window.onbToggle = function(key) {
   _onbData[key] = (_onbData[key] === false) ? true : false;
@@ -514,7 +537,11 @@ window.guardarPresupuestoBase = async function() {
       if (!soloTipo && !soloMeta) {
         // A2: Educación solo puede ser true en hogares familia — el toggle no se renderiza
         // en otros tipos, por lo que _onbData.tieneEducacion sería undefined → !== false = true.
-        const eduFlag = (_onbData.tipoHogar === 'familia') ? (_onbData.tieneEducacion !== false) : false;
+        // Educación disponible en familia (como siempre) y ahora también en soltero con hijos.
+        // En "pareja" sigue en false: P1 ya declaró "sin hijos por ahora".
+        const _eduAplica = (_onbData.tipoHogar === 'familia')
+                        || (_onbData.tipoHogar === 'soltero' && _onbData.tieneHijos === true);
+        const eduFlag = _eduAplica ? (_onbData.tieneEducacion !== false) : false;
         updates['perfil/tieneVehiculo']  = _onbData.tieneVehiculo  !== false;
         updates['perfil/tieneEmpleada']  = _onbData.tieneEmpleada  !== false;
         updates['perfil/tieneEducacion'] = eduFlag;
