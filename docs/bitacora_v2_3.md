@@ -1437,3 +1437,78 @@ if (frec === 'mensual') return b;
 Sin cambios de código — no requiere bump de `sw.js`.
 
 ---
+
+## Fase 47 — Fix telemetría offline + hallazgos del piloto (Agosto 2026)
+
+**Contexto:** Revisión de los datos reales del piloto en `admin.html` tras 9 semanas. Los números expusieron un bug de telemetría y una falla de diseño en el onboarding que ningún criterio de salida estaba capturando.
+
+### 1. Bug corregido — gastos offline no contabilizados
+
+`submitDaily()` en `daily.js` llamaba a `trackEvent('gasto_registrado')` únicamente en la ruta de escritura exitosa online. Las dos rutas alternas — `!navigator.onLine` (return temprano) y el `catch` de error de escritura — encolaban el gasto con `oqAdd()` pero salían sin registrar el evento.
+
+**Efecto:** el gasto se guardaba y sincronizaba correctamente, pero la telemetría lo perdía de forma permanente. En una PWA orientada a gama media con conectividad irregular, el uso real es **mayor** que el reportado por el dashboard.
+
+**Fix:** `trackEvent('gasto_registrado')` agregado en ambas rutas. Cambio quirúrgico, dos líneas.
+
+| Archivo | Cambio |
+|---------|--------|
+| `daily.js` | `trackEvent` en rama offline y en `catch` de `submitDaily()` |
+| `sw.js` | Bump `organiza2-v2-14` → `organiza2-v2-15` |
+
+### 2. Hallazgo de datos — discrepancia 152 vs 74
+
+El contador global de `admin.html` reportaba 152 gastos acumulados, mientras la tabla semanal sumaba 74 (S1–S4). La diferencia son ~78 registros en las semanas 5–10, que el dashboard **no renderiza** porque la tabla itera solo hasta `PILOTO_WEEKS = 4`.
+
+Confirma que la telemetría siguió escribiendo — no hubo caída del sistema, sino ceguera del tablero.
+
+### 3. Hallazgo — SNBDPA no aparece en el conteo de hogares
+
+`trackEvent('hogar_creado')` solo se dispara en `hogar.js:36`, al crear un hogar nuevo. SNBDPA existe desde la v2.1, anterior a la Fase 34 (telemetría). El evento nunca ocurrió.
+
+**Consecuencia:** "Hogares creados: 2" subcuenta. Los hogares reales del piloto son **3**. Esto explica la aparente inconsistencia de S2 (3 uids activos · 2 hogares · 0 hogares con 2 activos): son tres hogares con un miembro activo cada uno.
+
+### 4. Hallazgo crítico de producto — P1 colapsa dos preguntas distintas
+
+La pantalla P1 del onboarding (`presupuesto.js:130-138`) ofrece tres opciones cuyo subtexto mezcla dos dimensiones independientes:
+
+| Opción | Etiqueta | Subtexto | Dimensión que describe |
+|--------|----------|----------|------------------------|
+| `soltero` | Solo | "Manejo mis finanzas" | **Quién opera la app** |
+| `pareja` | En pareja | "Sin hijos por ahora" | Composición del hogar |
+| `familia` | Familia | "Con hijos" | Composición del hogar |
+
+Un padre casado que lleva el control financiero él solo lee *"Solo · Manejo mis finanzas"* y lo elige con honestidad — está respondiendo a la pregunta que el texto le hace.
+
+**Consecuencia grave:** `presupuesto.js:517` fuerza `tieneEducacion = false` cuando `tipoHogar !== 'familia'`. Por DA-7 el perfil filtra toda la UX, de modo que la categoría 📚 Educación desaparece de P4, P5 y del tab Hoy. Ese usuario **no puede registrar el colegio de su hija** — probablemente su mayor gasto del año.
+
+**Vacío adicional:** no existe casilla para padre o madre soltera con hijos. "En pareja · sin hijos" y "Familia · con hijos" no cubren ese caso.
+
+### 5. Contexto cualitativo del piloto (más valioso que las métricas)
+
+Razones reales por las que ningún hogar tuvo dos miembros activos:
+
+| Hogar | Razón | Naturaleza |
+|-------|-------|------------|
+| SNBDPA | Celular dañado — no pudo instalar | Barrera técnica |
+| Hogar 2 | *"Él llevaba el control del gasto"* | **Señal de producto** |
+| Hogar 3 | Fuera del país | Circunstancia |
+
+Dos de tres no constituyen evidencia contra la tesis del producto. La tercera sí es información: sugiere que en el hogar latino puede existir **un administrador financiero, no dos co-registradores**. Si se confirma, el criterio de salida *"≥3 hogares con ambos miembros activos"* estaría midiendo un comportamiento que quizá no deba ocurrir — y el valor para el segundo miembro sería **ver** (tab Resumen, ¿Quién pagó?), no registrar.
+
+> ⚠️ **Salvedad:** una sola respuesta, de un solo hogar. Hipótesis a validar, no hallazgo. No se rediseñan criterios de salida con n=1.
+
+### Deuda abierta en `admin.html` (no corregida en esta fase)
+
+| # | Problema | Ubicación |
+|---|----------|-----------|
+| 1 | Tabla semanal congelada en 4 semanas — semanas 5+ invisibles | línea 546 |
+| 2 | Header muestra "Semana 4 de 4 · hasta 13 jul" desde julio | línea 392 |
+| 3 | Criterio S4 anclado a la semana calendario 4, no a la última completa | línea 434 |
+| 4 | `hogaresCon2` acumula histórico, no mide actividad concurrente | líneas 381-388 |
+| 5 | `fmt(n)` devuelve `—` para `0` — no distingue "cero" de "sin datos" | línea 338 |
+| 6 | Lectura sin límite de `metricas/eventos` | línea 352 |
+| 7 | Guard de `ADMIN_UID` es solo client-side; reglas dan `.read` a todo auth | `firebase-rules.json:54` |
+
+**Aprendizaje:** un dashboard con ventana fija se vuelve silenciosamente obsoleto. No falla, no avisa — sigue mostrando datos correctos de un período equivocado.
+
+---

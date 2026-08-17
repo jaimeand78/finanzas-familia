@@ -458,3 +458,32 @@ El picker de calendario completo solo aparece si el usuario toca "Elegir fecha".
 **Alcance del fix:** `finanzas.js` (función), `recalc()`, `renderResumen()`, `analisis.js` (`_renderSemaforoConData`), `presupuesto.js` (footer totales).
 
 **Presupuesto base vive en un solo nodo:** El presupuesto no se propaga a los 12 meses en Firebase — vive en el mes donde fue configurado. Los otros meses lo proyectan en memoria con `calcPresupuestoBase`. `loadFixed()` busca hacia atrás hasta 12 meses para encontrar el nodo con budgets.
+
+---
+
+## 15. P1 debe separar composición del hogar de operación de la app
+
+**Fecha:** Agosto 2026 · **Origen:** feedback real del piloto (Fase 47)
+
+**Problema detectado.** La pantalla P1 pregunta *"¿Cómo es tu hogar?"* pero sus tres opciones mezclan dos dimensiones que son independientes entre sí:
+
+- **Composición** — quiénes viven en el hogar. Determina qué categorías tienen sentido: hijos, educación, vehículo, servicio doméstico.
+- **Operación** — quiénes van a usar la app. Determina la UX de colaboración: banner de miembro 2, ¿Quién pagó?, lenguaje singular o plural.
+
+Hoy `soltero` implica ambas cosas a la vez, y su subtexto (*"Manejo mis finanzas"*) describe explícitamente la **operación**. Un padre casado que administra solo elige esa opción de buena fe y pierde la categoría Educación por el hard-coded de `presupuesto.js:517`.
+
+**Casos que el modelo actual no cubre:**
+
+| Caso real | Composición | Operación | Opción disponible hoy |
+|-----------|-------------|-----------|------------------------|
+| Papá casado que administra solo | Familia | Individual | Ninguna correcta |
+| Madre soltera con hijos | Monoparental con hijos | Individual | Ninguna — no existe casilla |
+| Pareja que registra a dos manos | Pareja | Compartida | `pareja` ✅ |
+
+**Dirección de la decisión (pendiente de mockup):** desacoplar las dos preguntas. P1 pregunta únicamente por composición; los flags de P1.5 gobiernan hijos y educación con independencia de `tipoHogar`. Eso elimina el condicional rígido de la línea 517.
+
+**Alternativa descartada:** agregar una cuarta opción a P1. Multiplica casillas sin resolver el problema de raíz — cada nueva combinación de composición × operación exigiría otra opción.
+
+**Estado:** ⏸️ Pendiente. Requiere mockup aprobado antes de implementar (Regla de Mockups). Queda a criterio del product owner si entra durante el piloto o al backlog post-piloto — califica como feedback real de usuario, no como observación interna.
+
+**Mitigación inmediata sin código:** el hogar afectado puede corregirse desde la app con los flujos existentes (DA-21) — primero `_soloTipo` para cambiar a Familia, luego `_soloFlags` para activar Educación.
