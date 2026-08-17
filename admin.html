@@ -223,6 +223,28 @@
     </div>
   </div>
 
+  <!-- Detalle por hogar -->
+  <div class="section">
+    <p class="section-title">Hogares · cada uno desde su entrada</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Hogar</th>
+            <th>Entró</th>
+            <th>Miembros</th>
+            <th>Gastos</th>
+            <th>Semanas</th>
+            <th>Patrón de uso</th>
+          </tr>
+        </thead>
+        <tbody id="hogarTableBody">
+          <tr><td colspan="6"><div class="loading-row"><span class="spinner"></span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Tabla semanal -->
   <div class="section">
     <p class="section-title">Evolución semanal</p>
@@ -279,7 +301,8 @@
 
   // Fecha de inicio del piloto (lunes de la semana 1)
   const PILOTO_START = new Date('2026-06-15T00:00:00'); // lunes 15 jun
-  const PILOTO_WEEKS = 4;
+  const PILOTO_WEEKS = 4;   // semanas que debe sostener CADA hogar (no del calendario global)
+  const MAX_FILAS    = 16;  // tope de filas en la tabla semanal
 
   // ── AUTH ────────────────────────────────────────────────────────────────────
   function loginGoogle() {
@@ -328,15 +351,16 @@
 
   // Etiqueta "S1 · 16 jun"
   function etiquetaSemana(n) {
-    const d = new Date(PILOTO_START);
+    const d = lunesDe(PILOTO_START);
     d.setDate(d.getDate() + (n - 1) * 7);
     const dia = d.getDate();
     const mes = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];
     return `S${n} · ${dia} ${mes}`;
   }
 
+  // 0 es un dato real (nadie registro); solo undefined/null es ausencia de dato.
   function fmt(n) {
-    return n === 0 || n === undefined ? '—' : String(n);
+    return (n === undefined || n === null) ? '—' : String(n);
   }
 
   function hoy() {
@@ -385,15 +409,21 @@
       if (!porHogar[e.hogar]) porHogar[e.hogar] = new Set();
       porHogar[e.hogar].add(e.uid);
     });
-    const hogaresCon2 = Object.values(porHogar).filter(s => s.size >= 2).length;
-
-    // Semana actual del piloto
+    // Semana actual real del piloto - sin recortar (bug corregido Fase 47)
     const semanaActual = semanaDelPiloto(hoy()) || 1;
-    const semanaActualLabel = `Semana ${Math.min(semanaActual, PILOTO_WEEKS)} de ${PILOTO_WEEKS}`;
-    const fechaFin = new Date(PILOTO_START);
-    fechaFin.setDate(fechaFin.getDate() + PILOTO_WEEKS * 7);
+    const inicioTxt = lunesDe(PILOTO_START).toLocaleDateString('es-CO', { day:'numeric', month:'short' });
     document.getElementById('pageMeta').textContent =
-      `${semanaActualLabel} · Piloto hasta ${fechaFin.getDate()} jul 2026`;
+      `Semana ${semanaActual} · Piloto desde el ${inicioTxt} 2026`;
+
+    // Hogares con 2 miembros activos EN UNA MISMA SEMANA (concurrencia real, no historico).
+    // El acumulado historico contaba hogares abandonados hace meses.
+    let hogaresCon2 = 0;
+    const setC2 = new Set();
+    for (let n = 1; n <= semanaActual; n++) {
+      const d = semanaN(eventos, n);
+      d.hogaresC2.forEach(h => setC2.add(h));
+    }
+    hogaresCon2 = setC2.size;
 
     // Colorear hogares con 2 activos
     const c2 = hogaresCon2 >= 3 ? 'm-green' : hogaresCon2 >= 1 ? 'm-amber' : 'm-red';
@@ -428,17 +458,21 @@
     `;
 
     // Progreso a exit criteria
-    const semPct    = Math.round(Math.min(semanaActual - 1, PILOTO_WEEKS) / PILOTO_WEEKS * 100);
+    const semanasComp = Math.max(0, semanaActual - 1);
+    const semPct    = Math.round(Math.min(semanasComp, PILOTO_WEEKS) / PILOTO_WEEKS * 100);
     const onbPct    = Math.round(Math.min(onboardingCompleto, 3) / 3 * 100);
     const c2Pct     = Math.round(Math.min(hogaresCon2, 3) / 3 * 100);
-    const gastosS4  = semanaN(eventos, 4);
-    const s4Pct     = semanaActual >= 4 ? Math.round(Math.min(gastosS4.hogaresConGastos, 3) / 3 * 100) : 0;
+    // Antes: semanaN(eventos, 4) - anclado a la semana calendario 4, congelado para siempme.
+    // Ahora: ultima semana COMPLETA, que es la medida vigente de registro sostenido.
+    const ultSem    = Math.max(1, semanaActual - 1);
+    const gastosUlt = semanaN(eventos, ultSem);
+    const s4Pct     = semanasComp >= 1 ? Math.round(Math.min(gastosUlt.hogaresConGastos, 3) / 3 * 100) : 0;
 
     document.getElementById('progresoContainer').innerHTML = `
       <div class="prog-row">
         <span class="prog-label">Semanas completadas</span>
         <div class="prog-track"><div class="prog-fill" style="width:${semPct}%"></div></div>
-        <span class="prog-val">${Math.min(semanaActual - 1, PILOTO_WEEKS)}/${PILOTO_WEEKS}</span>
+        <span class="prog-val">${Math.min(semanasComp, PILOTO_WEEKS)}/${PILOTO_WEEKS}</span>
       </div>
       <div class="prog-row">
         <span class="prog-label">Onboarding completo</span>
@@ -451,31 +485,33 @@
         <span class="prog-val">${Math.min(hogaresCon2, 3)}/3</span>
       </div>
       <div class="prog-row">
-        <span class="prog-label">Registro sostenido S4</span>
+        <span class="prog-label">Registro última semana</span>
         <div class="prog-track"><div class="prog-fill" style="width:${s4Pct}%"></div></div>
-        <span class="prog-val">${semanaActual >= 4 ? gastosS4.hogaresConGastos + '/3' : '—'}</span>
+        <span class="prog-val">${semanasComp >= 1 ? gastosUlt.hogaresConGastos + '/3' : '—'}</span>
       </div>
     `;
 
     // Tabla semanal automática
     renderTabla(eventos, semanaActual, hogaresCreados, porHogar);
+    renderHogares(eventos, semanaActual);
 
     // Exit criteria
-    const todoBien = semanaActual > PILOTO_WEEKS
-      && onboardingCompleto >= 3
-      && hogaresCon2 >= 3
-      && gastosS4.hogaresConGastos >= 3;
+    // Un hogar "sostenido" es el que lleva >= PILOTO_WEEKS semanas con registro,
+    // contadas desde SU fecha de entrada - no desde el arranque global (Fase 47).
+    const hogaresSostenidos = porHogarDetalle(eventos, semanaActual)
+      .filter(h => h.semanasConGasto >= PILOTO_WEEKS).length;
 
-    const okSem  = semanaActual > PILOTO_WEEKS;
     const okOnb  = onboardingCompleto >= 3;
     const okC2   = hogaresCon2 >= 3;
-    const okS4   = semanaActual >= 4 && gastosS4.hogaresConGastos >= 3;
+    const okS4   = gastosUlt.hogaresConGastos >= 3;
+    const okSost = hogaresSostenidos >= 3;
+    const todoBien = okOnb && okC2 && okS4 && okSost;
 
     document.getElementById('exitContainer').innerHTML = `
       <div class="exit-row">
         <span class="exit-icon">🗓</span>
-        <span class="exit-text">4 semanas de piloto completadas</span>
-        <span class="exit-status ${okSem ? 'ok' : 'pend'}">${okSem ? '✓ completo' : 'semana ' + Math.min(semanaActual, 4) + '/4'}</span>
+        <span class="exit-text">≥ 3 hogares con ${PILOTO_WEEKS}+ semanas de registro propio</span>
+        <span class="exit-status ${okSost ? 'ok' : 'pend'}">${okSost ? '✓ ' + hogaresSostenidos : hogaresSostenidos + ' de 3'}</span>
       </div>
       <div class="exit-row">
         <span class="exit-icon">🏠</span>
@@ -489,8 +525,8 @@
       </div>
       <div class="exit-row">
         <span class="exit-icon">📊</span>
-        <span class="exit-text">≥ 3 hogares registrando gastos en semana 4</span>
-        <span class="exit-status ${okS4 ? 'ok' : semanaActual < 4 ? 'pend' : 'fail'}">${semanaActual < 4 ? 'por evaluar' : okS4 ? '✓ ' + gastosS4.hogaresConGastos : gastosS4.hogaresConGastos + ' de 3'}</span>
+        <span class="exit-text">≥ 3 hogares registrando en la última semana (S${ultSem})</span>
+        <span class="exit-status ${okS4 ? 'ok' : 'fail'}">${okS4 ? '✓ ' + gastosUlt.hogaresConGastos : gastosUlt.hogaresConGastos + ' de 3'}</span>
       </div>
       <div class="exit-row">
         <span class="exit-icon">🚦</span>
@@ -530,23 +566,98 @@
       porHogarSem[e.hogar].add(e.uid);
     });
     const c2 = Object.values(porHogarSem).filter(s => s.size >= 2).length;
+    const hogaresC2 = Object.keys(porHogarSem).filter(h => porHogarSem[h].size >= 2);
 
     // Hogares con al menos 1 gasto en esa semana
     const hogaresConGastos = new Set(
       evSem.filter(e => e.tipo === 'gasto_registrado' && e.hogar).map(e => e.hogar)
     ).size;
 
-    return { gastos, uids, c2, hogaresConGastos, tieneData: evSem.length > 0 };
+    return { gastos, uids, c2, hogaresC2, hogaresConGastos, tieneData: evSem.length > 0 };
+  }
+
+  // ── DETALLE POR HOGAR ─────────────────────────────────────────
+  // Cada hogar se evalua desde SU primera actividad, no desde el arranque global.
+  // Distingue administrador (registra gastos) de observador (entra pero no registra),
+  // que es la hipotesis abierta del piloto - ver Fase 47.
+  function porHogarDetalle(eventos, semanaActual) {
+    const hogares = {};
+    eventos.forEach(e => {
+      if (!e.hogar || !e.timestamp) return;
+      if (!hogares[e.hogar]) {
+        hogares[e.hogar] = { codigo: e.hogar, primer: e.timestamp, gastos: 0,
+                             uidsActivos: new Set(), uidsGasto: new Set(), semanas: new Set() };
+      }
+      const h = hogares[e.hogar];
+      if (e.timestamp < h.primer) h.primer = e.timestamp;
+      if (e.uid && e.tipo === 'usuario_activo') h.uidsActivos.add(e.uid);
+      if (e.tipo === 'gasto_registrado') {
+        h.gastos++;
+        if (e.uid) h.uidsGasto.add(e.uid);
+        const sem = semanaDelPiloto(new Date(e.timestamp));
+        if (sem) h.semanas.add(sem);
+      }
+    });
+    return Object.values(hogares).map(h => {
+      const miembros    = new Set([...h.uidsActivos, ...h.uidsGasto]);
+      const observadores = [...h.uidsActivos].filter(u => !h.uidsGasto.has(u)).length;
+      const semEntrada  = semanaDelPiloto(new Date(h.primer)) || 1;
+      return {
+        codigo: h.codigo,
+        primer: h.primer,
+        semEntrada,
+        semanasEnPiloto: Math.max(0, semanaActual - semEntrada + 1),
+        semanasConGasto: h.semanas.size,
+        gastos: h.gastos,
+        miembros: miembros.size,
+        administradores: h.uidsGasto.size,
+        observadores
+      };
+    }).sort((a, b) => a.primer - b.primer);
+  }
+
+  function renderHogares(eventos, semanaActual) {
+    const tbody = document.getElementById('hogarTableBody');
+    if (!tbody) return;
+    const filas = porHogarDetalle(eventos, semanaActual);
+    if (!filas.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;">Sin datos</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filas.map(h => {
+      const f = new Date(h.primer).toLocaleDateString('es-CO', { day:'numeric', month:'short' });
+      const ok = h.semanasConGasto >= PILOTO_WEEKS;
+      const patron = h.administradores >= 2
+        ? '<span class="badge badge-green">2 registran</span>'
+        : h.observadores >= 1
+          ? '<span class="badge badge-active">admin + observador</span>'
+          : '<span class="badge badge-gray">1 solo</span>';
+      return `<tr>
+        <td class="label-col">${h.codigo}</td>
+        <td>${f} · S${h.semEntrada}</td>
+        <td>${fmt(h.miembros)}</td>
+        <td>${fmt(h.gastos)}</td>
+        <td><span class="${ok ? 'badge badge-green' : ''}">${h.semanasConGasto}/${PILOTO_WEEKS}</span></td>
+        <td>${patron}</td>
+      </tr>`;
+    }).join('');
   }
 
   function renderTabla(eventos, semanaActual, hogaresTotal, porHogar) {
     const tbody = document.getElementById('weekTableBody');
     let html = '';
 
-    for (let n = 1; n <= PILOTO_WEEKS; n++) {
+    // Antes: for (n=1; n<=PILOTO_WEEKS) - congelaba la tabla en 4 semanas y ocultaba
+    // todo lo posterior sin avisar. Ahora recorre las semanas realmente transcurridas.
+    const desde = Math.max(1, semanaActual - MAX_FILAS + 1);
+    if (desde > 1) {
+      html += `<tr><td colspan="6" style="text-align:center;color:var(--muted);font-size:12px;">
+        ··· semanas 1–${desde - 1} omitidas ···</td></tr>`;
+    }
+    for (let n = desde; n <= semanaActual; n++) {
       const datos = semanaN(eventos, n);
       const esCurrent = n === semanaActual;
-      const esFutura  = n > semanaActual;
+      const esFutura  = false;
 
       // Hogares acumulados hasta esta semana (los nuevos hogar_creado hasta fin de semana)
       const fin = new Date(PILOTO_START);
