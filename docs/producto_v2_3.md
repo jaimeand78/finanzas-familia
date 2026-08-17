@@ -49,6 +49,46 @@ La sensación de: saber cómo va el hogar, no olvidar lo importante, tomar decis
 | 3 | **"Nuestro hogar", no "mi presupuesto"** | Transparencia compartida, coordinación real, visión conjunta. |
 | 4 | **Todo conectado** | Los eventos originan gastos. El colegio genera recordatorios. La empleada genera prestaciones. |
 
+### Panorama Competitivo — Agosto 2026
+
+> Análisis realizado tras identificar FamilyWall como competidor directo. Fuente: revisión de mercado agosto 2026.
+
+**Hallazgo central:** existen dos mercados que casi no se cruzan. Organiza2 vive en el espacio vacío entre ambos.
+
+**Bloque A — Organizadores familiares (entran por el calendario)**
+
+| App | Escala | Modelo | Debilidad |
+|-----|--------|--------|-----------|
+| **Cozi** | 20M+ usuarios, desde 2005 | $39.99 USD/año · gratuito limitado a 30 días de historial | Interfaz antigua · sin gestión de tareas real |
+| **TimeTree** | 55M+ usuarios, Japón 2015 | Gratuito con publicidad · ~$4.49 USD/mes | Solo calendario · sin listas ni gastos |
+| **FamilyWall** | 5M+ descargas | $4.99 USD/mes · $44.99 USD/año | Finanzas relegadas a Premium · quejas de sync |
+| **OurHome** | Nicho infantil | Gratuito · gamificado | Sin calendario ni gastos — es complemento |
+| **Oleada 2025–26** | Homsy · Maple · Nestify · Pistachio · Pairently · Fami | Varía | Todas atacan el mismo hueco: el calendario no reparte responsabilidad |
+
+**Bloque B — Finanzas compartidas (entran por el dinero)**
+
+Spendee · Mobills · Wallet · Bluecoins · Tricount · Splitwise · Shareroo. Presentes en Colombia. Organizan dinero, no organizan el hogar.
+
+**Vacíos que ninguno cubre**
+
+| # | Vacío |
+|---|-------|
+| 1 | Presupuesto por frecuencia latina — SOAT, prima, cesantías, matrículas |
+| 2 | Servicio doméstico como categoría de primera clase |
+| 3 | Ingresos por quincena, no mensuales |
+| 4 | Dos adultos sin cuenta bancaria conjunta llevando cuentas claras |
+| 5 | Sin conexión bancaria — requisito de confianza en LatAm |
+| 6 | PWA sin descarga — ventaja de distribución en gama media |
+| 7 | Español latino nativo, no traducción |
+
+**Implicación estratégica**
+
+El mercado está **validado, no ganado**: 80M+ de usuarios repartidos y seis competidores nuevos en 18 meses significa que el problema existe y nadie lo resolvió. La crítica que se repite en todas las reseñas es la misma: las apps muestran eventos pero no transfieren responsabilidad, y el modelo híbrido de pareja (cuentas individuales + gastos compartidos) es el peor atendido del mercado. Eso es exactamente lo que resuelve **¿Quién pagó?**.
+
+> **Regla de posicionamiento:** Organiza2 NO compite en la categoría "organizador familiar" — ahí pierde contra productos con 20 años de ventaja. Compite en **"el dinero del hogar en pareja en Latinoamérica"** y crece hacia organización. El Planeador y la Alimentación deben nacer atados a la lógica financiera del hogar, nunca como features genéricas.
+
+> **Nota de precio:** la referencia internacional es $40–50 USD/año (~$180.000 COP). El modelo de negocio de v5.0 debe pensarse desde cero en pesos, nunca convertido — ver §12.
+
 ---
 
 ## 4. Usuario Objetivo
