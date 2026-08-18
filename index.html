@@ -50,6 +50,11 @@
           Entrar con Google
         </button>
         <p id="loginError" class="login-error" style="display:none"></p>
+        <div id="updBanner" class="upd" style="display:none">
+          <div class="upd-txt"><strong>Hay una versión nueva lista.</strong> Toca para aplicarla.</div>
+          <button onclick="location.reload()">Actualizar</button>
+        </div>
+        <div id="appVersion" class="login-version">v2.3</div>
       </div>
     </div>
   </div>
@@ -436,9 +441,46 @@
 
   <!-- Service Worker — Fase 39 -->
   <script>
+    // Etiqueta de versión: se lee del cache real, nunca se escribe a mano.
+    // index.html es cache-first, asi que un numero hardcodeado aqui llegaria
+    // desactualizado al usuario desactualizado y nunca detectaria nada (Fase 48).
+    function _pintarVersion() {
+      if (!('caches' in window)) return;
+      caches.keys().then(ks => {
+        const builds = ks
+          .filter(k => k.indexOf('organiza2-v') === 0)
+          .map(k => parseInt(k.split('-').pop(), 10))
+          .filter(n => !isNaN(n))
+          .sort((a, b) => b - a);
+        if (builds.length) {
+          document.getElementById('appVersion').textContent = 'v2.3 · build ' + builds[0];
+        }
+      }).catch(() => {});
+    }
+
+    function _avisarActualizacion() {
+      const b = document.getElementById('updBanner');
+      if (b) b.style.display = 'flex';
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            _pintarVersion();
+            reg.update().catch(() => {});
+            // Con skipWaiting() el SW nuevo se activa solo; lo unico que falta
+            // es recargar la pagina para que corra el codigo nuevo.
+            reg.addEventListener('updatefound', () => {
+              const nuevo = reg.installing;
+              if (!nuevo) return;
+              nuevo.addEventListener('statechange', () => {
+                if (nuevo.state === 'activated' && navigator.serviceWorker.controller) {
+                  _avisarActualizacion();
+                }
+              });
+            });
+          })
           .catch(err => console.warn('SW registro fallido:', err));
       });
     }

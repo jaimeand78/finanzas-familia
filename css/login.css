@@ -141,3 +141,35 @@
 .paso-conf-title       { font-size: 1.1rem; }
 .paso-conf-sub         { color: var(--color-muted); font-size: .9rem; margin: .5rem 0; }
 .paso-conf-hint        { font-size: .75rem; color: var(--color-muted); margin-bottom: .75rem; }
+
+/* ── VERSIÓN Y AVISO DE ACTUALIZACIÓN (Fase 48) ── */
+.login-version {
+  font-family: 'DM Mono', monospace;
+  font-size: .7rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  letter-spacing: .02em;
+  margin-top: -.35rem;
+}
+.upd {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background: #FDF4E7;
+  border: 1px solid #F0DCBE;
+  border-radius: 10px;
+  padding: .6rem .75rem;
+}
+.upd-txt { flex: 1; font-size: .78rem; color: #8A5716; line-height: 1.35; }
+.upd button {
+  border: none;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: .45rem .75rem;
+  font-family: inherit;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
