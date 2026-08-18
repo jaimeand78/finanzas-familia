@@ -1563,3 +1563,47 @@ Pendientes de `admin.html` no abordados: lectura sin límite de `metricas/evento
 - Sin casilla propia para madre o padre soltero con hijos en P1
 
 ---
+
+## Fase 48 — Versión visible y aviso de actualización (Agosto 2026)
+
+**Contexto:** durante el piloto no había forma de saber qué versión tenía una familia sin pedirle que abriera las herramientas de desarrollo. Se añade la versión al login y un aviso accionable cuando hay código nuevo.
+
+### El error que se evitó
+
+La primera propuesta era hardcodear el build esperado en `index.html` y compararlo. **No funciona:** `./index.html` está en el `SHELL` del Service Worker con estrategia cache-first. Un usuario desactualizado carga el `index.html` viejo, con el número viejo, que coincide con su cache viejo — y la comparación reporta "al día". El mecanismo sería ciego exactamente en el único caso que debe detectar.
+
+**Solución (DA-28):** la etiqueta se deriva de `caches.keys()` en runtime. Refleja el código que **realmente** está corriendo, no el que debería. Sin segunda fuente de verdad y sin mantenimiento: bumpear `CACHE_NAME` ya actualiza la etiqueta.
+
+### Detalle técnico
+
+| Aspecto | Decisión |
+|---------|----------|
+| Origen del número | `caches.keys()`, prefijo `organiza2-v` |
+| Orden | **Numérico descendente** — `sort()` de strings pone `v2-9` después de `v2-17` |
+| Formato | `v2.3 · build 17` — "build" comunica que es técnico y desechable; `v2.3` es la versión de producto |
+| Primera visita | Sin cache aún: muestra solo `v2.3`. Comportamiento correcto, no es error |
+| Ubicación | Bajo el botón de Google, dentro de `.login-body` |
+
+### Aviso de actualización
+
+`sw.js` ya tenía `skipWaiting()` + `clients.claim()`, de modo que **el Service Worker nuevo se instala y activa solo**. Lo único pendiente es recargar la página para que corra el código nuevo.
+
+Por eso el aviso **no explica cómo instalar nada** — ya está instalado. Ofrece un botón *Actualizar* que hace `location.reload()`. Un toque en lugar de instruir a cada familia sobre cómo cerrar la app por completo, y elimina el problema de iOS que exigía abrirla dos veces.
+
+Detección vía `registration.addEventListener('updatefound')` → `statechange` → `state === 'activated'`, con guarda `navigator.serviceWorker.controller` para no mostrar el aviso en la primera instalación.
+
+**Texto elegido:** *"Hay una versión nueva lista"*, no *"Tu versión está desactualizada"*. Si alguien no abre la app en semanas, verá el aviso apenas entre sin haber hecho nada — informar sin culpar evita que se lea como reproche.
+
+### Archivos
+
+| Archivo | Cambio |
+|---------|--------|
+| `index.html` | `#appVersion` y `#updBanner` en el login · `_pintarVersion()` y `_avisarActualizacion()` en el registro del SW |
+| `css/login.css` | `.login-version`, `.upd`, `.upd-txt`, `.upd button` |
+| `sw.js` | Bump `v2-16` → `v2-17` |
+
+### Portabilidad
+
+El patrón es independiente de Organiza2 y se reutilizará en **Follower**. Para trasladarlo solo hay que cambiar el prefijo del filtro (`organiza2-v` → el `CACHE_NAME` correspondiente) y la versión de producto mostrada. Requisitos: que el SW use `skipWaiting()` y que `CACHE_NAME` termine en un entero incremental.
+
+---
