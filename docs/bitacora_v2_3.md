@@ -1455,6 +1455,8 @@ Sin cambios de código — no requiere bump de `sw.js`.
 | `daily.js` | `trackEvent` en rama offline y en `catch` de `submitDaily()` |
 | `sw.js` | Bump `organiza2-v2-14` → `organiza2-v2-15` |
 
+Formalizado como **DA-27**: la telemetría cubre todas las rutas de éxito funcional, no solo la online.
+
 ### 2. Hallazgo de datos — discrepancia 152 vs 74
 
 El contador global de `admin.html` reportaba 152 gastos acumulados, mientras la tabla semanal sumaba 74 (S1–S4). La diferencia son ~78 registros en las semanas 5–10, que el dashboard **no renderiza** porque la tabla itera solo hasta `PILOTO_WEEKS = 4`.
@@ -1483,6 +1485,19 @@ Un padre casado que lleva el control financiero él solo lee *"Solo · Manejo mi
 
 **Vacío adicional:** no existe casilla para padre o madre soltera con hijos. "En pareja · sin hijos" y "Familia · con hijos" no cubren ese caso.
 
+**Fix aplicado — pregunta explícita en P1.5 (DA-26).** Se evaluaron tres opciones con mockup; ver `decisiones_junio2026.md` §15. La aprobada **no toca P1**: añade la pregunta *"¿Tienes hijos?"* en P1.5, visible únicamente cuando `tipoHogar === 'soltero'` — el único tipo cuyo subtexto habla de operación y no de composición. Es obligatoria: bloquea el botón *Continuar* hasta responderse.
+
+| Caso | `tieneEducacion` | ¿Cambia? |
+|------|------------------|----------|
+| Familia | `true` | — igual que antes |
+| Familia apagando el toggle | `false` | — igual que antes |
+| Pareja | `false` | — igual que antes |
+| **Soltero con hijos** | **`true`** | ✅ **caso corregido** |
+| Soltero con hijos, apaga el toggle | `false` | nuevo, coherente |
+| Soltero sin hijos | `false` | — igual que antes |
+
+La respuesta **no se persiste** en Firebase: al reabrir `_soloFlags` se infiere de `perfil.tieneEducacion === true`. Evita un campo de esquema nuevo. La pregunta también aparece en `_soloFlags`, de modo que el hogar ya afectado **se autocorrige** desde *Actualizar mi hogar*, sin los dos pasos manuales que hacían falta.
+
 ### 5. Contexto cualitativo del piloto (más valioso que las métricas)
 
 Razones reales por las que ningún hogar tuvo dos miembros activos:
@@ -1497,7 +1512,7 @@ Dos de tres no constituyen evidencia contra la tesis del producto. La tercera s�
 
 > ⚠️ **Salvedad:** una sola respuesta, de un solo hogar. Hipótesis a validar, no hallazgo. No se rediseñan criterios de salida con n=1.
 
-### Deuda abierta en `admin.html` (no corregida en esta fase)
+### Defectos detectados en `admin.html`
 
 | # | Problema | Ubicación |
 |---|----------|-----------|
@@ -1510,5 +1525,41 @@ Dos de tres no constituyen evidencia contra la tesis del producto. La tercera s�
 | 7 | Guard de `ADMIN_UID` es solo client-side; reglas dan `.read` a todo auth | `firebase-rules.json:54` |
 
 **Aprendizaje:** un dashboard con ventana fija se vuelve silenciosamente obsoleto. No falla, no avisa — sigue mostrando datos correctos de un período equivocado.
+
+### Reparación de `admin.html` (misma fase)
+
+| # | Corrección |
+|---|-----------|
+| 1 | La tabla semanal recorre las semanas **realmente transcurridas** (tope `MAX_FILAS = 16`), no cuatro fijas |
+| 2 | Cabecera sin recorte: muestra la semana real del piloto y la fecha de inicio |
+| 3 | Criterio de registro anclado a la **última semana completa**, no a la semana calendario 4 |
+| 4 | Criterio de sostenimiento: *"≥ 3 hogares con 4+ semanas de registro propio"*, contadas **desde la entrada de cada hogar** — alinea el código con `producto_v2_3.md` §9 |
+| 5 | `hogaresCon2` exige concurrencia en alguna semana; antes acumulaba histórico e incluía hogares abandonados |
+| 6 | `fmt()` distingue `0` (dato real) de `undefined` (ausencia de dato) |
+| 7 | **Sección nueva** — *"Hogares · cada uno desde su entrada"*, con columna de patrón de uso: `2 registran` / `admin + observador` / `1 solo` |
+
+El punto 7 permite medir la hipótesis del administrador único **sin telemetría nueva**: `usuario_activo` sin `gasto_registrado` para un mismo `uid` identifica a un observador.
+
+Pendientes de `admin.html` no abordados: lectura sin límite de `metricas/eventos` y guard de `ADMIN_UID` solo client-side (las reglas dan `.read` a cualquier `auth != null`).
+
+### Archivos entregados en la fase
+
+| Archivo | Cambio |
+|---------|--------|
+| `daily.js` | Telemetría en rutas offline — refuerza DA-25, sin DA propia |
+| `presupuesto.js` | Pregunta *¿Tienes hijos?* en P1.5 + `eduFlag` desacoplado de `tipoHogar` (DA-26) |
+| `presupuesto.css` | Estilos `.onb-q`, `.onb-q-t`, `.onb-q-btns` |
+| `admin.html` | Ventana real de semanas, anclaje por hogar, patrón de uso |
+| `producto_v2_3.md` | Panorama competitivo agosto 2026 (§3) |
+| `arquitectura_v2_3.md` | DA-26 y DA-27 |
+| `decisiones_junio2026.md` | §15 (opciones evaluadas y decisión adoptada) · §16 (Mascotas aplazada) |
+| `REGLAS_IA.md` | Acceso al repo: límites de cuota y frescura por SHA |
+| `sw.js` | Bump `v2-14` → `v2-15` → `v2-16` |
+
+### Backlog abierto tras la fase
+
+- **Mascotas como categoría** — propuesta y pospuesta deliberadamente. Gasto real e invisible (veterinario, alimento, vacunas, guardería), ortogonal al tipo de hogar, por lo que encajaría como flag `tieneMascotas` en P1.5. Requiere DA-10 (tres artefactos) y definir la frecuencia de cada ítem. Ventana relevante: conviene **antes** de reclutar la fase 2, para que los hogares nuevos la reciban sin migración
+- `_tx()` sigue atado a `tipoHogar === 'soltero'` — lenguaje singular para quien administra solo aunque viva en pareja
+- Sin casilla propia para madre o padre soltero con hijos en P1
 
 ---

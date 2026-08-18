@@ -461,29 +461,56 @@ El picker de calendario completo solo aparece si el usuario toca "Elegir fecha".
 
 ---
 
-## 15. P1 debe separar composición del hogar de operación de la app
+## 15. Educación depende de hijos, no del tipo de hogar
 
-**Fecha:** Agosto 2026 · **Origen:** feedback real del piloto (Fase 47)
+**Fecha:** Agosto 2026 · **Origen:** feedback real del piloto (Fase 47) · **Estado:** ✅ Implementado
 
-**Problema detectado.** La pantalla P1 pregunta *"¿Cómo es tu hogar?"* pero sus tres opciones mezclan dos dimensiones que son independientes entre sí:
+**Problema.** P1 pregunta *"¿Cómo es tu hogar?"* pero el subtexto de `soltero` — *"Manejo mis finanzas"* — describe **quién opera la app**, no **quién vive en el hogar**. Un padre casado que lleva el control financiero él solo elige esa opción de buena fe. Y `presupuesto.js` forzaba `tieneEducacion = false` para todo tipo distinto de `familia`, de modo que la categoría 📚 Educación desaparecía de P4, P5 y del tab Hoy (DA-7). Ese usuario no podía registrar el colegio de su hija — probablemente su mayor gasto del año.
 
-- **Composición** — quiénes viven en el hogar. Determina qué categorías tienen sentido: hijos, educación, vehículo, servicio doméstico.
-- **Operación** — quiénes van a usar la app. Determina la UX de colaboración: banner de miembro 2, ¿Quién pagó?, lenguaje singular o plural.
+**Opciones evaluadas:**
 
-Hoy `soltero` implica ambas cosas a la vez, y su subtexto (*"Manejo mis finanzas"*) describe explícitamente la **operación**. Un padre casado que administra solo elige esa opción de buena fe y pierde la categoría Educación por el hard-coded de `presupuesto.js:517`.
+| Opción | Descartada porque |
+|--------|-------------------|
+| Reescribir P1 con 4 opciones (añadir monoparental) | Cambia una pantalla estable y en producción; multiplica casillas sin resolver la raíz. **Mockup rechazado por el product owner.** |
+| Mostrar Educación siempre en P1.5 | Obliga a inventar un valor por defecto para hogares sin hijos — suposición en lugar de dato. |
+| **Preguntar explícitamente solo en el caso ambiguo** | **Elegida.** |
 
-**Casos que el modelo actual no cubre:**
+**Decisión.** P1 no se toca. En P1.5, cuando `tipoHogar === 'soltero'`, aparece un bloque con la pregunta **¿Tienes hijos?** (Sí / No) y el botón *Continuar* queda deshabilitado hasta responder. El toggle de Educación se muestra si el hogar es `familia` **o** es `soltero` con hijos.
 
-| Caso real | Composición | Operación | Opción disponible hoy |
-|-----------|-------------|-----------|------------------------|
-| Papá casado que administra solo | Familia | Individual | Ninguna correcta |
-| Madre soltera con hijos | Monoparental con hijos | Individual | Ninguna — no existe casilla |
-| Pareja que registra a dos manos | Pareja | Compartida | `pareja` ✅ |
+`pareja` y `familia` no reciben la pregunta: sus subtextos en P1 (*"Sin hijos por ahora"* y *"Con hijos"*) ya la respondieron. **`soltero` es el único tipo ambiguo, y por eso el único que se pregunta.**
 
-**Dirección de la decisión (pendiente de mockup):** desacoplar las dos preguntas. P1 pregunta únicamente por composición; los flags de P1.5 gobiernan hijos y educación con independencia de `tipoHogar`. Eso elimina el condicional rígido de la línea 517.
+**Persistencia.** `tieneHijos` **no** se guarda en Firebase. En el flujo `_soloFlags` se infiere de `perfil.tieneEducacion === true`. Evita un campo nuevo y una DA de esquema. Costo aceptado: quien tenga hijos pero haya apagado Educación a mano verá la pregunta en blanco al reconfigurar.
 
-**Alternativa descartada:** agregar una cuarta opción a P1. Multiplica casillas sin resolver el problema de raíz — cada nueva combinación de composición × operación exigiría otra opción.
+**Regresión verificada — los tres casos existentes dan resultado idéntico al anterior:**
 
-**Estado:** ⏸️ Pendiente. Requiere mockup aprobado antes de implementar (Regla de Mockups). Queda a criterio del product owner si entra durante el piloto o al backlog post-piloto — califica como feedback real de usuario, no como observación interna.
+| Caso | `tieneEducacion` | |
+|------|------------------|---|
+| Familia | `true` | igual que antes |
+| Familia apagando el toggle | `false` | igual que antes |
+| Pareja | `false` | igual que antes |
+| **Soltero con hijos** | **`true`** | **caso nuevo — el papá** |
+| Soltero con hijos, toggle apagado | `false` | nuevo |
+| Soltero sin hijos | `false` | igual que antes |
 
-**Mitigación inmediata sin código:** el hogar afectado puede corregirse desde la app con los flujos existentes (DA-21) — primero `_soloTipo` para cambiar a Familia, luego `_soloFlags` para activar Educación.
+**Fuera de alcance, al backlog post-piloto:**
+- El lenguaje sigue en singular para `soltero` aunque conviva con pareja — `_tx()` sigue atado a `tipoHogar`. Cosmético.
+- Madre o padre soltero con hijos aún debe elegir entre "Familia" (plural) o "Solo" (singular + responder Sí). Funciona, no es elegante.
+
+---
+
+## 16. Mascotas — aplazada conscientemente
+
+**Fecha:** Agosto 2026 · **Estado:** ⏸️ Backlog
+
+Se evaluó añadir 🐾 Mascotas como categoría. **El caso de producto es sólido:** gasto recurrente, real e invisible (veterinario, alimento, vacunas, guardería, peluquería) — encaja con la tesis de gasto hormiga y es **ortogonal al tipo de hogar**, por lo que sería un `tieneMascotas` limpio en P1.5, más simple que Educación.
+
+Se verificó que **Mascotas no está documentada como nodo reservado** en ningún archivo del repo — no existía tal restricción.
+
+**Por qué se aplaza:**
+- Toca tres artefactos simultáneamente (DA-10): `defD()`, `DAILY_ITEMS` y `migrateCategories()`. Es una migración, no una línea.
+- No es feedback reportado por un usuario, sino observación interna — por la regla de disciplina de alcance, va al backlog.
+- Había dos cambios sin cerrar en la misma sesión; mezclarlos impediría aislar una regresión.
+
+**Argumento a favor de hacerlo pronto (registrado para no perderlo):** incorporarla **antes** de reclutar la fase 2 evita migrar en caliente a familias que apenas están tomando el hábito.
+
+**Pendiente de diseño antes de codificar:** qué ítems y con qué frecuencia — alimento es mensual, vacunas anual, veterinario imprevisto. Eso determina el comportamiento de `calcPresupuestoBase()`.

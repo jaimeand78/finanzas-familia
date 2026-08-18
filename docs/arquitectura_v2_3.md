@@ -279,6 +279,8 @@ function calcPresupuestoBase(item, mesActual) {
 | DA-23 | `calcPresupuestoBase(item, mes)` chequea `months` antes que `frecuencia`. Si el ítem tiene `months[]`, es de fecha fija — aplica solo en esos meses independientemente de `frecuencia`. El presupuesto base vive en un solo nodo Firebase; los demás meses lo proyectan en memoria. | ✅ Implementado |
 | DA-24 | `loadFixed()` busca hacia atrás hasta 12 meses para encontrar el nodo con budgets configurados. El presupuesto no se propaga a los 12 meses en Firebase — vive donde fue configurado (típicamente el mes actual al hacer onboarding). | ✅ Implementado |
 | DA-25 | Telemetría del piloto: módulo aislado `telemetria.js`, función única `trackEvent(tipo)`, nodo `metricas/eventos`. Solo 6 métricas oficiales, sin datos sensibles (montos, categorías, nombres, emails). Registrada originalmente como DA-19 — renumerada en Julio 2026 por colisión. | ✅ Implementado |
+| DA-26 | Educación depende de **si hay hijos**, no del tipo de hogar. `soltero` es el único tipo ambiguo (su subtexto en P1 describe quién opera, no quién vive) — por eso P1.5 le hace la pregunta explícita `¿Tienes hijos?` y bloquea el botón hasta responder. `pareja` y `familia` ya lo declararon en P1 y no se les pregunta. La respuesta **no se persiste**: en el flujo `_soloFlags` se infiere de `perfil.tieneEducacion === true`. | ✅ Implementado |
+| DA-27 | `admin.html` mide cada hogar **desde su propia fecha de entrada**, no desde `PILOTO_START` global. La tabla semanal recorre las semanas realmente transcurridas (tope `MAX_FILAS`) y los criterios de salida usan la última semana completa. Consecuencia: incorporar hogares nuevos no exige reiniciar el piloto. | ✅ Implementado |
 
 ---
 
