@@ -1,7 +1,7 @@
 # Organiza2 — Decisiones de Producto
 ## Sesión de diseño — Junio 2026
 
-> ⚠️ **Documento parcialmente histórico.** Algunas secciones reflejan decisiones tomadas en Junio 2026 que luego evolucionaron (ej: número de categorías, pantallas de onboarding). Para el estado vigente del producto consultar `CONTEXTO_MAESTRO_ORGANIZA2.md` y `bitacora_v2_3.md` Fases 15 en adelante.
+> ⚠️ **Documento parcialmente histórico.** Algunas secciones reflejan decisiones tomadas en Junio 2026 que luego evolucionaron (ej: número de categorías, pantallas de onboarding). Para el estado vigente del producto consultar `contexto_maestro.md` y `bitacora.md` Fases 15 en adelante.
 
 ---
 

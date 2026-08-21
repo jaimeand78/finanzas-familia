@@ -3,6 +3,8 @@
 > Junio 2026 — Pre-piloto
 > **Audiencia:** cualquier IA o desarrollador que trabaje en las correcciones
 
+> ⚠️ **Documento histórico.** Refleja la auditoría hecha en Junio 2026, antes del piloto. Sus hallazgos ya fueron trabajados y sus instrucciones fueron reemplazadas — incluida su "Regla de Oro", que en el vocabulario vigente se llama Regla de Archivos. Para el criterio de trabajo vigente consultar `REGLAS_IA.md`; para el estado del producto, `docs/producto.md` y `docs/bitacora.md`. Las rutas citadas en el cuerpo son las de junio de 2026 y no se actualizaron.
+
 ---
 
 ## Instrucciones para la IA que trabaje este documento
