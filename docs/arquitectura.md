@@ -66,9 +66,9 @@ organiza2/hogar/
 │   └── presupuesto.css       → onboarding presupuesto base, banner miembro 2, config
 └── docs/
     ├── REGLAS_IA.md          → reglas para cualquier IA que trabaje en el proyecto
-    ├── producto_v2_3.md
-    ├── arquitectura_v2_3.md  → este archivo
-    ├── bitacora_v2_3.md
+    ├── producto.md
+    ├── arquitectura.md  → este archivo
+    ├── bitacora.md
     └── decisiones_junio2026.md
 ```
 

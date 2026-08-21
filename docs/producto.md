@@ -1,4 +1,4 @@
-# 📋 Organiza2 — Documento de Producto v2.3
+# 📋 Organiza2 — Producto
 
 > Junio 2026 — Actualizado con Fases 25–41 · Piloto activo
 
@@ -218,6 +218,10 @@ Lenguaje conversacional, no financiero. *"Lo que sí o sí hay que pagar"* en lu
 El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo de hogar correcto, presupuesto base con valor real, transparencia en pareja funcional, registro diario suficientemente rápido.
 
 > **Estado actual:** Piloto activo — Junio 2026. Canal de feedback: WhatsApp "Organiza2 · Piloto Familias". URL: `bit.ly/Organiza2`.
+
+> **⚠️ Abierto — Divergencia en los criterios de salida.**
+> Esta sección y `admin.html` no describen el mismo piloto. Aquí: 5–10 familias, ≥ 4 semanas, cinco condiciones en prosa. En el código: `≥ 3 hogares` en cuatro condiciones medidas (`okOnb`, `okC2`, `okS4`, `okSost`, con `PILOTO_WEEKS = 4`) más una verificación manual. "Presupuesto Base con valor real" se exige aquí y no se mide allá; "registro diario suficientemente rápido" se mide como frecuencia, no como velocidad — los ≤ 10 segundos por gasto de §5 no están instrumentados.
+> Por la regla de conflicto manda el código, así que hoy el piloto saldría con 3 hogares. Pendiente de resolver: **es la puerta que habilita el Planeador.**
 
 ---
 
