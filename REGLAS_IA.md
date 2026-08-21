@@ -1,151 +1,77 @@
-# 🤖 REGLAS_IA.md
-# Reglas de trabajo para asistentes IA en Organiza2
+# Parte II — ORGANIZA2
 
-> Este archivo debe leerse ANTES de tocar cualquier línea de código.
-> Aplica para Claude, ChatGPT, Gemini o cualquier IA que trabaje en este proyecto.
-
----
-
-## Regla de Arbitraje — GitHub
-
-El repositorio `github.com/organiza2/hogar` (rama `main`) es el **árbitro final** del estado real del proyecto: es lo que está desplegado en producción.
-
-- Ante cualquier duda sobre si Fuentes está actualizado, la IA verifica directamente contra el repo:
-  `curl -s https://raw.githubusercontent.com/organiza2/hogar/main/[ruta]` y compara con la copia en Fuentes. Documentación en `docs/` · `README.md` y `REGLAS_IA.md` en la raíz.
-- **Verificación canario:** comparar `CACHE_NAME` de `sw.js` (repo vs Fuentes). Si coinciden, el código en Fuentes muy probablemente está al día.
-- Si Fuentes difiere del repo → **detener el trabajo**, informar la diferencia y pedir actualización de Fuentes antes de continuar.
-- Antes de modificar cualquier archivo de código, esta verificación complementa la Pregunta Inicial Obligatoria: no solo preguntar — comprobar.
-
-**Jerarquía de verdad:** GitHub `main` (estado real) → Fuentes (espejo de trabajo) → instrucciones y memoria.
-
-### Acceso al repo — límites y frescura (aprendizaje Fase 47)
-
-`raw.githubusercontent.com` responde **HTTP 429 Too Many Requests** al acceso anónimo. **La cuota pertenece a la IP de salida del entorno de la IA, no al proyecto ni al repo** — se comparte con otros usuarios y puede agotarse por consumo ajeno. Es estocástico: puede ocurrir en cualquier sesión, sin relación con cuánto se haya pedido aquí. **No afecta a `git push` ni al repositorio:** solo bloquea la lectura anónima por HTTP.
-
-| Situación | Regla |
-|-----------|-------|
-| **Aparece un 429** | **No reintentar en bucle** — los reintentos seguidos extienden el bloqueo. Informar al usuario, declarar explícitamente qué quedó sin verificar, y continuar bajo inferencia. Nunca afirmar que se verificó algo que no se pudo descargar. |
-| **Alcance de la verificación** | Verificar los archivos que se van a modificar. El canario de `sw.js` cubre el estado del código sin descargar todo. |
-| **Archivo subido hace menos de 5 minutos** | `raw` cachea con `cache-control: max-age=300` por rama: puede devolver la versión anterior sin error y sin aviso. Pedirlo por **SHA de commit** — ruta inmutable: `raw.githubusercontent.com/organiza2/hogar/<sha>/<ruta>`. Preferible a un sufijo `?cb=`, que no garantiza saltarse el CDN. |
-
-> **Detección:** una respuesta de ~199 bytes que empieza con `429:` no es el archivo. Antes de comparar, **validar el tamaño descargado** — un `diff` contra una página de error reporta "DIFIERE" y provoca una falsa alarma de desincronización que puede detener el trabajo sin motivo.
-
-> **Nota:** no existe conector autenticado de GitHub en el directorio de Claude. Mientras no lo haya, aplican las reglas de arriba. Claude Code, que usa el `git` autenticado de la máquina local, no tiene esta limitación.
+> **Este archivo es el original versionado de la Parte II de las instrucciones de proyecto de Organiza2.**
+> La copia que vive en claude.ai se pega desde aquí, entera y sin editar. Si el criterio cambia, se cambia
+> aquí, se commitea y se vuelve a pegar completo. Una sola edición hecha directamente en la interfaz
+> reinstala la divergencia que esta reorganización eliminó — y nada la delata.
+>
+> Encima de este bloque va la **Parte I — Andamiaje**, que es transversal y no vive en este repo.
+> Lo que la Parte I ya manda **no se repite aquí**: Regla de Oro y sus tres corolarios, regla de conflicto,
+> mantenimiento del conjunto, taxonomía de hallazgos, A/B/C antes de código, una variable a la vez,
+> cierre de sesión y PowerShell.
 
 ---
 
-## Regla de Oro — Archivos
+## Pregunta rectora
 
-**Antes de modificar cualquier archivo, SIEMPRE:**
+Antes de proponer cualquier cambio:
 
-1. Preguntar al usuario: *"¿El archivo [nombre] del proyecto está actualizado?"*
-2. Si no está actualizado → pedirlo antes de tocar nada
-3. Leer el archivo actual del proyecto o el que el usuario suba
-4. Hacer SOLO el cambio necesario — nunca reescribir desde cero
-5. Entregar SOLO el archivo modificado, no todos los archivos
+**¿Esto reduce la carga mental del hogar o agrega complejidad?**
 
-**¿Por qué?** En sesiones anteriores se perdieron cambios porque se generaron archivos nuevos basados en versiones desactualizadas del proyecto, pisando el trabajo correcto. Esta regla evita ese problema.
+Si la respuesta no es claramente "reduce carga mental" → no implementar.
 
 ---
 
-## Regla de Cambios
+## Identidad
 
-- **Cambios pequeños y localizados** → el usuario los aplica directamente en VS Code con Ctrl+H
-- **Cambios grandes o que afectan múltiples funciones** → la IA genera el archivo completo
-- **Nunca reescribir un archivo completo si solo cambia una función**
-- **Nunca generar un archivo desde cero si ya existe en el proyecto**
+Organiza2 **no** es una aplicación financiera. Es una plataforma para organizar la vida en pareja y familia en Latinoamérica. Lema: *"Organizamos tu vida en pareja."*
 
----
+Las finanzas son **uno** de los módulos del ecosistema, no el producto.
 
-## Regla de Arquitectura
-
-Antes de proponer cualquier cambio técnico, verificar alineación con:
-
-- `docs/producto_v2_3.md` — visión, módulos, onboarding
-- `docs/arquitectura_v2_3.md` — decisiones arquitecturales DA-0 a DA-25
-- `docs/bitacora_v2_3.md` — historial por fases, bugs resueltos, deuda técnica
-- `docs/decisiones_junio2026.md` — registros de decisión
-- `docs/CONTEXTO_MAESTRO_ORGANIZA2.md` — contexto maestro para IAs
-
-Preguntarse siempre: **¿esto reduce la carga mental del hogar o agrega complejidad?**
+El desarrollo completo — propósito, qué NO es, ADN — vive en `docs/contexto_maestro.md`.
 
 ---
 
-## Regla de Producto
+## Invariantes
 
-- **No construir Planeador ni Alimentación** hasta validar Finanzas v2 con familias reales
-- **El Hogar es la entidad principal** — todo dato vive en `hogares/[codigoHogar]/`
-- **El tab Resumen es solo lectura** — sin inputs, sin edición
-- **El tab Config es configuración** — no muestra gastos reales del mes
+- **El Hogar es la entidad principal.** Todo dato vive bajo `hogares/[codigoHogar]/`. Nunca en un nodo personal de usuario.
+- **No construir Planeador ni Alimentación** hasta cumplir los criterios de salida definidos en `docs/producto.md` §9. Ese documento manda sobre el número y la condición; aquí no se repiten para que no puedan quedar viejos.
+- **Tab Resumen es solo lectura.** Tab Config es solo configuración — no muestra gastos reales del mes.
+- **Stack cerrado:** HTML + CSS + JS vanilla, Firebase Realtime Database + Auth (Google), GitHub Pages, PWA. **No usar** React, Vue, Angular, npm, webpack ni ningún build tool.
 
----
-
-## Reglas Técnicas Críticas
-
-| Regla | Descripción |
-|-------|-------------|
-| `planItems(cat)` | SIEMPRE usar esta función, nunca `cat.items` directamente (DA-2) |
-| `canonicalLabel()` | Aplicar al leer de Firebase, nunca modificar (DA-3) |
-| `calcPresupuestoBase(item, mes)` | Única función para calcular provisión mensual (DA-8) |
-| `DAILY_ITEMS` | Catálogo del tab Hoy — NUNCA mezclar con `defD()` (DA-10) |
-| Ingresos | Siempre desde `buildIncomeFromPerfil()`, nunca hardcodeados (DA-11) |
-| iOS inputs | `type="text" inputmode="decimal"` en todos los campos de monto |
-| Firebase daily | Los gastos diarios NUNCA se escriben en el nodo mensual (DA-1) |
+Las decisiones ratificadas y su razonamiento viven en `docs/arquitectura.md` (DA-0 en adelante). **Ese documento manda sobre esta lista** — si algo de aquí lo contradice, gana la DA.
 
 ---
 
-## Regla de Mockup
+## Protocolo de arranque
 
-**Antes de implementar cualquier cambio visual:**
-1. Hacer un mockup interactivo
-2. Iterar con el usuario hasta aprobación
-3. Solo entonces implementar
+No preguntar si la documentación está actualizada: **comprobarlo.**
 
-Esto aplica para: nuevas pantallas, rediseños de tabs, cambios en formularios, onboarding.
+1. **Canario.** Comparar `CACHE_NAME` de `sw.js` entre el repo y la copia de trabajo. Si coinciden, el código de la copia muy probablemente está al día; si no, la copia quedó atrás.
+2. **Alcance.** Verificar los archivos que se van a modificar. El canario cubre el estado general sin descargar todo.
 
----
-
-## Regla de Commits
-
-Un commit por cambio específico. Formato:
-
-```
-feat: descripción corta de la nueva funcionalidad
-fix: descripción corta del bug corregido
-docs: descripción de documentación actualizada
-refactor: descripción del cambio técnico sin nueva funcionalidad
-```
+Índice de documentos: `README.md` (puerta de entrada) y `.claude/skills/organiza2/SKILL.md` (dónde ir a mirar). Repo: `github.com/organiza2/hogar` · App: `organiza2.github.io/hogar` · Firebase: `organiza2-a09ef`.
 
 ---
 
-## Regla de Service Worker (cache)
+## Convenciones propias
 
-- Todo deploy con cambios en HTML, CSS o JS requiere incrementar `CACHE_NAME` en `sw.js` (ej: `organiza2-v2-14` → `organiza2-v2-15`).
-- Si solo cambian docs o el propio `sw.js`, no se requiere bump.
-- El bump va SIEMPRE en el último commit — después de que los archivos corregidos estén commiteados. Bumpear antes deja la versión con bugs en cache (aprendizaje Fase 44).
-- Verificar tras el bump: `grep "CACHE_NAME" sw.js`.
+**Regla de Archivos.** Leer el archivo actual antes de modificarlo. Hacer solo el cambio necesario — nunca reescribir desde cero si ya existe una versión oficial. Entregar solo el archivo modificado.
 
----
+**Regla de Cambios.** Cambios pequeños y localizados → el usuario los aplica en VS Code con `Ctrl+H`. Cambios grandes o que afectan varias funciones → la IA genera el archivo completo.
 
-## Stack — No cambiar sin consultar
+**Regla de Mockup.** Antes de implementar cualquier cambio de UX o UI: mockup interactivo → iterar con el usuario → aprobación → recién entonces código. Aplica a pantallas nuevas, rediseños de tabs, formularios y onboarding.
 
-- HTML + CSS + JS Vanilla — **sin frameworks**
-- Firebase Realtime Database + Auth (Google)
-- GitHub Pages hosting
-- PWA con Service Worker (cache-first para shell, network-only para Firebase)
+**Regla de Service Worker.** Todo deploy con cambios en HTML, CSS o JS requiere incrementar `CACHE_NAME` en `sw.js`. Si solo cambian docs o el propio `sw.js`, no se requiere bump. **El bump va siempre en el último commit**, después de que los archivos corregidos ya estén commiteados — bumpear antes deja la versión con bugs en cache (aprendizaje Fase 44). Verificar tras el bump: `grep "CACHE_NAME" sw.js`.
 
-**No usar:** React, Vue, Angular, npm, webpack, ni ningún build tool.
+**Commits.** Tipos: `feat` · `fix` · `docs` · `refactor`. **Código y documentación nunca en el mismo commit.**
 
 ---
 
-## Contexto del Proyecto
+## Lecciones
 
-- **App:** [organiza2.github.io/hogar](https://organiza2.github.io/hogar)
-- **Repo:** `github.com/organiza2/hogar`
-- **Firebase:** proyecto `organiza2-a09ef`
-- **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros
-- **Estado:** v2.3 — piloto activo con familias (desde junio 2026)
+Solo las que no tienen dueño en una DA. Lo demás vive en `docs/arquitectura.md`.
 
----
-
-*Organiza2 — REGLAS_IA.md | Julio 2026*
+- **Verificar en Firebase antes de asumir pérdida de datos.** Los datos pueden estar intactos aunque la UI no los muestre.
+- **Documentar los textos aprobados de onboarding en la bitácora en el momento.** Reconstruirlos después desde el código es caro.
+- **Después de eliminar cualquier módulo de código, barrer referencias huérfanas:** JS, CSS, variables globales y el objeto `PAGES`.
