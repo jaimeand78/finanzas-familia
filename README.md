@@ -8,29 +8,6 @@ Organiza2 es una plataforma para organizar la vida en pareja y familia latinoame
 
 ---
 
-## Estado actual — v2.3 ✅
-
-| Módulo | Estado |
-|--------|--------|
-| Login Google + Firebase Auth | ✅ |
-| Modelo de Hogar — crear/unirse por código | ✅ |
-| Finanzas v2 — arquitectura modular | ✅ |
-| Presupuesto Base + Onboarding 6 pantallas (P1.5 flags) | ✅ |
-| Tab Resumen — ahorro fijo + semáforo + ¿Quién ha pagado? | ✅ |
-| Tab Análisis — tendencia rediseñada con daily | ✅ |
-| Tab Config — ingresos adicionales + acordeón + Mi hogar | ✅ |
-| C3 — filtro categorías/ítems por perfil del hogar | ✅ |
-| Pantalla login con logo | ✅ |
-| Edición de registros del día | ✅ |
-| Service Worker — shell offline (PWA) | ✅ |
-| Telemetría piloto — 6 métricas | ✅ |
-| Dashboard admin del piloto (`admin.html`) | ✅ |
-| **Piloto 5-10 familias** | 🔄 En curso |
-
-> **Hogar activo:** SNBDPA ("Ibarra Masso") — 2 miembros en producción.
-
----
-
 ## El problema que resuelve
 
 Las familias modernas cargan una cantidad enorme de decisiones pequeñas que nadie coordina bien: ¿quién lleva al niño?, ¿ya pagamos el SOAT?, ¿cuánto llevamos gastado este mes?, ¿quién compra el regalo?
@@ -38,6 +15,8 @@ Las familias modernas cargan una cantidad enorme de decisiones pequeñas que nad
 Esas preguntas no tienen respuesta fácil porque la información está dispersa — en el celular de uno, en una hoja de cálculo, en WhatsApp, en la memoria de dos personas que llegan cansadas a casa.
 
 **Organiza2 existe para que esas preguntas tengan respuesta en segundos, compartida entre los dos.**
+
+Organiza2 **no** es una aplicación financiera. Finanzas es uno de sus módulos.
 
 ---
 
@@ -50,23 +29,11 @@ Esas preguntas no tienen respuesta fácil porque la información está dispersa 
        │            │            │
        ▼            ▼            ▼
  💰 Finanzas   📋 Planeador  🍽️ Alimentación
- (v2.3 🔄)    (v3.0 🔲)     (v4.0 🔲)
 ```
 
-⛔ **No construir Planeador ni Alimentación hasta cumplir los criterios de salida del piloto v2.3.**
+Todo dato vive bajo `hogares/[codigoHogar]/`.
 
----
-
-## Roadmap
-
-| Versión | Hitos | Estado |
-|---------|-------|--------|
-| v2.1 | Login · Hogar · Finanzas modular | ✅ |
-| v2.2 | Presupuesto Base · Onboarding · Resumen · Login | ✅ |
-| v2.3 | Piloto 5-10 familias | 🔄 En curso |
-| v3.0 | Planeador | 🔲 |
-| v4.0 | Alimentación | 🔲 |
-| v5.0 | Monetización | 🔲 |
+⛔ **No construir Planeador ni Alimentación hasta cumplir los criterios de salida del piloto.** Los criterios y el estado del piloto viven en [`docs/producto.md`](./docs/producto.md) §9 y §11; el seguimiento en vivo, en `admin.html`.
 
 ---
 
@@ -78,20 +45,37 @@ HTML + CSS + JS Vanilla · Firebase Realtime Database · Firebase Auth (Google) 
 
 ---
 
-## Para IAs y desarrolladores
+## Documentación
 
-**Leer antes de tocar cualquier archivo:** [`REGLAS_IA.md`](./REGLAS_IA.md)
+| Buscas | Archivo |
+|---|---|
+| **Criterio de trabajo — leer antes de tocar cualquier archivo** | [`REGLAS_IA.md`](./REGLAS_IA.md) |
+| Qué es el producto y qué NO es | [`docs/contexto_maestro.md`](./docs/contexto_maestro.md) |
+| Decisiones de arquitectura (DA) y funciones únicas | [`docs/arquitectura.md`](./docs/arquitectura.md) |
+| Visión, roadmap, estado del piloto, modelo de negocio | [`docs/producto.md`](./docs/producto.md) |
+| Historial de sesiones, aprendizajes, deuda técnica | [`docs/bitacora.md`](./docs/bitacora.md) |
+| Decisiones de diseño de junio 2026 *(histórico)* | [`docs/decisiones_junio2026.md`](./docs/decisiones_junio2026.md) |
+| Auditoría técnica pre-piloto *(histórico)* | [`docs/auditoria_v2_3_junio2026.md`](./docs/auditoria_v2_3_junio2026.md) |
+| Lo que la app hace de verdad | El código |
 
-Reglas clave:
-- Hogar es la entidad principal — datos en `hogares/[codigoHogar]/`
-- Nunca usar `cat.items` directamente — siempre `planItems(cat)`
-- `calcPresupuestoBase(item, mes)` — única función de provisión mensual
-- `defD()` + `DAILY_ITEMS` + `migrateCategories()` — catálogo único, modificar los tres juntos
-- Tab Resumen = solo lectura / Tab Config = solo configuración
-- Siempre pedir el archivo actual antes de modificarlo
-
-Documentación completa en [`docs/`](./docs/) — `REGLAS_IA.md` vive en la raíz.
+`REGLAS_IA.md` vive en la raíz; el resto en [`docs/`](./docs/).
 
 ---
 
-*Organiza2 | Julio 2026*
+## Estructura
+
+```
+├── index.html          → shell de la app
+├── admin.html          → dashboard del piloto (standalone)
+├── sw.js               → Service Worker
+├── manifest.json
+├── css/                → base · login · finanzas · presupuesto
+├── js/                 → config · utils · offline · firebase-paths · auth
+│                         telemetria · hogar · finanzas · presupuesto
+│                         daily · analisis · ui · app
+└── docs/
+```
+
+---
+
+*Organiza2*
