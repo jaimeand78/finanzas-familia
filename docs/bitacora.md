@@ -1,4 +1,4 @@
-# 📓 Organiza2 — Bitácora Técnica v2.3
+# 📓 Organiza2 — Bitácora Técnica
 
 > Historial completo de desarrollo, decisiones y aprendizajes
 > Abril — Junio 2026
@@ -75,7 +75,7 @@ Lema redefinido: *"Organizamos tu vida en pareja."*
 - Módulos redefinidos: Finanzas · Planeador · Alimentación
 - Regla de validación: no construir Planeador ni Alimentación hasta validar Finanzas v2 con familias reales
 
-**Documentos generados:** `producto_v2_3.md`, `arquitectura_v2_3.md`, `README_v2_3.md`, `bitacora_v2_3.md`
+**Documentos generados:** `producto.md`, `arquitectura.md`, `README_v2_3.md`, `bitacora.md`
 
 ### 📅 Fase 8 — v2.1 / Etapas A-D (Junio 2026)
 
@@ -406,7 +406,7 @@ Sesión de validación en producción y resolución de problemas específicos de
 
 ## 4. Decisiones Arquitecturales
 
-*(DA-0 al DA-13 — ver arquitectura_v2_3.md)*
+*(DA-0 al DA-13 — ver arquitectura.md)*
 
 **DA-14:** Tab Resumen es solo lectura — sin inputs.
 **DA-15:** Login con logo oficial `logo.png`.
@@ -499,13 +499,13 @@ Sesión de validación en producción y resolución de problemas específicos de
 - `<title>` decía "Organiza2 — Finanzas" → desalineado con identidad redefinida
 - Topbar mostraba "💰 Finanzas" → primer impacto visual incorrecto
 - `manifest.json` tenía `name: "Finanzas — Organiza2"` y `description: "Control de Finanzas Familiares"`
-- Documentación (`producto_v2_3.md`, `README_v2_3.md`) desactualizada respecto al estado real
+- Documentación (`producto.md`, `README_v2_3.md`) desactualizada respecto al estado real
 
 **Cambios aplicados:**
 - `index.html`: `<title>` → `Organiza2`; topbar → ícono `icono-181.png` + "Organiza2"
 - `manifest.json`: `name` → "Organiza2"; `description` → "Organizamos tu vida en pareja."
 - `docs/README_v2_3.md`: versión v2.2 → v2.3; tabla de módulos completada con C3, Config, Análisis
-- `docs/producto_v2_3.md`: Sección 11 — pendientes pre-piloto marcados como ✅ resueltos
+- `docs/producto.md`: Sección 11 — pendientes pre-piloto marcados como ✅ resueltos
 
 **Promesas del login validadas:** Las tres promesas ("Saben en qué se va el dinero", "Deciden juntos sin sorpresas", "Paz mental a fin de mes") están alineadas con la visión. No requieren cambio.
 
@@ -921,7 +921,7 @@ refactor: mover inline styles a CSS — solo display:none queda inline
 | — | feat: telemetría piloto — trackEvent + metricasPiloto (Fase 34) |
 | — | docs: Fase 34 + DA-19 + reglas Firebase metricas/eventos |
 
-> **Nota (Julio 2026):** La DA de telemetría se registró originalmente como DA-19, colisionando con la DA-19 de Ahorro. Renumerada a **DA-25** en `arquitectura_v2_3.md`. El registro del commit se conserva tal como ocurrió.
+> **Nota (Julio 2026):** La DA de telemetría se registró originalmente como DA-19, colisionando con la DA-19 de Ahorro. Renumerada a **DA-25** en `arquitectura.md`. El registro del commit se conserva tal como ocurrió.
 
 ### Diseño
 
@@ -957,7 +957,7 @@ Módulo aislado `js/telemetria.js`, independiente del resto del sistema:
 
 ### Decisión: `onboarding_completado` — 1 vez por hogar, no por uid
 
-Según el modelo de colaboración (producto_v2_3.md §7), solo el miembro 1 (creador del hogar) ejecuta el onboarding completo y llama `guardarPresupuestoBase()` con `!esFlujoParcial`. El miembro 2 ve el banner de confirmación y, si ajusta algo, pasa por Config — que usa los flujos `_soloFlags`/`_soloTipo`/`_soloMeta`, ya excluidos del evento. Por lo tanto:
+Según el modelo de colaboración (producto.md §7), solo el miembro 1 (creador del hogar) ejecuta el onboarding completo y llama `guardarPresupuestoBase()` con `!esFlujoParcial`. El miembro 2 ve el banner de confirmación y, si ajusta algo, pasa por Config — que usa los flujos `_soloFlags`/`_soloTipo`/`_soloMeta`, ya excluidos del evento. Por lo tanto:
 
 > `onboarding_completado` ≈ hogares que completaron el setup inicial — no se duplica por pareja.
 
@@ -1049,7 +1049,7 @@ Sesión de verificación y documentación. Los tres hallazgos críticos de `audi
 | Archivo | Cambio |
 |---------|--------|
 | `auditoria_v2_3_junio2026.md` | A1, A2, A3 marcados ✅; tabla de orden de ejecución actualizada con estados reales |
-| `bitacora_v2_3.md` | Este registro (Fase 36) |
+| `bitacora.md` | Este registro (Fase 36) |
 
 ### Commit
 
@@ -1428,10 +1428,10 @@ if (frec === 'mensual') return b;
 
 | Archivo | Cambio |
 |---------|--------|
-| `arquitectura_v2_3.md` | DA-19 → Ahorro · DA-25 telemetría · versión 2.6 |
-| `bitacora_v2_3.md` | Nota de renumeración en Fase 34 · esta entrada |
+| `arquitectura.md` | DA-19 → Ahorro · DA-25 telemetría · versión 2.6 |
+| `bitacora.md` | Nota de renumeración en Fase 34 · esta entrada |
 | `REGLAS_IA.md` | Repo/URL corregidos · estado piloto · Regla de Service Worker · Regla de Arbitraje |
-| `CONTEXTO_MAESTRO_ORGANIZA2.md` | Estado actual + tabla DAs completa + Regla de Arbitraje |
+| `contexto_maestro.md` | Estado actual + tabla DAs completa + Regla de Arbitraje |
 | `README_v2_3.md` | Piloto en curso · DA-10 vigente · SW/telemetría/admin · ubicación docs |
 
 Sin cambios de código — no requiere bump de `sw.js`.
@@ -1533,7 +1533,7 @@ Dos de tres no constituyen evidencia contra la tesis del producto. La tercera s�
 | 1 | La tabla semanal recorre las semanas **realmente transcurridas** (tope `MAX_FILAS = 16`), no cuatro fijas |
 | 2 | Cabecera sin recorte: muestra la semana real del piloto y la fecha de inicio |
 | 3 | Criterio de registro anclado a la **última semana completa**, no a la semana calendario 4 |
-| 4 | Criterio de sostenimiento: *"≥ 3 hogares con 4+ semanas de registro propio"*, contadas **desde la entrada de cada hogar** — alinea el código con `producto_v2_3.md` §9 |
+| 4 | Criterio de sostenimiento: *"≥ 3 hogares con 4+ semanas de registro propio"*, contadas **desde la entrada de cada hogar** — alinea el código con `producto.md` §9 |
 | 5 | `hogaresCon2` exige concurrencia en alguna semana; antes acumulaba histórico e incluía hogares abandonados |
 | 6 | `fmt()` distingue `0` (dato real) de `undefined` (ausencia de dato) |
 | 7 | **Sección nueva** — *"Hogares · cada uno desde su entrada"*, con columna de patrón de uso: `2 registran` / `admin + observador` / `1 solo` |
@@ -1550,8 +1550,8 @@ Pendientes de `admin.html` no abordados: lectura sin límite de `metricas/evento
 | `presupuesto.js` | Pregunta *¿Tienes hijos?* en P1.5 + `eduFlag` desacoplado de `tipoHogar` (DA-26) |
 | `presupuesto.css` | Estilos `.onb-q`, `.onb-q-t`, `.onb-q-btns` |
 | `admin.html` | Ventana real de semanas, anclaje por hogar, patrón de uso |
-| `producto_v2_3.md` | Panorama competitivo agosto 2026 (§3) |
-| `arquitectura_v2_3.md` | DA-26 y DA-27 |
+| `producto.md` | Panorama competitivo agosto 2026 (§3) |
+| `arquitectura.md` | DA-26 y DA-27 |
 | `decisiones_junio2026.md` | §15 (opciones evaluadas y decisión adoptada) · §16 (Mascotas aplazada) |
 | `REGLAS_IA.md` | Acceso al repo: límites de cuota y frescura por SHA |
 | `sw.js` | Bump `v2-14` → `v2-15` → `v2-16` |
@@ -1605,5 +1605,93 @@ Detección vía `registration.addEventListener('updatefound')` → `statechange`
 ### Portabilidad
 
 El patrón es independiente de Organiza2 y se reutilizará en **Follower**. Para trasladarlo solo hay que cambiar el prefijo del filtro (`organiza2-v` → el `CACHE_NAME` correspondiente) y la versión de producto mostrada. Requisitos: que el SW use `skipWaiting()` y que `CACHE_NAME` termine en un entero incremental.
+
+---
+
+## Fase 49 — Reorganización y normalización de la documentación (Agosto 2026)
+
+**Contexto:** la documentación tenía seis capas que se pisaban entre sí. `CONTEXTO_MAESTRO` repetía la tabla de DA (congelada en DA-25 mientras la real iba en DA-28), las Reglas Técnicas Críticas, la Regla de Arbitraje, la Regla de Archivos y el estado del proyecto. Las instrucciones de la interfaz llevaban su propia copia, sin tocar desde julio, mientras `REGLAS_IA.md` seguía vivo en agosto. El README llevaba roadmap y checklist de módulos. El `SKILL.md` llevaba una copia de la paleta, con tres "tokens" —`color-positivo`, `color-negativo`, `color-info`— que no existen en el CSS.
+
+Se adoptó el reparto de capas de Follower: **Parte I — Andamiaje** (transversal, se replica tal cual) + **Parte II — Organiza2**, con `REGLAS_IA.md` como el original versionado de la Parte II. La copia de la interfaz se pega desde el repo, entera y sin editar.
+
+### Decisión de vocabulario
+
+**"Regla de Oro" se la queda el arbitraje** — *"el árbitro es el código"* — y la regla de preguntar antes de modificar pasa a llamarse **Regla de Archivos**, que ya es como la nombraba `contexto_maestro.md`.
+
+El motivo **no** es fidelidad al origen: en la Fase 14 "Regla de Oro" se estableció con el sentido contrario. El motivo es que en Follower y en `~/.claude/CLAUDE.md` ya significa arbitraje, y un mismo nombre con dos sentidos entre proyectos cuesta más que romper el origen — una contradicción se nota, una colisión de vocabulario no. Sin este párrafo, alguien lee la Fase 14 dentro de seis meses y lo "corrige" de vuelta.
+
+### Dos reglas de julio que se eliminaron, y por qué
+
+**La Pregunta Inicial Obligatoria.** Abría tres documentos pidiendo *preguntarle al usuario* si la documentación seguía actualizada. Contradice la Regla de Oro, que dice comprobarlo contra el repo. Era el protocolo débil: le pasaba al usuario una carga que se resuelve en dos comandos. Reemplazada por el **Protocolo de arranque** de `REGLAS_IA.md`, que abre con *"No preguntar si la documentación está actualizada: comprobarlo."*
+
+**La jerarquía "Fuente Única de Verdad".** Ordenaba: (1) archivos de Fuentes, (2) instrucciones del usuario en la conversación actual, (3) conversaciones anteriores — *"si hay contradicción, siempre prevalecen los archivos de Fuentes"*.
+
+Esa regla **no era ambigua: invertía la autoridad.** Ponía un archivo de julio por encima de lo que el usuario dijera en la conversación. En la sesión misma en que se detectó habría descartado dos correcciones del usuario que resultaron correctas — una sobre qué se había adoptado realmente en Follower, y otra sobre la forma de la Parte II. Ambas contradecían documentos de Fuentes; en ambas tenía razón el usuario. Reemplazada por la regla de conflicto de la Parte I: **el documento más específico gana sobre el general, y el código gana sobre todos.**
+
+También se eliminó la **Regla de Incertidumbre** (*detener el trabajo y pedir confirmación*), por el mismo choque en pequeño: la taxonomía obligatoria de la Parte I dice etiquetar y seguir, no parar.
+
+### Reglas promovidas a la capa transversal
+
+Dos reglas que vivían en Organiza2 resultaron **transversales por construcción**, no por analogía — no dependen del repo, del stack ni del producto:
+
+| Regla | Por qué es transversal |
+|---|---|
+| **Cuota y 429 de `raw.githubusercontent.com`** (Fase 47) | La cuota pertenece a la IP de salida del entorno de la IA y se comparte con terceros. Es una propiedad del entorno de ejecución |
+| **Regla de Transparencia** (*nunca inventar el contenido de un archivo que no se pudo leer*) | No la cubre la taxonomía: se puede fabricar el contenido de un archivo, rotularlo "hipótesis" y haber cumplido la letra |
+
+Ambas subieron a `ANDAMIAJE_parte1.md` en esta misma fase y salieron de la Parte II, así que no queda duplicación. En la capa transversal entraron recortadas a lo que es criterio — el 429 quedó dentro del Corolario 2 de la Regla de Oro, que ya describía otro modo de fallo del mismo host, en vez de abrir un corolario nuevo.
+
+El detalle operativo del 429 se queda aquí, que es su dueño, y no en la Parte I: la respuesta es un cuerpo de ~199 bytes que empieza con `429:`; la cuota pertenece a la IP de salida del entorno de la IA y se comparte con terceros, de modo que puede agotarse sin relación con la sesión en curso; los reintentos extienden el bloqueo; y no afecta a `git push` ni al repositorio —solo bloquea la lectura anónima por HTTP—, así que un entorno con `git` autenticado no tiene la limitación. La Parte I se replica a tres proyectos y cada línea que no sea criterio le cuesta a los tres.
+
+### Dos reglas que casi se pierden en la reescritura
+
+Detectadas al auditar las instrucciones viejas sección por sección contra el resultado:
+
+- **Regla de Service Worker** — un borrador decía *"después de que los archivos estén en GitHub Pages"* en vez de *"commiteados"*. No es lo mismo: hay minutos entre el push y el despliegue. Restaurado el original.
+- **Qué hacer cuando la copia de trabajo difiere del repo** — las instrucciones viejas decían *detener y pedir actualización*. Detenerse dejó de tener función cuando el árbitro pasó a ser el código: **manda el repo**, se trabaja sobre la versión viva y se avisa que la copia quedó atrás. No se escribió como regla propia porque ya lo es la Regla de Oro de la Parte I; en la Parte II solo queda el canario, que es el mecanismo con el que se detecta.
+
+### Normalización de nombres
+
+Cuatro documentos vivos llevaban la versión en el nombre. Un nombre con versión obliga a renombrar todo el día que llegue la v2.4 — o a dejar que el nombre mienta. La versión vigente ya vive dentro de cada documento, que es su dueño.
+
+| Actual | Nuevo |
+|---|---|
+| `docs/CONTEXTO_MAESTRO_ORGANIZA2.md` | `docs/contexto_maestro.md` |
+| `docs/arquitectura_v2_3.md` | `docs/arquitectura.md` |
+| `docs/producto_v2_3.md` | `docs/producto.md` |
+| `docs/bitacora_v2_3.md` | `docs/bitacora.md` |
+
+El renombre va en su **propio commit, sin cambios de contenido**, para que git lo detecte al 100% y `git log --follow` siga la historia de cada archivo.
+
+**Los históricos no se renombran.** `decisiones_junio2026.md` y `auditoria_v2_3_junio2026.md` conservan su nombre: en un documento vivo la versión del nombre expira, en uno histórico es parte de lo que el documento es. La fecha ya los identifica.
+
+**Regla aplicada a las referencias:** el banner de un documento histórico es capa viva y se actualiza — su única función es redirigir, y apuntando a un archivo inexistente se anula a sí mismo. El cuerpo está congelado y no se toca. Por eso se actualizó el banner de `decisiones_junio2026.md` y ninguna de las 7 referencias del cuerpo de la auditoría.
+
+Las entradas de fases anteriores de esta bitácora **sí** se actualizaron: un nombre de archivo en una entrada de bitácora es un puntero, no un hecho. El hecho registrado es "se actualizó la arquitectura". Se dejaron intactas las 4 menciones a `README_v2_3.md`, que apuntan a un documento que ya no existe — cambiarlas afirmaría que esas fases tocaron el README de la raíz, y eso no consta.
+
+### Archivos
+
+| Archivo | Cambio |
+|---|---|
+| `REGLAS_IA.md` | Reescrito como Parte II: pregunta rectora · identidad · invariantes · protocolo de arranque · convenciones propias · lecciones |
+| `docs/contexto_maestro.md` | 326 → 56 líneas. Queda como Qué es · Qué NO es · ADN · Objetivo permanente |
+| `docs/auditoria_v2_3_junio2026.md` | Marca histórica. Cuerpo intacto |
+| `.claude/skills/organiza2/SKILL.md` | Deja de duplicar la paleta — el CSS es el dueño. Queda identidad breve, vocabulario, dónde ir a mirar y la Regla de Branding |
+| `README.md` | Pierde el estado y el roadmap. Queda como puerta de entrada e índice |
+| `docs/producto.md` | Ticket: divergencia en los criterios de salida · H1 sin versión |
+| `docs/bitacora.md` | Esta entrada · H1 sin versión |
+| `docs/decisiones_junio2026.md` | Banner actualizado a los nombres nuevos |
+| Instrucciones de la interfaz | Parte I + Parte II pegadas desde el repo |
+| `INSTRUCCIONES_PROYECTO_ORGANIZA2.md` | Eliminado de Fuentes — era el espejo sin dueño versionado |
+
+Sin bump de `CACHE_NAME`: no se tocó HTML, CSS ni JS. Ningún archivo de producción referencia estos documentos.
+
+### Backlog abierto tras la fase
+
+- **`index-v1.html`** — en la raíz del repo, un solo commit del 3 de junio, sin ninguna referencia en el árbol y servido públicamente por GitHub Pages. Mismo patrón fósil que la documentación, pero en código
+- **`--color-success` no existe** — `css/presupuesto.css:249` usa `var(--color-success, #0F6E56)` y esa variable no está definida en ninguna parte del repo, ni hay `setProperty` que la cree en runtime. Hoy siempre pinta el fallback; el día que alguien la defina con otro valor, el "Total mes" de Config cambia de color solo. `decisiones_junio2026.md` §12 la documenta como si existiera
+- **Colores semánticos sin token** — `#0F6E56`, `#993C1D`, `#185FA5` y sus fondos aparecen como literales en el CSS. El vocabulario "color-positivo / negativo / info" solo existía en el `SKILL.md`
+- **Divergencia de criterios de salida del piloto** — ticket en `docs/producto.md` §9
+- **`v2.3` dentro de los títulos de sección de `producto.md`** — *Estado v2.3*, *Estado del Piloto v2.3*, *Categorías Oficiales v2.3*, *Sub-tabs v2.3*. Mismo tipo de estado que se quitó de los nombres de archivo, pero en contenido
 
 ---
