@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organiza2 · Mockup Planeador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-primary:   #1D9E75;
+    --color-bg:        #F5F5F5;
+    --color-surface:   #FFFFFF;
+    --color-text:      #1A1A1A;
+    --color-muted:     #6B6B68;
+    --color-border:    #E0E0E0;
+    --color-error:     #D85A30;
+    --color-compromiso:#378ADD;
+    --color-compromiso-bg:#EEF4FF;
+    --color-meta:      #BA7517;
+    --color-meta-bg:   #FEF3C7;
+    --font: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--color-bg); color: var(--color-text);
+    min-height: 100vh; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
+  button { cursor: pointer; border: none; font-family: var(--font); }
+
+  .mockup-banner { background: #1A1A1A; color: #fff; text-align: center; font-size: .68rem;
+    padding: .45rem .8rem; letter-spacing: .02em; line-height: 1.4; }
+  .mockup-banner b { color: var(--color-primary); }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1rem; height: 52px; background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100; }
+  .app-title { font-weight: 700; font-size: 1.1rem; color: var(--color-primary); }
+  .chip { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px;
+    font-size: .8rem; font-weight: 600; background: var(--color-primary); color: #fff; }
+
+  .tabs { background: #fff; border-bottom: 1px solid var(--color-border);
+    display: flex; max-width: 500px; margin: 0 auto; position: sticky; top: 52px; z-index: 90; }
+  .tab { flex: 1; padding: .65rem .5rem; font-size: .75rem; font-weight: 500;
+    color: var(--color-muted); background: none; border-bottom: 2px solid transparent; }
+  .tab.on { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+
+  .pg { display: none; }
+  .pg.on { display: block; }
+  .pg-inner { max-width: 500px; margin: 0 auto; padding: 1rem 1rem 2rem; }
+
+  .sub-tabs { display: flex; gap: .4rem; margin-bottom: 1rem; }
+  .sub-tab { flex: 1; padding: .5rem .3rem; font-size: .74rem; font-weight: 500;
+    border: 1.5px solid var(--color-border); border-radius: 8px;
+    background: #fff; color: var(--color-muted); }
+  .sub-tab.on { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+  .sub-pg { display: none; }
+  .sub-pg.on { display: block; }
+
+  .readonly-flag { display: inline-flex; align-items: center; gap: .3rem; font-size: .68rem;
+    font-weight: 600; color: var(--color-muted); background: #fff; border: 1px solid var(--color-border);
+    padding: .3rem .6rem; border-radius: 99px; margin-bottom: .8rem; }
+
+  .sec { background: #fff; border-radius: 14px; padding: 1rem; margin-bottom: .75rem; }
+  .sec-title { font-size: .75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--color-muted); margin-bottom: .75rem; }
+
+  /* ═══════════ FORMULARIO DE CREACIÓN (Hoy → Pendientes) ═══════════ */
+  .type-picker { display: flex; gap: .5rem; margin-bottom: 1.25rem; }
+  .type-opt { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .3rem;
+    padding: .85rem .4rem; border: 1.5px solid var(--color-border); border-radius: 12px;
+    background: #fff; font-size: .75rem; font-weight: 600; color: var(--color-muted); text-align: center; }
+  .type-opt .ic { font-size: 1.3rem; }
+  .type-opt .test { font-size: .62rem; font-weight: 400; line-height: 1.25; opacity: .8; }
+  .type-opt[data-type="recordatorio"].on { border-color: var(--color-primary); background: #E1F5EE; color: #085041; }
+  .type-opt[data-type="compromiso"].on   { border-color: var(--color-compromiso); background: var(--color-compromiso-bg); color: #1E3A8A; }
+  .type-opt[data-type="meta"].on         { border-color: var(--color-meta); background: var(--color-meta-bg); color: #633806; }
+
+  .field-label { font-size: .75rem; font-weight: 600; color: var(--color-muted); margin-bottom: .4rem; display: block; }
+  .field-group { margin-bottom: 1rem; }
+  .txt-input { width: 100%; padding: .65rem .8rem; border: 1.5px solid var(--color-border);
+    border-radius: 8px; font-size: .95rem; font-family: var(--font); outline: none; }
+  .txt-input:focus { border-color: var(--color-primary); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+  .chip-date { padding: .5rem .8rem; border: 1.5px solid var(--color-border); border-radius: 99px;
+    background: #fff; font-size: .8rem; font-weight: 500; color: var(--color-text); }
+  .chip-date.on { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+  .chip-meta { padding: .4rem .7rem; border: 1.5px solid var(--color-border); border-radius: 99px;
+    background: #fff; font-size: .75rem; font-weight: 500; color: var(--color-text); }
+  .chip-meta.on { background: var(--color-meta-bg); border-color: var(--color-meta); color: #633806; font-weight: 600; }
+
+  .opt-row { display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem 0; border-bottom: 1px solid #f5f3ee; font-size: .85rem; }
+  .opt-row:last-child { border-bottom: none; }
+  .toggle { width: 40px; height: 22px; border-radius: 99px; background: #e0e0e0; position: relative;
+    transition: background .2s; flex-shrink: 0; }
+  .toggle.on { background: var(--color-primary); }
+  .toggle .dot { width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute;
+    top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .toggle.on .dot { left: 20px; }
+
+  .money-row { display: flex; align-items: center; gap: .5rem; }
+  .money-row .cur { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--color-muted); }
+  .money-row input { flex: 1; }
+
+  .btn-save { width: 100%; padding: .85rem; background: var(--color-primary); color: #fff;
+    border-radius: 10px; font-size: .95rem; font-weight: 600; margin-top: .5rem; }
+  .btn-save.compromiso { background: var(--color-compromiso); }
+  .btn-save.meta { background: var(--color-meta); }
+  .hint { font-size: .75rem; color: var(--color-muted); margin-top: .5rem; line-height: 1.4; }
+
+  /* ═══════════ LISTA DE PENDIENTES (Vencidos / Próximos) ═══════════ */
+  .list-hdr { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; }
+  .badge-count { font-size: .7rem; font-weight: 700; border-radius: 99px; padding: 1px 8px; }
+  .badge-count.venc  { background: #FAECE7; color: #993C1D; }
+  .badge-count.prox  { background: #E1F5EE; color: #085041; }
+
+  .item-row { display: flex; align-items: flex-start; gap: .65rem; padding: .75rem 0;
+    border-bottom: 1px solid #f5f3ee; }
+  .item-row:last-child { border-bottom: none; }
+  .item-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: .4rem; flex-shrink: 0; }
+  .item-dot.recordatorio { background: var(--color-primary); }
+  .item-dot.compromiso   { background: var(--color-compromiso); }
+  .item-body { flex: 1; min-width: 0; }
+  .item-title { font-size: .9rem; font-weight: 600; margin-bottom: .1rem; }
+  .item-sub { font-size: .75rem; color: var(--color-muted); }
+  .item-sub.late { color: var(--color-error); font-weight: 600; }
+  .item-amt { font-family: 'DM Mono', monospace; font-size: .8rem; font-weight: 600;
+    color: var(--color-muted); white-space: nowrap; }
+  .item-by { font-size: .72rem; color: var(--color-muted); }
+  .item-by::before { content: "· "; }
+  .item-meta-tag { display: inline-flex; align-items: center; gap: .25rem; font-size: .68rem; font-weight: 600;
+    padding: .15rem .5rem; border-radius: 99px; background: var(--color-meta-bg); color: #854F0B; margin-top: .3rem; }
+
+  .item-actions { margin-top: .4rem; display: flex; gap: .4rem; align-items: center; }
+  .btn-cargo { font-size: .72rem; font-weight: 600; padding: .3rem .65rem; border-radius: 99px;
+    border: 1.5px solid var(--color-border); background: #fff; color: var(--color-muted); }
+  .btn-cargo:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .btn-hecho { font-size: .72rem; font-weight: 600; padding: .3rem .65rem; border-radius: 99px;
+    border: 1.5px solid var(--color-primary); background: var(--color-primary); color: #fff; }
+  .btn-hecho:hover { opacity: .9; }
+  .tomado-badge { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem;
+    font-weight: 600; padding: .3rem .65rem; border-radius: 99px;
+    background: #E1F5EE; color: #085041; }
+  .tomado-badge .undo { font-weight: 400; color: #085041; opacity: .6; margin-left: .2rem; cursor: pointer; }
+  .estado-tag { font-size: .72rem; font-weight: 600; padding: .25rem .6rem; border-radius: 99px;
+    background: #f0eee7; color: var(--color-muted); }
+
+  .resuelto-row { display: flex; align-items: flex-start; gap: .65rem; padding: .6rem 0;
+    border-bottom: 1px solid #f5f3ee; opacity: .75; }
+  .resuelto-row:last-child { border-bottom: none; }
+  .resuelto-check { width: 16px; height: 16px; border-radius: 50%; background: var(--color-primary);
+    color: #fff; font-size: .65rem; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: .15rem; }
+  .resuelto-title { font-size: .85rem; text-decoration: line-through; color: var(--color-muted); }
+  .resuelto-trace { font-size: .72rem; color: var(--color-muted); margin-top: .1rem; }
+  .resuelto-trace b { color: var(--color-text); font-weight: 600; }
+
+  /* ═══════════ METAS ═══════════ */
+  .meta-card { background: var(--color-meta-bg); border-radius: 12px; padding: .9rem 1rem; margin-bottom: .6rem; }
+  .meta-card.clickable { cursor: pointer; }
+  .meta-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+  .meta-name { font-size: .9rem; font-weight: 700; color: #633806; }
+  .meta-fecha { font-size: .7rem; color: #854F0B; }
+  .meta-fecha .chevron { opacity: .7; }
+  .meta-bar-track { height: 7px; background: rgba(0,0,0,.08); border-radius: 99px; overflow: hidden; margin-bottom: .4rem; }
+  .meta-bar-fill { height: 100%; background: var(--color-meta); border-radius: 99px; }
+  .meta-nums { display: flex; justify-content: space-between; font-size: .75rem; color: #854F0B; font-family: 'DM Mono', monospace; }
+  .meta-falta { font-size: .72rem; color: #854F0B; opacity: .75; margin-top: .25rem; }
+
+  .meta-detail { background: #fff; border-radius: 14px; padding: 1rem; margin-top: -.4rem; margin-bottom: .75rem;
+    border: 1.5px solid var(--color-meta-bg); }
+  .meta-detail.collapsible { display: none; }
+  .meta-detail.collapsible.on { display: block; }
+  .meta-detail-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
+  .meta-detail-hdr .sec-title { margin-bottom: 0; }
+
+  .subpaso-row { display: flex; align-items: center; gap: .6rem; padding: .6rem 0; border-bottom: 1px solid #f5f3ee; }
+  .subpaso-row:last-of-type { border-bottom: none; }
+  .subpaso-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--color-border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: #fff; }
+  .subpaso-check.resuelto { background: var(--color-meta); border-color: var(--color-meta); }
+  .subpaso-body { flex: 1; min-width: 0; }
+  .subpaso-title { font-size: .87rem; font-weight: 600; }
+  .subpaso-title.done { text-decoration: line-through; color: var(--color-muted); font-weight: 500; }
+  .subpaso-sub { font-size: .72rem; color: var(--color-muted); margin-top: .1rem; }
+  .subpaso-amt { font-family: 'DM Mono', monospace; font-size: .8rem; font-weight: 600; color: #854F0B; white-space: nowrap; }
+  .subpaso-cta { font-size: .68rem; font-weight: 600; padding: .25rem .55rem; border-radius: 99px;
+    border: 1.5px solid var(--color-meta); background: #fff; color: var(--color-meta); margin-left: .3rem; }
+
+  .btn-add-paso { width: 100%; padding: .6rem; margin-top: .5rem; border: 1.5px dashed var(--color-meta);
+    border-radius: 10px; background: #fff; color: #854F0B; font-size: .82rem; font-weight: 600; }
+  .btn-add-paso:hover { background: var(--color-meta-bg); }
+
+  .paso-form { display: none; margin-top: .7rem; padding-top: .7rem; border-top: 1px dashed var(--color-border); }
+  .paso-form.on { display: block; }
+  .paso-form .field-group { margin-bottom: .7rem; }
+  .sec.paso-form { border-top: none; padding-top: 1rem; }
+  .paso-form-actions { display: flex; gap: .5rem; }
+  .paso-form-actions .btn-save { margin-top: 0; }
+  .btn-cancel-paso { flex: 0 0 auto; padding: .7rem 1rem; background: #fff; border: 1.5px solid var(--color-border);
+    border-radius: 10px; color: var(--color-muted); font-size: .9rem; font-weight: 600; }
+
+  .fab-note { text-align: center; font-size: .72rem; color: var(--color-muted); margin-top: 1rem; padding: 0 1rem; }
+
+  .demo-switch { display: flex; align-items: center; gap: .4rem; margin-bottom: .9rem; font-size: .7rem; color: var(--color-muted); }
+  .demo-btn { padding: .3rem .6rem; border-radius: 99px; border: 1.5px solid var(--color-border);
+    background: #fff; font-size: .68rem; font-weight: 600; color: var(--color-muted); }
+  .demo-btn.on { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">MOCKUP — solo diseño, <b>sin implementar</b> · Planeador v3.0 · no ejecuta la Regla de Validación<br>Principio aplicado: <b>Hoy actúa · Cómo vamos observa</b> (extiende DA-14 a Pendientes y Metas)</div>
+
+<div class="topbar">
+  <span class="app-title">Organiza2</span>
+  <span class="chip">SNBDPA</span>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="tabHoy" onclick="goTab('hoy')">✏️ Hoy</button>
+  <button class="tab" id="tabVamos" onclick="goTab('vamos')">📊 Cómo vamos</button>
+  <button class="tab" onclick="alert('Sin cambios — no forma parte de este mockup')">📈 Análisis</button>
+  <button class="tab" onclick="alert('Sin cambios — no forma parte de este mockup')">⚙️ Config</button>
+</div>
+
+<!-- ═════════════════════════════ TAB HOY — ACTÚA ═════════════════════════════ -->
+<div class="pg on" id="pgHoy">
+  <div class="pg-inner">
+    <div class="sub-tabs">
+      <button class="sub-tab on" onclick="goSub('hoy','gastos')">💸 Gastos</button>
+      <button class="sub-tab" onclick="goSub('hoy','pendientes')">📋 Pendientes</button>
+      <button class="sub-tab" onclick="goSub('hoy','metas')">🎯 Metas</button>
+    </div>
+
+    <div class="sub-pg on" id="hoyGastos">
+      <div class="sec">
+        <p class="sec-title">Registro de gastos — sin cambios</p>
+        <p style="font-size:.85rem;color:var(--color-muted);">Esta sub-tab es la que ya existe hoy. No se toca.</p>
+      </div>
+    </div>
+
+    <!-- ═══ Hoy → Pendientes: formulario + lista accionable ═══ -->
+    <div class="sub-pg" id="hoyPendientes">
+
+      <div class="sec">
+        <p class="sec-title">¿Qué necesitan tener presente?</p>
+
+        <div class="type-picker">
+          <button class="type-opt on" data-type="recordatorio" onclick="pickType('recordatorio')">
+            <span class="ic">🔔</span>Recordatorio
+            <span class="test">Se cumple, y ya</span>
+          </button>
+          <button class="type-opt" data-type="compromiso" onclick="pickType('compromiso')">
+            <span class="ic">📅</span>Compromiso
+            <span class="test">Queda ahí hasta que lo cierren</span>
+          </button>
+        </div>
+
+        <div id="camposRecordatorio">
+          <div class="field-group">
+            <label class="field-label">Título</label>
+            <input class="txt-input" placeholder="Ej: Lonchera temática jardín" value="Lonchera temática jardín">
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Para cuándo?</label>
+            <div class="chips">
+              <button class="chip-date on">Hoy</button>
+              <button class="chip-date">Mañana</button>
+              <button class="chip-date">En 2 días</button>
+              <button class="chip-date">En 1 semana</button>
+              <button class="chip-date">Elegir fecha</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Es parte de una meta? (opcional)</label>
+            <div class="chips">
+              <button class="chip-meta on">Sin meta</button>
+              <button class="chip-meta">🎯 Viaje a Europa</button>
+              <button class="chip-meta">🚗 Carro nuevo</button>
+            </div>
+          </div>
+          <button class="btn-save">Guardar recordatorio</button>
+        </div>
+
+        <div id="camposCompromiso" style="display:none;">
+          <div class="field-group">
+            <label class="field-label">Título</label>
+            <input class="txt-input" placeholder="Ej: Terapia familiar" value="Terapia familiar">
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Para cuándo?</label>
+            <div class="chips">
+              <button class="chip-date">Hoy</button>
+              <button class="chip-date on">Mañana</button>
+              <button class="chip-date">En 2 días</button>
+              <button class="chip-date">En 1 semana</button>
+              <button class="chip-date">Elegir fecha</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Es parte de una meta? (opcional)</label>
+            <div class="chips">
+              <button class="chip-meta on">Sin meta</button>
+              <button class="chip-meta">🎯 Viaje a Europa</button>
+              <button class="chip-meta">🚗 Carro nuevo</button>
+            </div>
+          </div>
+          <div class="opt-row">
+            <span>¿Tiene un gasto asociado?</span>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="dot"></div></div>
+          </div>
+          <div class="field-group" style="margin-top:.75rem;">
+            <label class="field-label">Monto (opcional)</label>
+            <div class="money-row"><span class="cur">$</span><input class="txt-input" value="180.000"></div>
+          </div>
+          <button class="btn-save compromiso">Guardar compromiso</button>
+        </div>
+      </div>
+
+      <!-- Lista accionable -->
+      <div class="sec">
+        <div class="list-hdr">
+          <span class="sec-title" style="margin-bottom:0;">Vencidos</span>
+          <span class="badge-count venc">2</span>
+        </div>
+        <div class="item-row">
+          <div class="item-dot compromiso"></div>
+          <div class="item-body">
+            <div class="item-title">⚠️ Pagar terapia familiar</div>
+            <div class="item-sub late">Venció hace 15 días<span class="item-by">Anny</span></div>
+            <div class="item-actions" data-creo="Anny">
+              <button class="btn-cargo" onclick="tomarCargo(this)">Me hago cargo</button>
+              <button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>
+            </div>
+          </div>
+          <div class="item-amt">$180.000</div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">⚠️ Enviar plata actividad colegio</div>
+            <div class="item-sub late">Venció hace 2 días<span class="item-by">Jaime</span></div>
+            <div class="item-actions" data-creo="Jaime" data-tomo="Anny">
+              <span class="tomado-badge">✓ Lo tomó Anny<span class="undo" onclick="deshacer(this)">deshacer</span></span>
+              <button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="list-hdr">
+          <span class="sec-title" style="margin-bottom:0;">Próximos</span>
+          <span class="badge-count prox">3</span>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">Lonchera temática jardín</div>
+            <div class="item-sub">Mañana<span class="item-by">Anny</span></div>
+            <div class="item-actions" data-creo="Anny">
+              <button class="btn-cargo" onclick="tomarCargo(this)">Me hago cargo</button>
+              <button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>
+            </div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot compromiso"></div>
+          <div class="item-body">
+            <div class="item-title">Cita pediatra María José</div>
+            <div class="item-sub">En 4 días · 3 mar<span class="item-by">Jaime</span></div>
+            <div class="item-actions" data-creo="Jaime" data-tomo="Jaime">
+              <span class="tomado-badge">✓ Lo tomó Jaime<span class="undo" onclick="deshacer(this)">deshacer</span></span>
+              <button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>
+            </div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">Revisar fechas de vuelo</div>
+            <div class="item-sub">En 1 semana<span class="item-by">Anny</span></div>
+            <div><span class="item-meta-tag">🎯 Viaje a Europa</span></div>
+            <div class="item-actions" data-creo="Anny">
+              <button class="btn-cargo" onclick="tomarCargo(this)">Me hago cargo</button>
+              <button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" id="secResueltos">
+        <p class="sec-title" style="margin-bottom:.5rem;">Ya lo resolvieron</p>
+        <div class="resuelto-row">
+          <div class="resuelto-check">✓</div>
+          <div>
+            <div class="resuelto-title">Pago actividad del colegio</div>
+            <div class="resuelto-trace">Creó: <b>Jaime</b> · Resolvió: <b>Anny</b> · hace 1 día</div>
+          </div>
+        </div>
+        <div class="resuelto-row">
+          <div class="resuelto-check">✓</div>
+          <div>
+            <div class="resuelto-title">Mensaje jardín — vestimenta especial</div>
+            <div class="resuelto-trace">Creó: <b>Anny</b> · Resolvió: <b>Jaime</b> · hace 3 días</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="fab-note">Flujo pensado para 10 segundos de atención — teclado ya abierto, un toque para la fecha.</p>
+    </div>
+
+    <!-- ═══ Hoy → Metas: cards interactivas ═══ -->
+    <div class="sub-pg" id="hoyMetas">
+
+      <div class="demo-switch">
+        <span>Simular:</span>
+        <button class="demo-btn on" id="demoConMetas" onclick="simularMetas('con')">Con metas</button>
+        <button class="demo-btn" id="demoSinMetas" onclick="simularMetas('sin')">Sin metas (primera vez)</button>
+      </div>
+
+      <!-- Estado vacío: formulario directo, sin botón -->
+      <div id="metasEstadoVacio" style="display:none;">
+        <div class="sec">
+          <p class="sec-title">Empiecen su primer proyecto juntos</p>
+          <div class="field-group">
+            <label class="field-label">Nombre de la meta</label>
+            <input class="txt-input" placeholder="Ej: Viaje a Europa">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Monto objetivo</label>
+            <div class="money-row"><span class="cur">$</span><input class="txt-input" placeholder="0"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Fecha horizonte</label>
+            <input class="txt-input" placeholder="Ej: Diciembre 2027">
+          </div>
+          <p class="hint">Los sub-pasos se agregan después, tocando la meta ya creada.</p>
+          <button class="btn-save meta">Guardar meta</button>
+        </div>
+      </div>
+
+      <!-- Estado con metas: cards + formulario colapsado -->
+      <div id="metasEstadoConDatos">
+
+      <button class="btn-add-paso" style="margin-top:0; margin-bottom:.9rem;" onclick="toggleNuevaMeta()">+ Nueva meta</button>
+      <div class="sec paso-form" id="formNuevaMeta">
+        <div class="field-group">
+          <label class="field-label">Nombre de la meta</label>
+          <input class="txt-input" placeholder="Ej: Viaje a Europa">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Monto objetivo</label>
+          <div class="money-row"><span class="cur">$</span><input class="txt-input" placeholder="0"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Fecha horizonte</label>
+          <input class="txt-input" placeholder="Ej: Diciembre 2027">
+        </div>
+        <p class="hint">Los sub-pasos se agregan después, tocando la meta ya creada.</p>
+        <div class="paso-form-actions">
+          <button class="btn-cancel-paso" onclick="toggleNuevaMeta()">Cancelar</button>
+          <button class="btn-save meta" style="flex:1;">Guardar meta</button>
+        </div>
+      </div>
+
+      <div class="meta-card clickable" onclick="toggleMetaDetail('europa')">
+        <div class="meta-top">
+          <span class="meta-name">🎯 Viaje a Europa</span>
+          <span class="meta-fecha">dic 2027 <span class="chevron" id="metaChevron-europa">▾</span></span>
+        </div>
+        <div class="meta-bar-track"><div class="meta-bar-fill" id="metaBarFill-europa" style="width:33%;"></div></div>
+        <div class="meta-nums"><span id="metaAhorrado-europa">$4.000.000 ahorrado</span><span id="metaPct-europa">33% de $12.000.000</span></div>
+        <div class="meta-falta" id="metaFalta-europa">Faltan $8.000.000</div>
+      </div>
+      <div class="meta-detail collapsible" id="metaDetail-europa">
+        <div class="meta-detail-hdr"><span class="sec-title">Sub-pasos</span></div>
+        <div id="subpasosList-europa">
+          <div class="subpaso-row" data-monto="4000000" data-resuelto="1">
+            <div class="subpaso-check resuelto">✓</div>
+            <div class="subpaso-body"><div class="subpaso-title done">Pasajes</div>
+              <div class="subpaso-sub">Resuelto por Jaime · hace 2 semanas</div></div>
+            <div class="subpaso-amt">$4.000.000</div>
+          </div>
+          <div class="subpaso-row" data-monto="1000000" data-resuelto="0">
+            <div class="subpaso-check"></div>
+            <div class="subpaso-body"><div class="subpaso-title">Transporte interno</div>
+              <div class="subpaso-sub">Lo tomó Anny</div></div>
+            <div class="subpaso-amt">$1.000.000</div>
+            <button class="subpaso-cta" onclick="event.stopPropagation(); resolverSubpaso(this,'europa',12000000)">Hecho</button>
+          </div>
+          <div class="subpaso-row" data-monto="3000000" data-resuelto="0">
+            <div class="subpaso-check"></div>
+            <div class="subpaso-body"><div class="subpaso-title">Alojamiento</div>
+              <div class="subpaso-sub">Sin tomar</div></div>
+            <div class="subpaso-amt">$3.000.000</div>
+            <button class="subpaso-cta" onclick="event.stopPropagation(); resolverSubpaso(this,'europa',12000000)">Hecho</button>
+          </div>
+        </div>
+        <button class="btn-add-paso" onclick="event.stopPropagation(); togglePasoForm('europa')">+ Agregar paso</button>
+        <div class="paso-form" id="pasoForm-europa">
+          <div class="field-group"><label class="field-label">¿Qué falta?</label>
+            <input class="txt-input" id="pasoTitulo-europa" placeholder="Ej: Seguro de viaje"></div>
+          <div class="field-group"><label class="field-label">Monto planeado (opcional)</label>
+            <div class="money-row"><span class="cur">$</span><input class="txt-input" id="pasoMonto-europa" placeholder="0"></div></div>
+          <div class="paso-form-actions">
+            <button class="btn-cancel-paso" onclick="event.stopPropagation(); togglePasoForm('europa')">Cancelar</button>
+            <button class="btn-save meta" style="flex:1;" onclick="event.stopPropagation(); agregarPaso('europa',12000000)">Guardar paso</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta-card clickable" onclick="toggleMetaDetail('carro')">
+        <div class="meta-top">
+          <span class="meta-name">🚗 Carro nuevo</span>
+          <span class="meta-fecha">jun 2027 <span class="chevron" id="metaChevron-carro">▾</span></span>
+        </div>
+        <div class="meta-bar-track"><div class="meta-bar-fill" id="metaBarFill-carro" style="width:32%;"></div></div>
+        <div class="meta-nums"><span id="metaAhorrado-carro">$8.000.000 ahorrado</span><span id="metaPct-carro">32% de $25.000.000</span></div>
+        <div class="meta-falta" id="metaFalta-carro">Faltan $17.000.000</div>
+      </div>
+      <div class="meta-detail collapsible" id="metaDetail-carro">
+        <div class="meta-detail-hdr"><span class="sec-title">Sub-pasos</span></div>
+        <div id="subpasosList-carro">
+          <div class="subpaso-row" data-monto="8000000" data-resuelto="1">
+            <div class="subpaso-check resuelto">✓</div>
+            <div class="subpaso-body"><div class="subpaso-title done">Enganche</div>
+              <div class="subpaso-sub">Resuelto por Anny · hace 1 mes</div></div>
+            <div class="subpaso-amt">$8.000.000</div>
+          </div>
+          <div class="subpaso-row" data-monto="500000" data-resuelto="0">
+            <div class="subpaso-check"></div>
+            <div class="subpaso-body"><div class="subpaso-title">Avalúo y trámite</div>
+              <div class="subpaso-sub">Lo tomó Jaime</div></div>
+            <div class="subpaso-amt">$500.000</div>
+            <button class="subpaso-cta" onclick="event.stopPropagation(); resolverSubpaso(this,'carro',25000000)">Hecho</button>
+          </div>
+          <div class="subpaso-row" data-monto="2000000" data-resuelto="0">
+            <div class="subpaso-check"></div>
+            <div class="subpaso-body"><div class="subpaso-title">Papeles y seguro</div>
+              <div class="subpaso-sub">Sin tomar</div></div>
+            <div class="subpaso-amt">$2.000.000</div>
+            <button class="subpaso-cta" onclick="event.stopPropagation(); resolverSubpaso(this,'carro',25000000)">Hecho</button>
+          </div>
+        </div>
+        <button class="btn-add-paso" onclick="event.stopPropagation(); togglePasoForm('carro')">+ Agregar paso</button>
+        <div class="paso-form" id="pasoForm-carro">
+          <div class="field-group"><label class="field-label">¿Qué falta?</label>
+            <input class="txt-input" id="pasoTitulo-carro" placeholder="Ej: Traspaso"></div>
+          <div class="field-group"><label class="field-label">Monto planeado (opcional)</label>
+            <div class="money-row"><span class="cur">$</span><input class="txt-input" id="pasoMonto-carro" placeholder="0"></div></div>
+          <div class="paso-form-actions">
+            <button class="btn-cancel-paso" onclick="event.stopPropagation(); togglePasoForm('carro')">Cancelar</button>
+            <button class="btn-save meta" style="flex:1;" onclick="event.stopPropagation(); agregarPaso('carro',25000000)">Guardar paso</button>
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ═════════════════════════════ TAB CÓMO VAMOS — OBSERVA ═════════════════════════════ -->
+<div class="pg" id="pgVamos">
+  <div class="pg-inner">
+    <div class="sub-tabs">
+      <button class="sub-tab on" onclick="goSub('vamos','finanzas')">💰 Finanzas</button>
+      <button class="sub-tab" onclick="goSub('vamos','pendientes')">📋 Pendientes</button>
+      <button class="sub-tab" onclick="goSub('vamos','metas')">🎯 Metas</button>
+    </div>
+
+    <div class="sub-pg on" id="vamosFinanzas">
+      <div class="sec">
+        <p class="sec-title">Cómo vamos — sin cambios</p>
+        <p style="font-size:.85rem;color:var(--color-muted);">Esta sub-tab es la que ya existe hoy. No se toca.</p>
+      </div>
+    </div>
+
+    <!-- ═══ Cómo vamos → Pendientes: mismo contenido, sin botones ═══ -->
+    <div class="sub-pg" id="vamosPendientes">
+      <span class="readonly-flag">👁️ Solo lectura — para actuar, ir a Hoy</span>
+
+      <div class="sec">
+        <div class="list-hdr">
+          <span class="sec-title" style="margin-bottom:0;">Vencidos</span>
+          <span class="badge-count venc">2</span>
+        </div>
+        <div class="item-row">
+          <div class="item-dot compromiso"></div>
+          <div class="item-body">
+            <div class="item-title">⚠️ Pagar terapia familiar</div>
+            <div class="item-sub late">Venció hace 15 días<span class="item-by">Anny</span></div>
+            <div class="item-actions"><span class="estado-tag">Sin tomar</span></div>
+          </div>
+          <div class="item-amt">$180.000</div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">⚠️ Enviar plata actividad colegio</div>
+            <div class="item-sub late">Venció hace 2 días<span class="item-by">Jaime</span></div>
+            <div class="item-actions"><span class="tomado-badge">✓ Lo tomó Anny</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="list-hdr">
+          <span class="sec-title" style="margin-bottom:0;">Próximos</span>
+          <span class="badge-count prox">3</span>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">Lonchera temática jardín</div>
+            <div class="item-sub">Mañana<span class="item-by">Anny</span></div>
+            <div class="item-actions"><span class="estado-tag">Sin tomar</span></div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot compromiso"></div>
+          <div class="item-body">
+            <div class="item-title">Cita pediatra María José</div>
+            <div class="item-sub">En 4 días · 3 mar<span class="item-by">Jaime</span></div>
+            <div class="item-actions"><span class="tomado-badge">✓ Lo tomó Jaime</span></div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-dot recordatorio"></div>
+          <div class="item-body">
+            <div class="item-title">Revisar fechas de vuelo</div>
+            <div class="item-sub">En 1 semana<span class="item-by">Anny</span></div>
+            <div><span class="item-meta-tag">🎯 Viaje a Europa</span></div>
+            <div class="item-actions"><span class="estado-tag">Sin tomar</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <p class="sec-title" style="margin-bottom:.5rem;">Ya lo resolvieron</p>
+        <div class="resuelto-row">
+          <div class="resuelto-check">✓</div>
+          <div>
+            <div class="resuelto-title">Pago actividad del colegio</div>
+            <div class="resuelto-trace">Creó: <b>Jaime</b> · Resolvió: <b>Anny</b> · hace 1 día</div>
+          </div>
+        </div>
+        <div class="resuelto-row">
+          <div class="resuelto-check">✓</div>
+          <div>
+            <div class="resuelto-title">Mensaje jardín — vestimenta especial</div>
+            <div class="resuelto-trace">Creó: <b>Anny</b> · Resolvió: <b>Jaime</b> · hace 3 días</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Cómo vamos → Metas: mismas cards, sin botones de acción ═══ -->
+    <div class="sub-pg" id="vamosMetas">
+      <span class="readonly-flag">👁️ Solo lectura — para actuar, ir a Hoy</span>
+
+      <div class="meta-card">
+        <div class="meta-top">
+          <span class="meta-name">🎯 Viaje a Europa</span>
+          <span class="meta-fecha">dic 2027</span>
+        </div>
+        <div class="meta-bar-track"><div class="meta-bar-fill" style="width:33%;"></div></div>
+        <div class="meta-nums"><span>$4.000.000 ahorrado</span><span>33% de $12.000.000</span></div>
+        <div class="meta-falta">Faltan $8.000.000</div>
+      </div>
+      <div class="meta-detail">
+        <div class="meta-detail-hdr"><span class="sec-title">Sub-pasos</span></div>
+        <div class="subpaso-row" data-monto="4000000">
+          <div class="subpaso-check resuelto">✓</div>
+          <div class="subpaso-body"><div class="subpaso-title done">Pasajes</div>
+            <div class="subpaso-sub">Resuelto por Jaime · hace 2 semanas</div></div>
+          <div class="subpaso-amt">$4.000.000</div>
+        </div>
+        <div class="subpaso-row">
+          <div class="subpaso-check"></div>
+          <div class="subpaso-body"><div class="subpaso-title">Transporte interno</div>
+            <div class="subpaso-sub">Lo tomó Anny</div></div>
+          <div class="subpaso-amt">$1.000.000</div>
+        </div>
+        <div class="subpaso-row">
+          <div class="subpaso-check"></div>
+          <div class="subpaso-body"><div class="subpaso-title">Alojamiento</div>
+            <div class="subpaso-sub">Sin tomar</div></div>
+          <div class="subpaso-amt">$3.000.000</div>
+        </div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-top">
+          <span class="meta-name">🚗 Carro nuevo</span>
+          <span class="meta-fecha">jun 2027</span>
+        </div>
+        <div class="meta-bar-track"><div class="meta-bar-fill" style="width:32%;"></div></div>
+        <div class="meta-nums"><span>$8.000.000 ahorrado</span><span>32% de $25.000.000</span></div>
+        <div class="meta-falta">Faltan $17.000.000</div>
+      </div>
+      <div class="meta-detail">
+        <div class="meta-detail-hdr"><span class="sec-title">Sub-pasos</span></div>
+        <div class="subpaso-row">
+          <div class="subpaso-check resuelto">✓</div>
+          <div class="subpaso-body"><div class="subpaso-title done">Enganche</div>
+            <div class="subpaso-sub">Resuelto por Anny · hace 1 mes</div></div>
+          <div class="subpaso-amt">$8.000.000</div>
+        </div>
+        <div class="subpaso-row">
+          <div class="subpaso-check"></div>
+          <div class="subpaso-body"><div class="subpaso-title">Avalúo y trámite</div>
+            <div class="subpaso-sub">Lo tomó Jaime</div></div>
+          <div class="subpaso-amt">$500.000</div>
+        </div>
+        <div class="subpaso-row">
+          <div class="subpaso-check"></div>
+          <div class="subpaso-body"><div class="subpaso-title">Papeles y seguro</div>
+            <div class="subpaso-sub">Sin tomar</div></div>
+          <div class="subpaso-amt">$2.000.000</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function goTab(t) {
+    document.getElementById('tabHoy').classList.toggle('on', t==='hoy');
+    document.getElementById('tabVamos').classList.toggle('on', t==='vamos');
+    document.getElementById('pgHoy').classList.toggle('on', t==='hoy');
+    document.getElementById('pgVamos').classList.toggle('on', t==='vamos');
+  }
+
+  function goSub(tab, sub) {
+    if (tab === 'hoy') {
+      const map = { gastos: 0, pendientes: 1, metas: 2 };
+      document.querySelectorAll('#pgHoy .sub-tab').forEach((el,i) => el.classList.toggle('on', i === map[sub]));
+      document.getElementById('hoyGastos').classList.toggle('on', sub==='gastos');
+      document.getElementById('hoyPendientes').classList.toggle('on', sub==='pendientes');
+      document.getElementById('hoyMetas').classList.toggle('on', sub==='metas');
+    } else {
+      const map = { finanzas: 0, pendientes: 1, metas: 2 };
+      document.querySelectorAll('#pgVamos .sub-tab').forEach((el,i) => el.classList.toggle('on', i === map[sub]));
+      document.getElementById('vamosFinanzas').classList.toggle('on', sub==='finanzas');
+      document.getElementById('vamosPendientes').classList.toggle('on', sub==='pendientes');
+      document.getElementById('vamosMetas').classList.toggle('on', sub==='metas');
+    }
+  }
+
+  document.querySelectorAll('.chip-date').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.querySelectorAll('.chip-date').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.chip-meta').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.querySelectorAll('.chip-meta').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+
+  function pickType(type) {
+    document.querySelectorAll('.type-opt').forEach(el => el.classList.toggle('on', el.dataset.type===type));
+    document.getElementById('camposRecordatorio').style.display = type==='recordatorio' ? 'block' : 'none';
+    document.getElementById('camposCompromiso').style.display   = type==='compromiso'   ? 'block' : 'none';
+  }
+
+  function toggleNuevaMeta() {
+    document.getElementById('formNuevaMeta').classList.toggle('on');
+  }
+
+  function simularMetas(estado) {
+    document.getElementById('demoConMetas').classList.toggle('on', estado==='con');
+    document.getElementById('demoSinMetas').classList.toggle('on', estado==='sin');
+    document.getElementById('metasEstadoVacio').style.display = estado==='sin' ? 'block' : 'none';
+    document.getElementById('metasEstadoConDatos').style.display = estado==='con' ? 'block' : 'none';
+  }
+
+  function tomarCargo(btn) {
+    const wrap = btn.parentElement;
+    wrap.dataset.tomo = 'Jaime';
+    wrap.innerHTML =
+      '<span class="tomado-badge">✓ Lo tomó Jaime<span class="undo" onclick="deshacer(this)">deshacer</span></span>' +
+      '<button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>';
+  }
+  function deshacer(el) {
+    const wrap = el.closest('.item-actions');
+    delete wrap.dataset.tomo;
+    wrap.innerHTML =
+      '<button class="btn-cargo" onclick="tomarCargo(this)">Me hago cargo</button>' +
+      '<button class="btn-hecho" onclick="marcarHecho(this)">Ya está hecho</button>';
+  }
+  function marcarHecho(btn) {
+    const wrap = btn.parentElement;
+    const row = wrap.closest('.item-row');
+    const creo = wrap.dataset.creo || '—';
+    const titulo = row.querySelector('.item-title').textContent.replace('⚠️ ', '');
+    row.style.transition = 'opacity .3s';
+    row.style.opacity = '0';
+    setTimeout(() => {
+      row.remove();
+      const destino = document.getElementById('secResueltos');
+      const nuevo = document.createElement('div');
+      nuevo.className = 'resuelto-row';
+      nuevo.innerHTML =
+        '<div class="resuelto-check">✓</div><div>' +
+        '<div class="resuelto-title">' + titulo + '</div>' +
+        '<div class="resuelto-trace">Creó: <b>' + creo + '</b> · Resolvió: <b>Jaime</b> · ahora</div></div>';
+      destino.insertBefore(nuevo, destino.children[1]);
+    }, 300);
+  }
+
+  function toggleMetaDetail(id) {
+    const det = document.getElementById('metaDetail-' + id);
+    const chev = document.getElementById('metaChevron-' + id);
+    det.classList.toggle('on');
+    chev.textContent = det.classList.contains('on') ? '▴' : '▾';
+  }
+
+  function recalcularMeta(id, objetivo) {
+    let total = 0;
+    document.querySelectorAll('#subpasosList-' + id + ' .subpaso-row').forEach(row => {
+      if (row.dataset.resuelto === '1') total += parseInt(row.dataset.monto, 10);
+    });
+    const pct = Math.min(100, Math.round((total / objetivo) * 100));
+    document.getElementById('metaBarFill-' + id).style.width = pct + '%';
+    document.getElementById('metaAhorrado-' + id).textContent = '$' + total.toLocaleString('es-CO') + ' ahorrado';
+    document.getElementById('metaPct-' + id).textContent = pct + '% de $' + objetivo.toLocaleString('es-CO');
+    const falta = Math.max(0, objetivo - total);
+    document.getElementById('metaFalta-' + id).textContent =
+      falta === 0 ? '¡Meta completa! 🎉' : 'Faltan $' + falta.toLocaleString('es-CO');
+  }
+
+  function resolverSubpaso(btn, id, objetivo) {
+    const row = btn.closest('.subpaso-row');
+    row.dataset.resuelto = '1';
+    row.querySelector('.subpaso-check').classList.add('resuelto');
+    row.querySelector('.subpaso-check').textContent = '✓';
+    row.querySelector('.subpaso-title').classList.add('done');
+    row.querySelector('.subpaso-sub').textContent = 'Resuelto por Jaime · ahora';
+    btn.remove();
+    recalcularMeta(id, objetivo);
+  }
+
+  function togglePasoForm(id) {
+    document.getElementById('pasoForm-' + id).classList.toggle('on');
+  }
+
+  function agregarPaso(id, objetivo) {
+    const titulo = document.getElementById('pasoTitulo-' + id).value.trim() || 'Nuevo paso';
+    const montoRaw = document.getElementById('pasoMonto-' + id).value.replace(/\D/g, '');
+    const monto = montoRaw ? parseInt(montoRaw, 10) : 0;
+    const row = document.createElement('div');
+    row.className = 'subpaso-row';
+    row.dataset.monto = monto;
+    row.dataset.resuelto = '0';
+    row.innerHTML =
+      '<div class="subpaso-check"></div>' +
+      '<div class="subpaso-body"><div class="subpaso-title">' + titulo + '</div>' +
+      '<div class="subpaso-sub">Sin tomar</div></div>' +
+      (monto ? '<div class="subpaso-amt">$' + monto.toLocaleString('es-CO') + '</div>' : '') +
+      '<button class="subpaso-cta" onclick="event.stopPropagation(); resolverSubpaso(this,\'' + id + '\',' + objetivo + ')">Hecho</button>';
+    document.getElementById('subpasosList-' + id).appendChild(row);
+    document.getElementById('pasoTitulo-' + id).value = '';
+    document.getElementById('pasoMonto-' + id).value = '';
+    togglePasoForm(id);
+  }
+</script>
+</body>
+</html>
