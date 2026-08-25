@@ -219,7 +219,7 @@ El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo d
 
 > **Estado actual:** Piloto activo — Junio 2026. Canal de feedback: WhatsApp "Organiza2 · Piloto Familias". URL: `bit.ly/Organiza2`.
 
-> **⚠️ Excepción ratificada — Agosto 2026:** se rompió conscientemente esta regla para diseñar el Planeador v3.0, sin que el criterio de arriba se haya cumplido todavía. Motivo, razonamiento y riesgo aceptado documentados en `docs/propuestas/planeador.md`. La regla sigue vigente para Alimentación.
+> **⚠️ Excepción ratificada — Agosto 2026:** se rompió conscientemente esta regla para diseñar el Planeador v3.0 y, en una sesión posterior, también Alimentación v1.0 — sin que el criterio de arriba se haya cumplido todavía en ninguno de los dos casos. Motivo, razonamiento y riesgo aceptado documentados en `docs/propuestas/planeador.md` y `docs/propuestas/alimentacion.md` respectivamente. Ambos son diseño ratificado y mockeado, sin una sola línea de código de producción todavía — el criterio de esta regla sigue sin cumplirse, y sigue bloqueando la implementación.
 
 ---
 

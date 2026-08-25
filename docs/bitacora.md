@@ -1622,3 +1622,27 @@ El patrón es independiente de Organiza2 y se reutilizará en **Follower**. Para
 **Documento completo:** `docs/propuestas/planeador.md`. **Mockup:** `docs/mockups/planeador.html`.
 
 ---
+
+## Sesión — Diseño de Alimentación v1.0 (Agosto 2026)
+
+**Regla de Validación rota conscientemente, extendiendo la excepción de Planeador.** La ratificación de la sesión de Planeador había nombrado explícitamente que "la regla sigue vigente para Alimentación" (`docs/producto.md` §9). Esta sesión revierte esa distinción: Jaime decidió, como product owner, aplicar el mismo criterio de excepción consciente a Alimentación — mismo razonamiento ya evaluado para Planeador (diferenciales estructurales frente a FamilyWall y al panorama de apps de listas/menú), no un motivo nuevo. El criterio de salida del piloto sigue sin cumplirse.
+
+**Origen del diseño: flujo doméstico real de Jaime, no una hipótesis de producto.** Empleada anota faltantes → Jaime valida contra nevera/despensa → compra separando por categoría → registra gasto total por categoría al final, sin precio por producto. Confirmado en campo, pero **n=1** — ningún otro hogar del piloto lo ha mencionado, porque el módulo no existe. Se descartó explícitamente un planificador de menú/loncheras automático como primer enfoque (dominio culinario, no financiero — violaría la Regla de Posicionamiento), dejándolo nombrado como backlog futuro condicionado al mismo flag `tieneEducacion` que ya usa DA-26, activable solo para hogares con hijos en edad escolar.
+
+**Hallazgo de mercado que sostiene el diferencial:** ningún competidor revisado (FamilyWall, apps de menú tipo Mealime, apps de lista tipo AnyList/Bring!, escáneres de recibos tipo GroceryTracker Pro) conecta frecuencia de compra con presupuesto sin depender de precio por producto — todos los análisis de patrón de consumo existentes en el mercado están atados a precio por ítem, justo lo que el flujo real de Jaime rechaza por no tener sentido con productos como la papa o la carne.
+
+**Trabajo de la sesión:** modelo de datos (`alimentacion/listado`, `catalogoHogar`, `historial`), vínculo con Finanzas por categoría — nunca por producto, sin precio individual —, reutilizando el formulario de gasto diario ya existente (DA-1 intacto). Cierre de compra resuelto como recordatorio pasivo, no formulario forzado. Catálogo global semilla construido en conjunto con Jaime (~140 productos en tres categorías, con corrección de duplicados, ortografía y una distinción culinaria real: fríjol seco vs. fríjol verde fresco, tratados como productos distintos a propósito). Convención de normalización fijada explícitamente (minúsculas, sin mayúscula inicial, singular/plural según uso real hablado) para proteger el patrón de consumo de contarse mal.
+
+**Corrección en vivo durante la sesión, documentada porque casi se pierde:** la primera versión del mockup ubicó el patrón de consumo en la tab Análisis, usando la clase CSS `.an-tab` (propia de esa tab en `finanzas.css`) — contradiciendo sin querer que el mockup real de Planeador ya había resuelto este mismo problema con Hoy-actúa/Cómo-vamos-observa (DA-14) y una clase genérica propia, `.sub-tab`, para no acoplar el mecanismo a Análisis. El error se detectó por señalamiento directo de Jaime, no por revisión propia, y se corrigió trayendo el mockup real de Planeador en vez de confiar en el resumen en memoria — Corolario 1 de la Regla de Oro (un solo documento no es toda la búsqueda) aplicado sobre el propio trabajo de la sesión, no solo sobre el código del repo.
+
+**Decisión de ubicación de interfaz, comparada en vivo:** construir Mercado como sub-tab propio (Opción A) apretaba la fila de sub-tabs a 4 elementos en ~360px de ancho — problema real, visible en captura de pantalla del propio Jaime en el mockup (que además destapó un bug de layout no relacionado: `body` sin `flex-direction:column` estiraba el selector de comparación a la altura completa del teléfono). Se construyó una segunda opción (B) dentro del mockup: botón fijo en Pendientes que abre listado o patrón en pantalla propia, reutilizando el patrón real de `modal-overlay`. Jaime eligió B con motivo explícito: *"no compite con nadie, es una feature adicional"* — priorizando no perturbar la navegación principal sobre la visibilidad inmediata de una acción de uso semanal. Costo aceptado y nombrado: Mercado queda un paso más lejos que Gastos, detrás de una tab (Pendientes) que conceptualmente pertenece a Planeador.
+
+**Huecos declarados, no resueltos en esta sesión:**
+- Normalización de nombres de producto — el catálogo + autocompletar reduce el problema hacia adelante, no lo elimina; sin mecanismo de fusión retroactiva entre grafías ya separadas en `catalogoHogar`.
+- Foto/OCR del listado manuscrito — técnicamente posible, pero exige API de visión externa (reconocimiento de letra manuscrita informal), con las mismas preguntas de costo, proveedor y privacidad que la decisión pospuesta de notificaciones push en Planeador. Queda nombrado como v1.1, no diseñado.
+- Catálogo global sin validar con Anny ni con el piloto — construido con conocimiento general de mercado colombiano, no con revisión sistemática.
+- Reglas de seguridad de Firebase para `alimentacion/` — mismo hueco que Planeador dejó para `items/`/`metas/`, no diseñadas en esta sesión.
+
+**Documento completo:** `docs/propuestas/alimentacion.md`. **Mockup:** `docs/mockups/alimentacion.html`.
+
+---
