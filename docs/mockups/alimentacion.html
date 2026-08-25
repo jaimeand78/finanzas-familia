@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organiza2 · Mockup Alimentación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --color-primary:#1D9E75;
+    --color-bg:#F5F5F5;
+    --color-surface:#FFFFFF;
+    --color-text:#1A1A1A;
+    --color-muted:#6B6B68;
+    --color-border:#E0E0E0;
+    --color-error:#D85A30;
+    --radius:12px;
+    --shadow:0 2px 8px rgba(0,0,0,0.08);
+    --font:'DM Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--font); background:#DADADA;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding:24px 0 60px; color:var(--color-text);
+  }
+  .phone{
+    width:390px; max-width:100%; background:var(--color-bg);
+    border-radius:28px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,.25);
+    min-height:780px; display:flex; flex-direction:column;
+  }
+  .topbar{
+    background:var(--color-surface); padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--color-border);
+  }
+  .app-title{font-weight:700; font-size:.95rem; display:flex; align-items:center; gap:6px;}
+  .app-title .dot{width:8px;height:8px;border-radius:50%;background:var(--color-primary);}
+  .slbl{font-size:.7rem; color:var(--color-muted);}
+
+  .tabs{display:flex; background:var(--color-surface); border-bottom:1px solid var(--color-border);}
+  .tab{
+    flex:1; padding:.65rem .25rem; text-align:center; font-size:.68rem; font-weight:500;
+    color:var(--color-muted); background:none; border:none; border-bottom:2.5px solid transparent;
+    cursor:pointer; font-family:var(--font);
+  }
+  .tab.on{color:var(--color-primary); border-bottom-color:var(--color-primary); font-weight:700;}
+
+  .pg{display:none; flex:1; overflow-y:auto;}
+  .pg.on{display:block;}
+  .pg-inner{padding:14px 14px 24px;}
+
+  /* sub-tabs cruzados entre Hoy y Cómo vamos — misma clase generica .sub-tab
+     que ya definió el mockup de Planeador, NO .an-tab (esa es propia de Análisis
+     en finanzas.css real y no debe reusarse fuera de esa tab) */
+  .sub-tabs{display:flex; gap:.4rem; margin-bottom:1rem; flex-wrap:wrap;}
+  .sub-tab{flex:1; min-width:64px; padding:.5rem .3rem; font-size:.7rem; font-weight:500;
+    border:1.5px solid var(--color-border); border-radius:8px;
+    background:#fff; cursor:pointer; font-family:var(--font); color:var(--color-muted);}
+  .sub-tab.on{background:var(--color-primary); color:#fff; border-color:var(--color-primary);}
+  .sub-pg{display:none;}
+  .sub-pg.on{display:block;}
+
+  /* .an-tabs real de Análisis, sin tocar — se mantiene intacta y separada */
+  .an-tabs{display:flex; gap:.4rem; margin-bottom:1rem; flex-wrap:wrap;}
+  .an-tab{flex:1; min-width:64px; padding:.5rem .3rem; font-size:.7rem; font-weight:500;
+    border:1.5px solid var(--color-border); border-radius:8px;
+    background:#fff; cursor:pointer; font-family:var(--font); color:var(--color-muted);}
+  .an-tab.on{background:var(--color-primary); color:#fff; border-color:var(--color-primary);}
+  .an-pg{display:none;}
+  .an-pg.on{display:block;}
+
+  .sec{background:#fff; border-radius:14px; padding:1rem; margin-bottom:.75rem;}
+  .sec-hdr{display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem;}
+  .sec-title{font-size:.72rem; font-weight:600; text-transform:uppercase; color:var(--color-muted); letter-spacing:.02em;}
+  .sec-val{font-size:.85rem; font-weight:700; font-family:'DM Mono', monospace;}
+
+  .placeholder{color:var(--color-muted); font-size:.8rem; text-align:center; padding:2rem 1rem;}
+
+  /* ── Mercado: catalogo colapsable (mismo patron visual de cfg-sec) ── */
+  .merc-add{
+    display:flex; gap:.5rem; margin-bottom:.9rem; position:relative;
+  }
+  .merc-add input{
+    flex:1; padding:.65rem .75rem; border:1.5px solid var(--color-border);
+    border-radius:10px; font-family:var(--font); font-size:.85rem; background:#fff;
+  }
+  .merc-add input:focus{outline:none; border-color:var(--color-primary);}
+  .merc-sugs{
+    position:absolute; top:110%; left:0; right:0; background:#fff;
+    border:1px solid var(--color-border); border-radius:10px; box-shadow:var(--shadow);
+    z-index:5; max-height:180px; overflow-y:auto; display:none;
+  }
+  .merc-sugs.on{display:block;}
+  .merc-sug{padding:.55rem .75rem; font-size:.82rem; cursor:pointer; border-bottom:1px solid #F0F0F0;}
+  .merc-sug:last-child{border-bottom:none;}
+  .merc-sug:hover, .merc-sug.hi{background:#F5F5F5;}
+  .merc-sug .cat-tag{font-size:.65rem; color:var(--color-muted); float:right;}
+  .merc-new-tag{
+    font-size:.62rem; background:#EAF6F1; color:var(--color-primary);
+    padding:.15rem .4rem; border-radius:6px; font-weight:600; margin-left:.4rem;
+  }
+
+  .cfg-sec{background:#fff; border-radius:14px; margin-bottom:.6rem; overflow:hidden;}
+  .cfg-sec-hdr{display:flex; align-items:center; justify-content:space-between;
+    padding:.85rem 1rem; cursor:pointer;}
+  .cfg-sec-title{font-size:.85rem; font-weight:600;}
+  .cfg-count{font-size:.7rem; color:var(--color-muted); font-family:'DM Mono', monospace;}
+  .cfg-chev{color:var(--color-muted); transition:transform .15s;}
+  .cfg-sec.open .cfg-chev{transform:rotate(180deg);}
+  .cfg-sec-body{display:none; padding:0 1rem 1rem;}
+  .cfg-sec.open .cfg-sec-body{display:block;}
+
+  .merc-grp-title{font-size:.68rem; font-weight:700; color:var(--color-muted);
+    text-transform:uppercase; letter-spacing:.03em; margin:.6rem 0 .35rem;}
+  .merc-grp-title:first-child{margin-top:0;}
+
+  .merc-item{
+    display:flex; align-items:center; gap:.6rem; padding:.45rem 0;
+    border-bottom:1px solid #F2F2F2; font-size:.85rem;
+  }
+  .merc-item:last-child{border-bottom:none;}
+  .merc-check{
+    width:20px; height:20px; border-radius:6px; border:1.8px solid var(--color-border);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:.75rem; color:#fff;
+  }
+  .merc-check.on{background:var(--color-primary); border-color:var(--color-primary);}
+  .merc-label{flex:1; cursor:pointer;}
+  .merc-item.checked .merc-label{color:var(--color-muted); text-decoration:line-through;}
+
+  .merc-footer{
+    position:sticky; bottom:0; background:var(--color-bg);
+    padding-top:.6rem; margin-top:.4rem;
+  }
+  .btn-primary{
+    width:100%; background:var(--color-primary); color:#fff; border:none;
+    padding:.85rem; border-radius:10px; font-weight:700; font-size:.88rem;
+    cursor:pointer; font-family:var(--font);
+  }
+  .btn-primary:disabled{background:#B9DCCD; cursor:not-allowed;}
+
+  .banner-reminder{
+    background:#EAF6F1; border:1px solid var(--color-primary);
+    border-radius:12px; padding:.85rem; margin-bottom:.8rem;
+  }
+  .banner-reminder-title{font-size:.8rem; font-weight:700; color:var(--color-primary); margin-bottom:.3rem;}
+  .banner-reminder-body{font-size:.78rem; color:var(--color-text); margin-bottom:.6rem;}
+  .banner-reminder-cats{font-size:.78rem; font-weight:600; margin-bottom:.6rem;}
+  .banner-reminder-btn{
+    background:var(--color-primary); color:#fff; border:none; padding:.55rem .9rem;
+    border-radius:8px; font-size:.78rem; font-weight:600; cursor:pointer; font-family:var(--font);
+  }
+
+  /* ── Mercado: patron de consumo (analisis) ── */
+  .patron-row{margin-bottom:.75rem;}
+  .patron-lbl{display:flex; justify-content:space-between; font-size:.82rem; margin-bottom:.3rem;}
+  .patron-frac{font-family:'DM Mono', monospace; font-weight:600; color:var(--color-muted);}
+  .patron-bar-bg{background:#F0F0F0; border-radius:6px; height:8px; overflow:hidden;}
+  .patron-bar-fill{height:100%; border-radius:6px;}
+  .patron-note{font-size:.72rem; color:var(--color-muted); margin-top:1rem; line-height:1.4;}
+
+  .dev-note{
+    background:#FFF7E8; border:1px dashed #E0B84B; border-radius:10px;
+    padding:.6rem .75rem; font-size:.7rem; color:#7A5C10; margin-bottom:.8rem; line-height:1.4;
+  }
+
+  /* ── selector de opcion A/B — SOLO para esta comparacion, no es UI real ── */
+  .modo-switch{
+    display:flex; gap:0; background:#1A1A1A; border-radius:10px; padding:4px;
+    margin-bottom:14px; width:390px; max-width:100%;
+  }
+  .modo-btn{
+    flex:1; padding:.55rem; border:none; border-radius:7px; background:none;
+    color:#aaa; font-family:var(--font); font-weight:600; font-size:.78rem; cursor:pointer;
+  }
+  .modo-btn.on{background:var(--color-primary); color:#fff;}
+  .modo-caption{
+    color:#555; font-size:.68rem; text-align:center; margin-bottom:16px; width:390px;
+    max-width:100%; line-height:1.4;
+  }
+
+  /* ── boton fijo dentro de Pendientes (Opcion B) ── */
+  .pend-merc-btn{
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff; border:1.5px solid var(--color-border); border-radius:12px;
+    padding:.85rem 1rem; cursor:pointer; margin-bottom:.75rem;
+  }
+  .pend-merc-btn:active{border-color:var(--color-primary);}
+  .pend-merc-left{display:flex; align-items:center; gap:.6rem; font-size:.85rem; font-weight:600;}
+  .pend-merc-arrow{color:var(--color-muted);}
+
+  /* ── modal, mismo patron que modal-overlay real de index.html ── */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+    z-index:200; align-items:flex-end; justify-content:center;
+  }
+  .modal-overlay.on{display:flex;}
+  .modal-card{
+    background:var(--color-bg); width:100%; max-width:390px; max-height:85%;
+    border-radius:18px 18px 0 0; overflow-y:auto; padding:14px;
+  }
+  .modal-hdr{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:.8rem; padding-bottom:.6rem; border-bottom:1px solid var(--color-border);
+  }
+  .modal-title{font-weight:700; font-size:.95rem;}
+  .modal-close{
+    background:none; border:none; font-size:1.1rem; color:var(--color-muted); cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="modo-switch">
+  <button class="modo-btn on" id="modo-A" onclick="setModo('A')">Opción A · sub-tab propio</button>
+  <button class="modo-btn" id="modo-B" onclick="setModo('B')">Opción B · dentro de Pendientes</button>
+</div>
+<div class="modo-caption" id="modo-caption">
+  Mercado vive como cuarto sub-tab, al mismo nivel que Gastos/Pendientes/Metas — visible siempre, compite por espacio en la fila.
+</div>
+
+<div class="phone">
+
+  <div class="topbar">
+    <span class="app-title"><span class="dot"></span>Organiza2</span>
+    <span class="slbl">SNBDPA</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tab-d" onclick="goTab('d')">✏️ Hoy</button>
+    <button class="tab" id="tab-m" onclick="goTab('m')">📊 Cómo vamos</button>
+    <button class="tab" id="tab-x" onclick="goTab('x')">📈 Análisis</button>
+    <button class="tab" id="tab-c" onclick="goTab('c')">⚙️ Config</button>
+  </div>
+
+  <!-- ═══ TAB HOY ═══ -->
+  <div id="pd" class="pg on">
+    <div class="pg-inner">
+
+      <div class="sub-tabs" id="hoy-subtabs">
+        <button class="sub-tab on" id="ht-gastos" onclick="goHoy('gastos')">💸 Gastos</button>
+        <button class="sub-tab" id="ht-pendientes" onclick="goHoy('pendientes')">📋 Pendientes</button>
+        <button class="sub-tab" id="ht-metas" onclick="goHoy('metas')">🎯 Metas</button>
+        <button class="sub-tab" id="ht-mercado" onclick="goHoy('mercado')">🛒 Mercado</button>
+      </div>
+
+      <!-- sub: Gastos (placeholder, no se rediseña aqui) -->
+      <div id="hoy-gastos" class="sub-pg on">
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">Registrar gasto</span></div>
+          <div class="placeholder">(sin cambios — el formulario real de hoy sigue aquí)</div>
+        </div>
+      </div>
+      <div id="hoy-pendientes" class="sub-pg">
+        <div class="sec"><div class="placeholder">Pendientes — ver mockup de Planeador (docs/mockups/planeador.html)</div></div>
+        <div id="hoy-pend-merc-slot"></div>
+      </div>
+      <div id="hoy-metas" class="sub-pg"><div class="sec"><div class="placeholder">Metas — ver mockup de Planeador (docs/mockups/planeador.html)</div></div></div>
+
+      <!-- sub: Mercado (solo existe como sub-tab en Modo A) -->
+      <div id="hoy-mercado" class="sub-pg">
+
+        <div id="banner-reminder-slot"></div>
+
+        <div class="merc-add">
+          <input id="merc-input" type="text" placeholder="Agregar producto…" oninput="mercFilter(this.value)" onfocus="mercFilter(this.value)">
+          <div class="merc-sugs" id="merc-sugs"></div>
+        </div>
+
+        <div id="merc-groups"></div>
+
+        <div class="merc-footer">
+          <button class="btn-primary" id="merc-cerrar" onclick="cerrarCompra()">Cerrar compra</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ TAB CÓMO VAMOS ═══ -->
+  <div id="pm" class="pg">
+    <div class="pg-inner">
+
+      <div class="sub-tabs" id="vamos-subtabs">
+        <button class="sub-tab on" id="cv-finanzas" onclick="goVamos('finanzas')">💰 Finanzas</button>
+        <button class="sub-tab" id="cv-pendientes" onclick="goVamos('pendientes')">📋 Pendientes</button>
+        <button class="sub-tab" id="cv-metas" onclick="goVamos('metas')">🎯 Metas</button>
+        <button class="sub-tab" id="cv-mercado" onclick="goVamos('mercado')">🛒 Mercado</button>
+      </div>
+
+      <div id="vamos-finanzas" class="sub-pg on"><div class="sec"><div class="placeholder">(sin cambios — sigue siendo solo lectura de Finanzas)</div></div></div>
+      <div id="vamos-pendientes" class="sub-pg">
+        <div class="sec"><div class="placeholder">Pendientes — ver mockup de Planeador</div></div>
+        <div id="vamos-pend-merc-slot"></div>
+      </div>
+      <div id="vamos-metas" class="sub-pg"><div class="sec"><div class="placeholder">Metas — ver mockup de Planeador</div></div></div>
+
+      <!-- sub: Mercado (solo existe como sub-tab en Modo A) -->
+      <div id="vamos-mercado" class="sub-pg">
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">Frecuencia · últimas 10 compras</span></div>
+          <div id="patron-list"></div>
+          <div class="patron-note">
+            Cuenta cuántas veces apareció cada producto en el listado marcado como comprado.
+            No mide cantidad ni gasto — eso sigue viviendo en Finanzas.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ TAB ANÁLISIS — INTACTO, sin cambios de este mockup ═══ -->
+  <div id="px" class="pg">
+    <div class="pg-inner">
+      <div class="an-tabs">
+        <button class="an-tab on" onclick="goAn('sem')" id="ant-sem">🚦 Semáforo</button>
+        <button class="an-tab" onclick="goAn('ten')" id="ant-ten">📉 Tendencia</button>
+        <button class="an-tab" onclick="goAn('hor')" id="ant-hor">🐜 Hormiga</button>
+        <button class="an-tab" onclick="goAn('who')" id="ant-who">👥 ¿Quién?</button>
+      </div>
+      <div id="an-sem" class="an-pg on"><div class="sec"><div class="placeholder">Semáforo (sin cambios)</div></div></div>
+      <div id="an-ten" class="an-pg"><div class="sec"><div class="placeholder">Tendencia (sin cambios)</div></div></div>
+      <div id="an-hor" class="an-pg"><div class="sec"><div class="placeholder">Hormiga (sin cambios)</div></div></div>
+      <div id="an-who" class="an-pg"><div class="sec"><div class="placeholder">¿Quién pagó? (sin cambios)</div></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB CONFIG ═══ -->
+  <div id="pc" class="pg">
+    <div class="pg-inner">
+      <div class="sec"><div class="placeholder">(sin cambios)</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Mercado (listado) — Opcion B lo abre desde Pendientes -->
+<div class="modal-overlay" id="modalListado">
+  <div class="modal-card">
+    <div class="modal-hdr">
+      <span class="modal-title">🛒 Listado de mercado</span>
+      <button class="modal-close" onclick="cerrarModal('modalListado')">✕</button>
+    </div>
+    <div id="banner-reminder-slot-modal"></div>
+    <div class="merc-add">
+      <input id="merc-input-modal" type="text" placeholder="Agregar producto…" oninput="mercFilter(this.value,true)" onfocus="mercFilter(this.value,true)">
+      <div class="merc-sugs" id="merc-sugs-modal"></div>
+    </div>
+    <div id="merc-groups-modal"></div>
+    <div class="merc-footer">
+      <button class="btn-primary" onclick="cerrarCompra(true)">Cerrar compra</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Mercado (patron) — Opcion B lo abre desde Pendientes en Como vamos -->
+<div class="modal-overlay" id="modalPatron">
+  <div class="modal-card">
+    <div class="modal-hdr">
+      <span class="modal-title">📊 Patrón de mercado</span>
+      <button class="modal-close" onclick="cerrarModal('modalPatron')">✕</button>
+    </div>
+    <div id="patron-list-modal"></div>
+    <div class="patron-note">
+      Cuenta cuántas veces apareció cada producto en el listado marcado como comprado.
+      No mide cantidad ni gasto.
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Datos de catálogo (semilla global) ── */
+const CATALOGO = {
+  "Aseo y Víveres": {
+    "Personal": ["jabón de cuerpo","jabón de manos","shampoo","acondicionador"],
+    "Ropa": ["jabón líquido para ropa","suavizante para ropa","quitamanchas"],
+    "Hogar": ["limpiador multiusos","limpiador de piso","cloro","clorogel","cera","esponja para platos","sacabrillo","fumigante antiinsectos","escoba","trapero","cepillo de baño","bolsas de basura"],
+    "Bebé y dental": ["pañales","toallas húmedas","cepillo de dientes","seda dental","crema dental","enjuague bucal"],
+    "Granos y básicos": ["arroz","pasta","fríjol","fríjol blanco","lentejas","garbanzos","aceite","panela","azúcar","café","pan","atún enlatado","chocolate","huevos","pollo","carne de res","carne de cerdo"],
+    "Condimentos y salsas": ["sal","pimienta","cúrcuma","paprika","sazonatodo","salsa de tomate","mayonesa","salsa de soya","BBQ","pasta de tomate"],
+    "Lácteos": ["leche","queso","crema de leche"]
+  },
+  "Frutas y Verduras": {
+    "Verduras": ["papa","papa criolla","plátano verde","plátano maduro","yuca","arracacha","tomate","tomate cherry","cebolla cabezona","cebolla larga","cebolla morada","zanahoria","zanahoria baby","cilantro","lechuga","habichuela","acelga","espinaca","arveja","fríjol verde","brócoli","coliflor","champiñones","pepino","pimentón","zucchini","ajo","mazorca","maíz dulce","zapallo","berenjena","apio"],
+    "Hierbas y aromáticas": ["perejil","albahaca","romero","tomillo","orégano","laurel","menta","hierbabuena"],
+    "Frutas": ["banano","mango","kiwi","mandarina","ciruela","granadilla","piña","papaya","uchuva","pitaya","manzana verde","manzana roja","pera","sandía","melón","lulo","tomate de árbol","fresa","uvas verdes","uvas rojas","arándanos","naranja","limón","mora","aguacate","coco"]
+  },
+  "Loncheras": {
+    "Snacks": ["papas fritas","galletas","jugo de caja","yogurt","compota","ponqué","barra de cereal","gelatina"]
+  }
+};
+
+const catalogoHogar = ["quinoa"]; // simula un producto ya agregado antes por el hogar
+const estadoChecks = {}; // producto -> bool
+let MODO = 'A';
+
+function setModo(m){
+  MODO = m;
+  document.getElementById('modo-A').classList.toggle('on', m==='A');
+  document.getElementById('modo-B').classList.toggle('on', m==='B');
+  document.getElementById('modo-caption').textContent = m==='A'
+    ? 'Mercado vive como cuarto sub-tab, al mismo nivel que Gastos/Pendientes/Metas — visible siempre, compite por espacio en la fila.'
+    : 'Mercado no es sub-tab — es un botón fijo dentro de Pendientes que abre el listado o el patrón en una pantalla propia. Hoy y Cómo vamos quedan en 3 sub-tabs, sin apriete.';
+
+  // sub-tabs: mostrar u ocultar el boton de Mercado
+  document.getElementById('ht-mercado').style.display = m==='A' ? '' : 'none';
+  document.getElementById('cv-mercado').style.display = m==='A' ? '' : 'none';
+
+  // si estaba parado en la sub-tab Mercado y se pasa a B, ese sub-tab ya no existe: volver a Gastos/Finanzas
+  if(m==='B'){
+    if(document.getElementById('hoy-mercado').classList.contains('on')) goHoy('gastos');
+    if(document.getElementById('vamos-mercado').classList.contains('on')) goVamos('finanzas');
+  }
+
+  renderPendMercBotones();
+}
+
+function renderPendMercBotones(){
+  const slotHoy = document.getElementById('hoy-pend-merc-slot');
+  const slotVamos = document.getElementById('vamos-pend-merc-slot');
+  if(MODO==='B'){
+    slotHoy.innerHTML = `
+      <div class="pend-merc-btn" onclick="abrirModal('modalListado')">
+        <span class="pend-merc-left">🛒 Listado de mercado</span>
+        <span class="pend-merc-arrow">→</span>
+      </div>`;
+    slotVamos.innerHTML = `
+      <div class="pend-merc-btn" onclick="abrirModal('modalPatron')">
+        <span class="pend-merc-left">📊 Ver patrón de mercado</span>
+        <span class="pend-merc-arrow">→</span>
+      </div>`;
+  } else {
+    slotHoy.innerHTML = '';
+    slotVamos.innerHTML = '';
+  }
+}
+
+function abrirModal(id){
+  document.getElementById(id).classList.add('on');
+  if(id==='modalListado'){ renderGrupos(); }
+  if(id==='modalPatron'){ renderPatron(); }
+}
+function cerrarModal(id){
+  document.getElementById(id).classList.remove('on');
+}
+
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  const map={d:'pd',m:'pm',x:'px',c:'pc'};
+  document.getElementById(map[id]).classList.add('on');
+}
+function goHoy(which){
+  ['gastos','pendientes','metas','mercado'].forEach(k=>{
+    document.getElementById('ht-'+k).classList.toggle('on', k===which);
+    document.getElementById('hoy-'+k).classList.toggle('on', k===which);
+  });
+}
+function goVamos(which){
+  ['finanzas','pendientes','metas','mercado'].forEach(k=>{
+    document.getElementById('cv-'+k).classList.toggle('on', k===which);
+    document.getElementById('vamos-'+k).classList.toggle('on', k===which);
+  });
+}
+function goAn(which){
+  ['sem','ten','hor','who'].forEach(k=>{
+    document.getElementById('ant-'+k).classList.toggle('on', k===which);
+    document.getElementById('an-'+k).classList.toggle('on', k===which);
+  });
+}
+
+/* ── Render del listado por categoria/subgrupo — sirve tanto inline (A) como en modal (B) ── */
+function renderGrupos(){
+  const targets = MODO==='A'
+    ? [document.getElementById('merc-groups')]
+    : [document.getElementById('merc-groups-modal')];
+  targets.forEach(cont=>{
+    cont.innerHTML = '';
+    Object.keys(CATALOGO).forEach((cat, i) => {
+      const sec = document.createElement('div');
+      sec.className = 'cfg-sec' + (i===0 ? ' open' : '');
+      const totalItems = Object.values(CATALOGO[cat]).reduce((a,b)=>a+b.length,0);
+      const checkedCount = Object.values(CATALOGO[cat]).flat().filter(p=>estadoChecks[p]).length;
+      sec.innerHTML = `
+        <div class="cfg-sec-hdr" onclick="this.parentElement.classList.toggle('open')">
+          <span class="cfg-sec-title">${cat}</span>
+          <span style="display:flex;align-items:center;gap:.5rem;">
+            <span class="cfg-count">${checkedCount}/${totalItems}</span>
+            <span class="cfg-chev">▾</span>
+          </span>
+        </div>
+        <div class="cfg-sec-body"></div>
+      `;
+      const body = sec.querySelector('.cfg-sec-body');
+      Object.keys(CATALOGO[cat]).forEach(grupo => {
+        const t = document.createElement('div');
+        t.className = 'merc-grp-title';
+        t.textContent = grupo;
+        body.appendChild(t);
+        CATALOGO[cat][grupo].forEach(prod => {
+          body.appendChild(itemRow(prod));
+        });
+      });
+      cont.appendChild(sec);
+    });
+  });
+}
+
+function itemRow(prod){
+  const row = document.createElement('div');
+  row.className = 'merc-item' + (estadoChecks[prod] ? ' checked' : '');
+  row.innerHTML = `
+    <span class="merc-check ${estadoChecks[prod]?'on':''}" onclick="toggleItem('${prod.replace(/'/g,"\\'")}')">${estadoChecks[prod]?'✓':''}</span>
+    <span class="merc-label" onclick="toggleItem('${prod.replace(/'/g,"\\'")}')">${prod}</span>
+  `;
+  return row;
+}
+
+function toggleItem(prod){
+  estadoChecks[prod] = !estadoChecks[prod];
+  renderGrupos();
+  actualizarBotonCerrar();
+}
+
+function actualizarBotonCerrar(){
+  const marcados = Object.values(estadoChecks).some(v=>v);
+  const txt = marcados ? 'Cerrar compra' : 'Cerrar compra (marca algo primero)';
+  const btnA = document.getElementById('merc-cerrar');
+  if(btnA) btnA.textContent = txt;
+}
+
+/* ── Autocompletar + creación de producto nuevo en catalogoHogar ── */
+function todosLosProductos(){
+  let all = [];
+  Object.keys(CATALOGO).forEach(cat=>{
+    Object.keys(CATALOGO[cat]).forEach(g=>{
+      CATALOGO[cat][g].forEach(p=>all.push({nombre:p, cat}));
+    });
+  });
+  catalogoHogar.forEach(p=>all.push({nombre:p, cat:'Frutas y Verduras (tu hogar)'}));
+  return all;
+}
+
+function mercFilter(val, modal){
+  const boxId = modal ? 'merc-sugs-modal' : 'merc-sugs';
+  const inputId = modal ? 'merc-input-modal' : 'merc-input';
+  const box = document.getElementById(boxId);
+  val = val.trim().toLowerCase();
+  if(!val){ box.classList.remove('on'); box.innerHTML=''; return; }
+  const matches = todosLosProductos().filter(p=>p.nombre.toLowerCase().includes(val));
+  box.innerHTML = '';
+  matches.slice(0,6).forEach(m=>{
+    const d = document.createElement('div');
+    d.className='merc-sug';
+    d.innerHTML = `${m.nombre}<span class="cat-tag">${m.cat}</span>`;
+    d.onclick = ()=>{ estadoChecks[m.nombre]=true; renderGrupos(); actualizarBotonCerrar();
+      document.getElementById(inputId).value=''; box.classList.remove('on'); box.innerHTML=''; };
+    box.appendChild(d);
+  });
+  const yaExiste = todosLosProductos().some(p=>p.nombre.toLowerCase()===val);
+  if(!yaExiste && val.length>1){
+    const d = document.createElement('div');
+    d.className='merc-sug';
+    d.innerHTML = `Agregar "${val}"<span class="merc-new-tag">nuevo · se guarda para tu hogar</span>`;
+    d.onclick = ()=>{
+      catalogoHogar.push(val);
+      estadoChecks[val]=true;
+      renderGrupos(); actualizarBotonCerrar();
+      document.getElementById(inputId).value=''; box.classList.remove('on'); box.innerHTML='';
+    };
+    box.appendChild(d);
+  }
+  box.classList.add('on');
+}
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.merc-add')){
+    document.getElementById('merc-sugs').classList.remove('on');
+    document.getElementById('merc-sugs-modal').classList.remove('on');
+  }
+});
+
+/* ── Cierre de compra → aviso, no formulario forzado (Opcion elegida: recordatorio pasivo) ── */
+function cerrarCompra(fromModal){
+  const catsTocadas = new Set();
+  Object.keys(CATALOGO).forEach(cat=>{
+    Object.values(CATALOGO[cat]).flat().forEach(p=>{
+      if(estadoChecks[p]) catsTocadas.add(cat);
+    });
+  });
+  if(catalogoHogar.some(p=>estadoChecks[p])) catsTocadas.add('Frutas y Verduras');
+
+  if(catsTocadas.size===0){ return; }
+
+  const html = `
+    <div class="banner-reminder">
+      <div class="banner-reminder-title">🧾 Compra cerrada</div>
+      <div class="banner-reminder-body">Cuando tengas el total a mano, registra el gasto de:</div>
+      <div class="banner-reminder-cats">${Array.from(catsTocadas).join(' · ')}</div>
+      <button class="banner-reminder-btn" onclick="${fromModal ? "cerrarModal('modalListado'); goHoy('gastos');" : "goHoy('gastos')"}">Ir a Registrar gasto →</button>
+    </div>
+  `;
+  if(fromModal){
+    document.getElementById('banner-reminder-slot-modal').innerHTML = html;
+  } else {
+    document.getElementById('banner-reminder-slot').innerHTML = html;
+    goHoy('mercado');
+  }
+}
+
+/* ── Vista de patron, datos simulados — sirve inline (A) y en modal (B) ── */
+const PATRON = [
+  {p:'papas fritas', n:8, total:10},
+  {p:'arroz', n:9, total:10},
+  {p:'pollo', n:7, total:10},
+  {p:'tomate', n:6, total:10},
+  {p:'fruta (variada)', n:3, total:10},
+  {p:'gelatina', n:2, total:10},
+];
+function renderPatron(){
+  const targets = [document.getElementById('patron-list'), document.getElementById('patron-list-modal')];
+  targets.forEach(cont=>{
+    if(!cont) return;
+    cont.innerHTML = '';
+    PATRON.forEach(row=>{
+      const pct = Math.round(row.n/row.total*100);
+      const color = pct>=70 ? 'var(--color-error)' : (pct<=30 ? 'var(--color-primary)' : '#D9A441');
+      const div = document.createElement('div');
+      div.className = 'patron-row';
+      div.innerHTML = `
+        <div class="patron-lbl"><span>${row.p}</span><span class="patron-frac">${row.n}/${row.total}</span></div>
+        <div class="patron-bar-bg"><div class="patron-bar-fill" style="width:${pct}%; background:${color};"></div></div>
+      `;
+      cont.appendChild(div);
+    });
+  });
+}
+
+renderGrupos();
+actualizarBotonCerrar();
+renderPatron();
+setModo('A');
+</script>
+</body>
+</html>
