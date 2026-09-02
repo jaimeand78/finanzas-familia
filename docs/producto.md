@@ -237,6 +237,27 @@ El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo d
 
 ---
 
+## 10.5 Backlog — Candidatos de diseño sin ratificar
+
+Ideas surgidas del piloto, no ratificadas como DA ni pasadas por Regla de Mockup. Entran aquí solo cuando tienen razonamiento y contraste con el código, no como lista de deseos. Condición de entrada a mockup real: **segunda familia que lo pida sin que se le sugiera** — mientras tanto son evidencia de una sola fuente, no señal del piloto.
+
+| Candidato | Módulo | Origen | Condición para avanzar |
+|---|---|---|---|
+| Checkbox Esencial/No esencial por ítem, agrupado en Cómo Vamos | Finanzas | Feedback piloto, Sep 2026 — ya respaldado por P4/P5 sin conectar | Segunda familia lo pide |
+| % de ahorro sugerido según ingreso, editable por la familia | Finanzas | Feedback piloto, Sep 2026 | Resolver en mockup que "no cumplido" no lea como reproche (ver DA-19) |
+| Responsable por ítem/categoría del presupuesto, definido al planear | Finanzas | Feedback piloto, Sep 2026 — reformulado desde una propuesta tipo Splitwise, descartada tal cual | Segunda familia lo pide; definir granularidad (categoría vs. ítem) |
+| Enlace `.ics` por evento de agenda, opcional, hacia calendario personal | Planeador | Feedback piloto, Sep 2026 — reemplaza una idea de sync OAuth descartada por romper el stack | Bloqueado por §9 hasta que Planeador entre en construcción |
+
+**Descartado en la misma sesión, con motivo — no reabrir sin evidencia nueva:**
+- Ahorro como macro-categoría separada con % fijo forzado antes de todo lo demás — contradicho por el Excel del propio usuario que lo propuso.
+- Ingreso variable por rentabilidad de portafolio de inversión — perfil atípico del piloto, sin segunda fuente.
+- Subcategoría dentro de categoría (auto 1/auto 2) — ya resoluble nombrando dos categorías en el catálogo plano actual, sin cambio de modelo.
+- Deuda por transacción entre personas estilo Splitwise (saldo cruzado, porcentajes) — Splitwise está catalogado en §3 como competidor de "Bloque B — Finanzas compartidas", con la debilidad *"organizan dinero, no organizan el hogar"*. Construirla tal cual replica esa debilidad.
+
+Detalle completo del razonamiento de cada hallazgo: `docs/bitacora.md`, sesión "Feedback de piloto: presupuesto por tipo, ahorro sugerido, responsable por ítem y agenda .ics" (Septiembre 2026).
+
+---
+
 ## 11. Estado del Piloto v2.3
 
 ✅ Piloto activo desde Junio 2026.
@@ -257,6 +278,12 @@ El piloto con 5–10 familias debe confirmar: onboarding sin fricción, modelo d
 | Service Worker PWA | ✅ | Fase 39 |
 | Limpieza código huérfano | ✅ | Fase 40 |
 | Dashboard admin piloto | ✅ | Fase 42 |
+
+### Tracción real — Semana 12 (31 ago 2026)
+
+2–3 hogares con actividad real contra meta de 5–10 (`docs/bitacora.md`, sesión "Revisión de `admin.html`..."). El dashboard mide "hogar" con dos criterios distintos (evento `hogar_creado` vs. cualquier evento con campo `hogar`) — la cifra de 3 es la más confiable, ver detalle en bitácora. De los 4 criterios de salida sustantivos, solo onboarding muestra progreso (2 de 3); el resto está en 0–1 de 3.
+
+**Hallazgo abierto — ningún hogar con 2 miembros activos (0 de 3).** En los tres hogares, quien no adopta es la mujer del hogar, y las tres están en iOS — correlación real pero confundida (no se sabe si los hombres del piloto están en Android, lo que separaría plataforma de rol/género). Se descartaron dos hipótesis técnicas: el banner de instalación iOS ya existe y se ejecuta antes del login (`checkPWA()`, `ui.js`); y no hay ningún mecanismo de notificaciones push implementado hoy, en ninguna plataforma, así que tampoco explica por qué quienes instalaron no vuelven. Pendiente: confirmar plataforma de los tres hombres, y preguntar directo a las tres mujeres (no a través de sus parejas) qué pasó al instalar o al dejar de usar la app.
 
 ---
 

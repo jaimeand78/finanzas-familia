@@ -1646,3 +1646,47 @@ El patrón es independiente de Organiza2 y se reutilizará en **Follower**. Para
 **Documento completo:** `docs/propuestas/alimentacion.md`. **Mockup:** `docs/mockups/alimentacion.html`.
 
 ---
+
+## Sesión — Feedback de piloto: presupuesto por tipo, ahorro sugerido, responsable por ítem y agenda .ics (Septiembre 2026)
+
+**Origen:** cuatro notas de voz de una familia del piloto, transcritas por WhatsApp con partes ilegibles, más una foto del Excel personal del mismo hablante. Procesadas con la taxonomía obligatoria (hipótesis / confirmado en código / confirmado en campo) y contrastadas contra `arquitectura.md` y el código vivo antes de aceptar cualquier premisa — **n=1**, un solo hogar, con perfil más sofisticado que el promedio del piloto (Excel propio, portafolio de inversión, usuario previo de Splitwise).
+
+**Hallazgo #1 — Esencial/No esencial como checkbox por ítem.** Propuesta inicial (macro-categoría separada, ahorro forzado primero) se descartó tal cual: el propio Excel del hablante la contradice (Ahorro vive dentro de "Esencial", no aparte). Refinada en conjunto a un flag booleano **por ítem, a decisión de la familia**, agrupado en Cómo Vamos. Confirmado en código que el respaldo semántico ya existe y no se usa: el onboarding P4/P5 (`docs/producto.md` §7, "Presupuesto Base — Onboarding") pregunta exactamente esta distinción (lo que sí o sí hay que pagar / lo que varía) y hoy no queda conectada a nada después de responderse. Candidato fuerte, condicionado a segunda familia que lo pida sin sugerírselo.
+
+**Hallazgo #2 — % de ahorro sugerido (no impuesto), derivado del ingreso.** Mismo patrón: usar P3 (¿con cuánto cuentan?) para proponer una meta editable por la familia. Riesgo de diseño nombrado y no resuelto: si el badge de Ahorro (DA-19) marca "no cumplido" en rojo cuando la familia no llega a la meta sugerida, el tono de reproche que el proyecto evita a propósito (ver Fase 48, aviso de versión) se cuela por la puerta de atrás aunque la meta sea nominalmente opcional. Pendiente de decidir explícito en mockup si se construye.
+
+**Hallazgo #3 — Ingreso variable por rentabilidad de portafolio.** Descartado. Perfil atípico del piloto, sin segunda fuente. Queda solo como registro de que se evaluó y por qué se dejó fuera.
+
+**Hallazgo #4 — Subcategoría dentro de categoría (auto 1/auto 2, mensual/eventual).** Descartado como necesidad de producto. La parte de frecuencia mensual/eventual ya está resuelta por DA-8 (`calcPresupuestoBase`, campo `frecuencia` + `months[]`) a nivel de ítem — el hablante no lo vio en su propio Excel porque su Excel es más plano que el producto real. La parte de "dos instancias de la misma categoría" no requiere cambio de modelo: se resuelve nombrando dos categorías distintas en el catálogo plano actual.
+
+**Hallazgo #5 — Ingresos adicionales/bonificaciones.** El hablante asumió que esto no existía; **confirmado en código que sí existe** (`presupuesto.js`: `abrirModalIngresoExtra`, `guardarModalIngresoExtra`, fila "Otros ingresos" en `income[]`). No es diseño nuevo — queda como tarea de verificar cobertura real, no de construir.
+
+**Hallazgo #6 — Deuda por transacción estilo Splitwise → reformulado a responsable por ítem del presupuesto.** La propuesta literal (saldo cruzado entre personas por gasto puntual, con porcentajes) se descartó explícitamente: `docs/producto.md` §3 tiene a Splitwise catalogado en "Bloque B — Finanzas compartidas", con la debilidad textual *"organizan dinero, no organizan el hogar"* — construirla tal cual habría sido replicar la debilidad ya identificada en la competencia, no una fortaleza propia. El fondo real del comentario, aclarado por Jaime, es distinto: **qué miembro se compromete a pagar qué ítem o categoría, definido al planear el mes** — no una deuda que se salda después. Confirmado en código que no existe ningún campo de responsable/asignado por ítem hoy; lo más cercano es `daily/` (quién registró el gasto real) y `¿Quién pagó?` (comparación agregada de fin de mes), ninguno de los dos captura el compromiso previo. Coherente con el diferencial de "responsabilidad compartida" ya documentado frente a la ola 2025-26 de calendarios familiares. Candidato fuerte junto con #7, con la misma pregunta de granularidad que el Hallazgo #1 (por categoría completa o por ítem).
+
+**Hallazgo #7 — Calendario del hogar → enlace `.ics` estándar, opcional.** Reemplaza una idea previa de sincronización bidireccional vía OAuth con proveedores externos (Google Calendar API), descartada en esta misma sesión por requerir backend y romper el stack cerrado. La versión final, propuesta por Jaime: cada evento de Planeador ya tiene fecha y hora, suficiente para generar un archivo `.ics` client-side, sin backend ni autenticación de terceros — Google Calendar, Outlook y Apple Calendar lo importan o se suscriben nativamente. Viable dentro del stack actual (vanilla JS, sin build tools). Sigue bloqueado por depender de Planeador, que a su vez sigue bloqueado por la Regla de Validación (`docs/producto.md` §9) — pero queda anotado en el backlog de Planeador como opción mucho más barata que la sync bidireccional que se había descartado antes de esta sesión.
+
+**Lección de la sesión, no de ningún hallazgo puntual:** procesar el feedback hallazgo por hallazgo, verificando cada uno contra el código vivo antes de opinar, encontró dos cosas que ya existían y estaban desconectadas (P4/P5, ingreso adicional) y una reformulación (Splitwise → responsable por ítem) que la lectura literal de la transcripción no habría dado. El riesgo que la sesión no resuelve, porque no le corresponde resolverlo: las siete ideas vienen de un solo hogar más sofisticado que el objetivo del piloto — evidencia de una fuente, no señal de que el piloto lo necesite.
+
+---
+## Sesión — Revisión de `admin.html` y patrón de adopción por miembro (Septiembre 2026)
+
+**Origen:** revisión conjunta de las capturas del dashboard del piloto (Semana 12, 31 ago) contra el código vivo de `admin.html`, seguida de una pregunta abierta sobre por qué "Hogares con 2 activos" lleva 0 de 3 desde el inicio.
+
+**Hallazgo #1 — El dashboard mide "hogar" con dos criterios distintos, confirmado en código.** La tarjeta "Hogares creados" cuenta eventos de tipo `hogar_creado` (= 2). La tabla de detalle (`porHogarDetalle`) arma la lista desde cualquier evento con campo `hogar`, sin exigir `hogar_creado` (= 3: SNBDPA, PCW9BB, GXNSCB). Los criterios de salida usan la base de 3; "Onboarding completo" usa la base de 2 — dos varas distintas en la misma pantalla. GXNSCB tiene actividad real (3 gastos, 2 semanas) pero nunca disparó (o perdió) el evento `hogar_creado`, y por eso no cuenta en la métrica principal. Pendiente: decidir si se corrige el conteo o se documenta la diferencia de criterio explícitamente en el propio dashboard.
+
+**Hallazgo #2 — Patrón de adopción por miembro, confirmado en campo, 3 de 3 hogares.** Ningún hogar del piloto tiene ambos miembros activos simultáneamente (coincide con "Hogares con 2 activos: 0/3" del dashboard). Detalle por hogar:
+- SNBDPA — Anny no instaló la app; la instala Jaime.
+- PCW9BB (Xiomy) — instaló, no usa.
+- GXNSCB (Carolina) — instaló, no usa.
+
+En los tres casos la persona que no adoptó es la mujer del hogar, y las tres están en iOS. Correlación real pero con una confusión sin resolver: no se sabe todavía si los tres hombres del hogar están en Android, lo que separaría si la variable que pesa es plataforma o rol/género — **con n=3 no se puede distinguir**, y no se debe escribir una conclusión de una sobre la otra sin ese dato.
+
+**Hallazgo #3 — Se descartó la hipótesis técnica de instalación, confirmado en código.** `checkPWA()` (`ui.js`) se ejecuta en `DOMContentLoaded`, antes del login, y muestra banner de instalación ("Agregar a pantalla de inicio") a cualquier iPhone/iPad fuera de modo standalone. El mecanismo existe — la ausencia de instrucción no explica el caso de Anny. Hipótesis abierta sin confirmar: si el link se abrió dentro del navegador embebido de WhatsApp en vez de Safari real, el flujo de instalación no está disponible del todo, independientemente del banner.
+
+**Hallazgo #4 — Se descartó la hipótesis de push/notificaciones, confirmado en código.** No existe ningún mecanismo de notificaciones push implementado hoy, en ninguna plataforma (`grep` de "push"/"Notification" en todo el repo solo devuelve usos de `Array.push` y `Firebase.push`). No puede ser la causa de que Xiomy y Carolina no vuelvan, porque nadie recibe notificación alguna todavía.
+
+**Estado real del piloto, sin filtro de dashboard, a Semana 12 de 12+:** 2-3 hogares con actividad real contra meta de 5-10. De los 4 criterios de salida sustantivos, solo "onboarding completo" muestra progreso (2 de 3, sobre una base cuestionada por el Hallazgo #1); el resto está en 0 o 1 de 3. El hallazgo #2 es la explicación directa y de campo de por qué "hogares con 2 activos" no avanza — no es ruido de telemetría.
+
+**Pendiente antes de cerrar este hallazgo:** confirmar sistema operativo de los tres hombres del piloto, y preguntar directamente a Anny, Xiomy y Carolina (no a través de sus parejas) qué pasó en el momento de instalar/al dejar de usar la app.
+
+---
